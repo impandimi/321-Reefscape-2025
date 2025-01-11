@@ -127,3 +127,9 @@ spotless {
         licenseHeader '/* (C) Robolancers 2025 */'
     }
 }
+
+task applyHooks(type: Exec) {
+    commandLine 'git', 'config', 'core.hooksPath', '.githooks'
+}
+
+build.dependsOn(applyHooks)
