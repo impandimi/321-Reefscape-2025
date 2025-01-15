@@ -1,7 +1,6 @@
+/* (C) Robolancers 2025 */
 package frc.robot.subsystems.drivetrain;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Drivetrain extends SubsystemBase {
-    
-}
+public class Drivetrain extends SubsystemBase {}
