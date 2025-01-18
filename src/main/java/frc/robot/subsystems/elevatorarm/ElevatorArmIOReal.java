@@ -20,7 +20,7 @@ import edu.wpi.first.units.measure.Voltage;
 @Logged
 public class ElevatorArmIOReal implements ElevatorArmIO {
 
-  public static final ElevatorArmConfig config = new ElevatorArmConfig(0, 0, 0, 0, 0, 0);
+  public static final ElevatorArmConfig config = new ElevatorArmConfig(0, 0, 0, 0, 0, 0, 0);
 
   private SparkMax armMotor =
       new SparkMax(ElevatorArmConstants.kElevatorArmId, MotorType.kBrushless);

@@ -7,8 +7,10 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
 
+@Logged
 public class ElevatorIOIdeal implements ElevatorIO {
 
   public SparkMax elevatorMotorLeft =

@@ -92,6 +92,7 @@ public class ElevatorArm extends SubsystemBase {
     TunableConstant kI = new TunableConstant("/ElevatorArm/kI", config.kI());
     TunableConstant kD = new TunableConstant("/ElevatorArm/kD", config.kD());
     TunableConstant kG = new TunableConstant("/ElevatorArm/kG", config.kG());
+    TunableConstant kS = new TunableConstant("/ElevatorArm/kS", config.kS());
     TunableConstant targetAngle = new TunableConstant("/ElevatorArm/TargetAngle", 0);
 
     return run(

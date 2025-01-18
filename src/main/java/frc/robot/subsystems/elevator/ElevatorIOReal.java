@@ -11,16 +11,20 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 
+@Logged
 public class ElevatorIOReal implements ElevatorIO {
 
   public static final ElevatorConfig config = new ElevatorConfig(0, 0, 0, 0, 0);
 
   public SparkMax elevatorMotorLeft =
       new SparkMax(ElevatorConstants.kLeftMotorID, MotorType.kBrushless);
-  public SparkMax elevatorMotorRight =
-      new SparkMax(ElevatorConstants.kRightMotorID, MotorType.kBrushless);
+
+  //   public SparkMax elevatorMotorRight =
+  //       new SparkMax(ElevatorConstants.kRightMotorID, MotorType.kBrushless);
 
   public ElevatorIOReal() {
     setupMotors();
@@ -35,7 +39,7 @@ public class ElevatorIOReal implements ElevatorIO {
   private void setupMotors() {
     elevatorMotorLeft.configure(
         new SparkMaxConfig()
-            .smartCurrentLimit(ElevatorConstants.kLimit)
+            .smartCurrentLimit(ElevatorConstants.kCurrentLimit)
             .inverted(ElevatorConstants.kInverted)
             .apply(
                 new EncoderConfig()
@@ -43,20 +47,30 @@ public class ElevatorIOReal implements ElevatorIO {
                     .positionConversionFactor(ElevatorConstants.kPositionConversionFactor)),
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    elevatorMotorRight.configure(
-        new SparkMaxConfig()
-            .smartCurrentLimit(ElevatorConstants.kLimit)
-            .inverted(ElevatorConstants.kInverted)
-            .apply(
-                new EncoderConfig()
-                    .velocityConversionFactor(ElevatorConstants.kVelocityConversionFactor)
-                    .positionConversionFactor(ElevatorConstants.kPositionConversionFactor))
-            .follow(elevatorMotorLeft),
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+    // elevatorMotorRight.configure(
+    //     new SparkMaxConfig()
+    //         .smartCurrentLimit(ElevatorConstants.kCurrentLimit)
+    //         .inverted(ElevatorConstants.kInverted)
+    //         .apply(
+    //             new EncoderConfig()
+    //                 .velocityConversionFactor(ElevatorConstants.kVelocityConversionFactor)
+    //                 .positionConversionFactor(ElevatorConstants.kPositionConversionFactor))
+    //         .follow(elevatorMotorLeft),
+    //     ResetMode.kResetSafeParameters,
+    //     PersistMode.kPersistParameters);
   }
 
   public void setVoltage(Voltage Volts) {
     elevatorMotorLeft.setVoltage(Volts);
+  }
+
+  public void setEncoderPosition(Distance position) {
+    elevatorMotorLeft.getEncoder().setPosition(position.in(Meters));
+  }
+
+  public void resetEncoderPosition() {
+    elevatorMotorLeft
+        .getEncoder()
+        .setPosition(ElevatorConstants.kElevatorStartingHeight.in(Meters));
   }
 }

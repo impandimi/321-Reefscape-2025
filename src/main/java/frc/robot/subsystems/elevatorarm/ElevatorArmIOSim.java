@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 @Logged
 public class ElevatorArmIOSim implements ElevatorArmIO {
-  public static final ElevatorArmConfig config = new ElevatorArmConfig(1, 0, 0.05, 4.07, 0, 0);
+  public static final ElevatorArmConfig config = new ElevatorArmConfig(1, 0, 0.05, 4.07, 0, 0, 0);
 
   private SingleJointedArmSim simMotor =
       new SingleJointedArmSim(

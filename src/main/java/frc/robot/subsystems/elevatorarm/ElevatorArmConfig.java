@@ -2,4 +2,4 @@
 package frc.robot.subsystems.elevatorarm;
 
 public record ElevatorArmConfig(
-    double kP, double kI, double kD, double kG, double kCoralFF, double kAlgaeFF) {}
+    double kP, double kI, double kD, double kG, double kCoralFF, double kAlgaeFF, double kS) {}
