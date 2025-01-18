@@ -12,12 +12,12 @@ public class RobotContainer {
   CommandXboxController driverController = new CommandXboxController(0);
 
   public RobotContainer() {
-    drivetrain.create();
+    drivetrain = drivetrain.create();
 
     drivetrain.setDefaultCommand(
         drivetrain.driveFieldCentric(
             driverController.getLeftX(),
-            driverController.getLeftY(),
+            -driverController.getLeftY(),
             driverController.getRightX()));
 
     configureBindings();
