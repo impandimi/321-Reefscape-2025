@@ -8,6 +8,10 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
 
+/**
+ * Implementation of the ElevatorArmIO that does NOT control anything This is used for easily
+ * disabling the arm
+ */
 @Logged
 public class ElevatorArmIOIdeal implements ElevatorArmIO {
   public static final ElevatorArmConfig config = new ElevatorArmConfig(0, 0, 0, 0, 0, 0);

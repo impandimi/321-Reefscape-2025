@@ -13,10 +13,14 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
+/** Implementation of the ElevatorArmIO that controls a simulated ElevatorArm */
 @Logged
 public class ElevatorArmIOSim implements ElevatorArmIO {
+
+  // tuning config for the ElevatorArmIOSim
   public static final ElevatorArmConfig config = new ElevatorArmConfig(1, 0, 0.05, 4.07, 0, 0);
 
+  // simulated instance of the elevator arm
   private SingleJointedArmSim simMotor =
       new SingleJointedArmSim(
           DCMotor.getNEO(1),
@@ -28,6 +32,7 @@ public class ElevatorArmIOSim implements ElevatorArmIO {
           true,
           ElevatorArmConstants.kMinAngle.in(Degrees));
 
+  // update inputs from the arm simulation
   public void updateInputs(ElevatorArmInputs inputs) {
     simMotor.update(0.02);
     inputs.angle = Radians.of(simMotor.getAngleRads());
@@ -35,6 +40,7 @@ public class ElevatorArmIOSim implements ElevatorArmIO {
     inputs.current = Amps.of(simMotor.getCurrentDrawAmps());
   }
 
+  // set voltage to the arm simulation
   public void setVoltage(Voltage volts) {
     simMotor.setInputVoltage(volts.in(Volts));
   }
