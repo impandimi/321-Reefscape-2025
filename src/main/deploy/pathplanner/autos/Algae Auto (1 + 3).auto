@@ -1,0 +1,97 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Starting to Reef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Reef to Algae 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAlgae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Algae 1 to Reef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeAlgae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Reef to Algae 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAlgae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Algae 2 to Reef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeAlgae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Reef to Algae 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAlgae"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Algae 3 to Reef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeAlgae"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
