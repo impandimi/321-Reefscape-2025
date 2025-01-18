@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Starting 2 to ReefR2"
+            "pathName": "Starting 1 to ReefR1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "OuttakeCoral"
+            "name": "ArmCoralOuttake"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Middle Starting Position",
+  "folder": "1st Starting Position",
   "choreoAuto": false
 }

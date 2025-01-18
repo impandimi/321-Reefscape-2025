@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Starting to Reef"
+            "pathName": "Starting 2 to ReefR2"
           }
         },
         {
@@ -19,55 +19,79 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Reef to Algae 1"
+            "pathName": "ReefR2 to Algae 1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "IntakeAlgae"
+            "name": "IntakeAlgCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Algae 1 to Reef"
+            "pathName": "Algae 1 to ReefL2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "OuttakeAlgae"
+            "name": "OuttakeAlgCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Reef to Algae 2"
+            "pathName": "ReefL2 to Algae 2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "IntakeAlgae"
+            "name": "IntakeAlgCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Algae 2 to Reef"
+            "pathName": "Algae 2 to ReefL2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "OuttakeAlgae"
+            "name": "OuttakeAlgCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReefL2 to Algae 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeAlgCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Algae 3 to ReefL3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeAlgCoral"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Middle Starting Position",
   "choreoAuto": false
 }

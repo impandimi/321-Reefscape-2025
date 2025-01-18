@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.1407786885245907,
+        "y": 4.00701844262295
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.1168032786885242,
+        "y": 3.35968237704918
+      },
+      "isLocked": false,
+      "linkedName": "Reef Left 2"
+    },
+    {
+      "anchor": {
+        "x": 1.786168032783052,
+        "y": 2.172899590167781
+      },
+      "prevControl": {
+        "x": 2.865061475409836,
+        "y": 2.076997950819672
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Algae 3"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "ArmAlgCoralIntake",
+      "waypointRelativePos": 0.30246913580246904,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

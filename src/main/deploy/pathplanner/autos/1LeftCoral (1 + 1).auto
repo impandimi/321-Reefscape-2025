@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Starting to Reef"
+            "pathName": "Starting 1 to ReefR1"
           }
         },
         {
@@ -19,31 +19,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Reef to Algae 1"
+            "pathName": "ReefR1 to LeftCoral1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "IntakeAlgae"
+            "name": "IntakeAlgCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Algae 1 to Reef"
+            "pathName": "LeftCoral1 to ReefL1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "OuttakeAlgae"
+            "name": "OuttakeAlgCoral"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "1st Starting Position",
   "choreoAuto": false
 }

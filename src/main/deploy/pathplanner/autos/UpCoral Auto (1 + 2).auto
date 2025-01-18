@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Starting to Reef"
+            "pathName": "Starting 2 to ReefR2"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Reef to Coral"
+            "pathName": "ReefR2 to UpCoral"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Coral to Reef"
+            "pathName": "UpCoral to ReefL1"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Reef2 to Coral"
+            "pathName": "ReefL1 to UpCoral"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Coral to Reef"
+            "pathName": "UpCoral to ReefL1"
           }
         },
         {
@@ -68,6 +68,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Middle Starting Position",
   "choreoAuto": false
 }

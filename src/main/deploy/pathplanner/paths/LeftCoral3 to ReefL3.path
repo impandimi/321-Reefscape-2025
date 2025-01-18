@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.019774590163935,
-        "y": 4.282735655737705
+        "x": 1.786168032783052,
+        "y": 2.172899590167781
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.817232994606835,
-        "y": 4.136185657207566
+        "x": 2.40825,
+        "y": 2.3675
       },
       "isLocked": false,
-      "linkedName": "Starting point middle"
+      "linkedName": "Algae 3"
     },
     {
       "anchor": {
-        "x": 5.849999999999999,
-        "y": 3.983043032786885
+        "x": 3.6442622950819668,
+        "y": 2.7602971311475404
       },
       "prevControl": {
-        "x": 6.233606557377048,
-        "y": 4.00701844262295
+        "x": 3.1785,
+        "y": 2.5625
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Reef right side"
+      "linkedName": "Reef Left 3"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ArmCoralOuttake",
-      "waypointRelativePos": 0.17331433998100662,
+      "name": "ArmAlgCoralOuttake",
+      "waypointRelativePos": 0.16510791366906466,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -49,13 +49,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 50.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

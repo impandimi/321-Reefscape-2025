@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Starting 2 to ReefR2"
+            "pathName": "Starting3 to ReefR3"
           }
         },
         {
@@ -20,6 +20,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Middle Starting Position",
+  "folder": "3rd Starting Position",
   "choreoAuto": false
 }
