@@ -16,26 +16,34 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 
 @Logged
+// For when Elevator is real
 public class ElevatorIOReal implements ElevatorIO {
-
+  // Creates config record w/ values
   public static final ElevatorConfig config = new ElevatorConfig(0, 0, 0, 0, 0);
 
+  // Creates motor objects
   public SparkMax elevatorMotorLeft =
       new SparkMax(ElevatorConstants.kLeftMotorID, MotorType.kBrushless);
+
+  // NOTE: Right motor MAY be commented out in order to test one motor
 
   //   public SparkMax elevatorMotorRight =
   //       new SparkMax(ElevatorConstants.kRightMotorID, MotorType.kBrushless);
 
+  // Constructor: Sets up motors
   public ElevatorIOReal() {
     setupMotors();
   }
 
+  // Updates inputs with values from encoder (Called periodically in periodic function later)
   public void updateInputs(ElevatorInputs inputs) {
     inputs.height = Meters.of(elevatorMotorLeft.getEncoder().getPosition());
     inputs.velocity = MetersPerSecond.of(elevatorMotorLeft.getEncoder().getVelocity());
     inputs.current = Amps.of(elevatorMotorLeft.getOutputCurrent());
   }
 
+  // Method to setup L & R motor & encoders
+  // NOTE: Right motor follows left & only left motor encoder is used
   private void setupMotors() {
     elevatorMotorLeft.configure(
         new SparkMaxConfig()
@@ -60,17 +68,18 @@ public class ElevatorIOReal implements ElevatorIO {
     //     PersistMode.kPersistParameters);
   }
 
+  // Sets power of motors w/voltage
   public void setVoltage(Voltage Volts) {
     elevatorMotorLeft.setVoltage(Volts);
   }
 
+  // Sets encoder pos
   public void setEncoderPosition(Distance position) {
     elevatorMotorLeft.getEncoder().setPosition(position.in(Meters));
   }
 
+  // Special case where encoder pos is reset to the initial/starting height
   public void resetEncoderPosition() {
-    elevatorMotorLeft
-        .getEncoder()
-        .setPosition(ElevatorConstants.kElevatorStartingHeight.in(Meters));
+    setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
   }
 }
