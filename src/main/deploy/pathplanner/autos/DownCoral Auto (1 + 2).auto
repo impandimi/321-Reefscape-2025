@@ -63,6 +63,12 @@
           "data": {
             "name": "OuttakeCoral"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReefL3 to DownCoral"
+          }
         }
       ]
     }

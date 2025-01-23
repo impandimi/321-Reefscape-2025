@@ -1,5 +1,6 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.coralendeffector;
+import static edu.wpi.first.units.Units.Volts;
 
 public class CoralEndEffectorIOIdeal implements CoralEndEffectorIO {
 
@@ -8,9 +9,8 @@ public class CoralEndEffectorIOIdeal implements CoralEndEffectorIO {
   // coralEndEffectorInputs
   @Override
   public void updateInputs(CoralEndEffectorInputs inputs) {
-    inputs.voltage = 0;
-    inputs.power = 0;
+    inputs.voltage = Volts.of(0);
     inputs.hasCoral = false;
-    inputs.isBroken = false;
+    inputs.isBeamBreakBroken = false;
   }
 }
