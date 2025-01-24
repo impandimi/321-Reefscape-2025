@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.8700819672131148,
-        "y": 4.00701844262295
+        "x": 1.95,
+        "y": 5.7995
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.119770051932576,
-        "y": 4.019502846858924
+        "x": 1.95,
+        "y": 4.463749999999999
       },
       "isLocked": false,
-      "linkedName": "Algae 2"
+      "linkedName": "Algae 1"
     },
     {
       "anchor": {
@@ -20,8 +20,8 @@
         "y": 4.00701844262295
       },
       "prevControl": {
-        "x": 2.7212090163934426,
-        "y": 4.019006147540983
+        "x": 2.733196721311475,
+        "y": 4.09093237704918
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ArmAlgCoralOuttake",
-      "waypointRelativePos": 0.2018043684710351,
+      "name": "ArmLeftCoralOuttake",
+      "waypointRelativePos": 0.18660968660968663,
       "endWaypointRelativePos": null,
       "command": null
     }

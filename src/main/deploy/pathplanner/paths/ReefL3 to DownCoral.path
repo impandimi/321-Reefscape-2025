@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2726434426229503,
-        "y": 2.424641393442623
+        "x": 3.20775,
+        "y": 2.465
       },
       "isLocked": false,
       "linkedName": "Reef Left 3"
@@ -20,12 +20,12 @@
         "y": 1.0820184426229513
       },
       "prevControl": {
-        "x": 1.8101434426229508,
-        "y": 1.4056864754098353
+        "x": 1.74525,
+        "y": 1.402249999999999
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Coral"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -49,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -125.00000000000001
+    "rotation": -130.0
   },
   "reversed": false,
   "folder": "Paths",

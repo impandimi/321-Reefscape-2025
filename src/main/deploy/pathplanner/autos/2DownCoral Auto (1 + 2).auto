@@ -19,25 +19,49 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ReefR2 to Algae 1"
+            "pathName": "ReefR2 to DownCoral"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "IntakeAlgCoral"
+            "name": "IntakeCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Algae 1 to ReefL2"
+            "pathName": "DownCoral to ReefL3"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "OuttakeAlgCoral"
+            "name": "OuttakeCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReefL3 to DownCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DownCoral to ReefL3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeCoral"
           }
         }
       ]

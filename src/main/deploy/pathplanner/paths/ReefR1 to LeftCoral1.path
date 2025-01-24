@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.031000000000001,
-        "y": 6.638
+        "x": 4.9725,
+        "y": 6.365
       },
       "isLocked": false,
       "linkedName": "Reef Right 1"
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ArmAlgCoralIntake",
+      "name": "ArmLeftCoralIntake",
       "waypointRelativePos": 0.34208633093525187,
       "endWaypointRelativePos": null,
       "command": null
@@ -55,7 +55,7 @@
   "folder": "Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 59.99999999999999
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

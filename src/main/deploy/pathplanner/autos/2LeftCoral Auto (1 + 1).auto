@@ -25,43 +25,19 @@
         {
           "type": "named",
           "data": {
-            "name": "IntakeAlgCoral"
+            "name": "IntakeLeftCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Algae 1 to ReefL2"
+            "pathName": "LeftCoral1 to ReefL2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "OuttakeAlgCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ReefL2 to Algae 2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeAlgCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Algae 2 to ReefL2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "OuttakeAlgCoral"
+            "name": "OuttakeLeftCoral"
           }
         }
       ]

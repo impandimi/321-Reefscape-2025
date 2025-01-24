@@ -3,42 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.786168032783052,
-        "y": 2.172899590167781
+        "x": 5.187,
+        "y": 2.815999999999999
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.673258196721312,
-        "y": 2.208862704918032
+        "x": 4.8555,
+        "y": 2.4844999999999993
       },
       "isLocked": false,
-      "linkedName": "Algae 3"
+      "linkedName": "Reef Right 3"
     },
     {
       "anchor": {
-        "x": 3.6442622950819668,
-        "y": 2.7602971311475404
+        "x": 1.17,
+        "y": 1.0804999999999996
       },
       "prevControl": {
-        "x": 3.368545081967213,
-        "y": 2.2688012295081954
+        "x": 1.6379999999999995,
+        "y": 1.3827499999999993
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Reef Left 3"
+      "linkedName": "DownCoral"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "ArmLeftCoralOuttake",
-      "waypointRelativePos": 0.15811965811965817,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -55,7 +48,7 @@
   "folder": "Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
 }

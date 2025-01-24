@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Starting 2 to ReefR2"
+            "pathName": "Starting 1 to ReefR1"
           }
         },
         {
@@ -19,79 +19,55 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ReefR2 to Algae 1"
+            "pathName": "ReefR1 to UpCoral"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "IntakeAlgCoral"
+            "name": "IntakeLeftCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Algae 1 to ReefL2"
+            "pathName": "UpCoral to ReefL1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "OuttakeAlgCoral"
+            "name": "OuttakeLeftCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ReefL2 to Algae 2"
+            "pathName": "ReefL1 to UpCoral"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "IntakeAlgCoral"
+            "name": "IntakeLeftCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Algae 2 to ReefL2"
+            "pathName": "UpCoral to ReefL1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "OuttakeAlgCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ReefL2 to Algae 3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeAlgCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Algae 3 to ReefL3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "OuttakeAlgCoral"
+            "name": "OuttakeLeftCoral"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Middle Starting Position",
+  "folder": "1st Starting Position",
   "choreoAuto": false
 }

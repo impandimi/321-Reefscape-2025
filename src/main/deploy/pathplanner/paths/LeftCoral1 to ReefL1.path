@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "ArmAlgCoralOuttake",
+      "name": "ArmLeftCoralOuttake",
       "waypointRelativePos": 0.06007194244604312,
       "endWaypointRelativePos": null,
       "command": null

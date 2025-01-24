@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Starting3 to ReefR3"
+            "pathName": "Starting 3 to ReefR3"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "named",
           "data": {
-            "name": "IntakeAlgCoral"
+            "name": "IntakeLeftCoral"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "named",
           "data": {
-            "name": "OuttakeAlgCoral"
+            "name": "OuttakeLeftCoral"
           }
         }
       ]
