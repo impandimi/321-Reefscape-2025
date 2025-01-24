@@ -98,7 +98,7 @@ public class ElevatorArm extends SubsystemBase {
     return run(
         () -> {
           this.pidController.setPID(kP.get(), kI.get(), kD.get());
-          this.feedforward = new ArmFeedforward(0, kG.get(), 0);
+          this.feedforward = new ArmFeedforward(kS.get(), kG.get(), 0);
           goToAngle(Degrees.of(targetAngle.get()));
         });
   }

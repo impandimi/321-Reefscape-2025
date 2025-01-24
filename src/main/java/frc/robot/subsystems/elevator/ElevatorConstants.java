@@ -22,7 +22,7 @@ public class ElevatorConstants {
   public static final double kVelocityConversionFactor = kPositionConversionFactor / 60;
   public static final Mass kElevatorCarriageMass = Pound.of(20);
   public static final Distance kElevatorDrumRadius = kElevatorConversion.div(2 * Math.PI);
-  public static final Distance kElevatorMinimumHeight = Inches.of(27.5);
-  public static final Distance kElevatorMaximumHeight = kElevatorMinimumHeight.times(3);
+  public static final Distance kElevatorMinimumHeight = Inches.of(27);
+  public static final Distance kElevatorMaximumHeight = Inches.of(56);
   public static final Distance kElevatorStartingHeight = kElevatorMinimumHeight;
 }

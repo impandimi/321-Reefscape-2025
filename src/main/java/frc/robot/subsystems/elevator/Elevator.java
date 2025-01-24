@@ -63,8 +63,9 @@ public class Elevator extends SubsystemBase {
 
   // Goes to height
   public void goToHeight(Distance targetHeight) {
-    double ff = feedForward.calculate(0.0);
     double motorOutput = pidController.calculate(inputs.height.in(Meters), targetHeight.in(Meters));
+
+    double ff = feedForward.calculate(motorOutput);
     setVoltage(Volts.of(motorOutput + ff));
   }
 
@@ -80,10 +81,11 @@ public class Elevator extends SubsystemBase {
   // Once current spikes (signaling motor running into resistance) & the V ~0, encoder position is
   // set to 0
   public Command homeEncoder() {
-    return setVoltage(() -> Volts.of(-1))
+    return setVoltage(() -> Volts.of(-2))
         .until(
             () ->
-                (inputs.current.in(Amp) > 20 && Math.abs(inputs.velocity.in(MetersPerSecond)) < 3))
+                (inputs.current.in(Amp) > 25
+                    && Math.abs(inputs.velocity.in(MetersPerSecond)) < 0.5))
         .andThen(
             runOnce(
                 () -> {

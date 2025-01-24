@@ -30,13 +30,14 @@ public class RobotContainer {
   private void configureBindings() {
     // driver.a().whileTrue(elevator.goToHeight(() -> ElevatorConstants.kElevatorStartingHeight));
     // driver.b().whileTrue(elevator.goToHeight(() ->
-    // ElevatorConstants.kElevatorStartingHeight.times(1.5)));
+    // ElevatorConstants.kElevatorStartingHeight.times(1.33333333333)));
     // driver.y().whileTrue(elevator.goToHeight(() ->
-    // ElevatorConstants.kElevatorStartingHeight.times(2)));
+    // ElevatorConstants.kElevatorStartingHeight.times(1.66666666666)));
     // driver.x().whileTrue(elevator.goToHeight(() ->
-    // ElevatorConstants.kElevatorStartingHeight.times(3)));
+    // ElevatorConstants.kElevatorMaximumHeight));
     driver.b().whileTrue(elevator.tune());
     driver.a().whileTrue(elevator.setVoltage(() -> Volt.of(-1)));
+    driver.leftBumper().whileTrue(elevator.homeEncoder());
   }
 
   public Command getAutonomousCommand() {
