@@ -1,6 +1,8 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.coralendeffector;
+
 import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.units.measure.Voltage;
 
 public class CoralEndEffectorConstants {

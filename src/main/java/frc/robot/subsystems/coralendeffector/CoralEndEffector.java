@@ -20,18 +20,17 @@ public class CoralEndEffector extends SubsystemBase {
   public static CoralEndEffector disable() {
     return new CoralEndEffector(new CoralEndEffectorIOIdeal());
   }
-  
+
   public CoralEndEffector(CoralEndEffectorIO io) {
     this.io = io;
     this.inputs = new CoralEndEffectorInputs();
   }
-  @Logged
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
   }
 
-  @Logged
   public Command intakeCoral() {
     return run(
         () -> {
@@ -48,8 +47,8 @@ public class CoralEndEffector extends SubsystemBase {
 
   public Command stallCoral() {
     return run(
-      () -> {
-        io.setVoltage(0);
-      });
+        () -> {
+          io.setVoltage(CoralEndEffectorConstants.kStallVoltage);
+        });
   }
 }
