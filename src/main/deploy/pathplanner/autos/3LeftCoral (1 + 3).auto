@@ -67,7 +67,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": null
+            "pathName": "ReefL2 to LeftCoral1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeLeftCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftCoral1 to ReefL1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeLeftCoral"
           }
         }
       ]

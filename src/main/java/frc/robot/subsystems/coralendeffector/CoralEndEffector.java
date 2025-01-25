@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+// coral end effector subsystem
 @Logged
 public class CoralEndEffector extends SubsystemBase {
   private CoralEndEffectorInputs inputs;
@@ -26,11 +27,13 @@ public class CoralEndEffector extends SubsystemBase {
     this.inputs = new CoralEndEffectorInputs();
   }
 
+  // constantly updates inputs
   @Override
   public void periodic() {
     io.updateInputs(inputs);
   }
 
+  // intakes coral
   public Command intakeCoral() {
     return run(
         () -> {
@@ -38,6 +41,7 @@ public class CoralEndEffector extends SubsystemBase {
         });
   }
 
+  // outtakes coral
   public Command outtakeCoral() {
     return run(
         () -> {
@@ -45,6 +49,7 @@ public class CoralEndEffector extends SubsystemBase {
         });
   }
 
+// stalls coral
   public Command stallCoral() {
     return run(
         () -> {
