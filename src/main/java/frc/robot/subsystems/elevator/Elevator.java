@@ -14,7 +14,6 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.elevatorarm.ElevatorArmConfig;
 import frc.robot.util.TunableConstant;
 import java.util.function.Supplier;
 
@@ -25,7 +24,7 @@ public class Elevator extends SubsystemBase {
   private ElevatorInputs inputs;
   private PIDController pidController;
   private ElevatorFeedforward feedForward;
-  private ElevatorArmConfig config;
+  private ElevatorConfig config;
 
   // Method that creates the Elevator object as the real/sim io by checking if we're running a sim
   // or not
