@@ -4,6 +4,7 @@ package frc.robot.subsystems.elevatorarm;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -57,6 +58,10 @@ public class ElevatorArmIOReal implements ElevatorArmIO {
 
   // set voltage to the arm motor
   public void setVoltage(Voltage volts) {
-    armMotor.setVoltage(volts);
+    double voltsWithStall = volts.in(Volts);
+    // TODO: uncomment if arm gearbox exploding becomes an actual issue
+    // if (armMotor.getOutputCurrent() > 40) voltsWithStall /= 60; // jank way to make the motor
+    // essentially stop
+    armMotor.setVoltage(voltsWithStall);
   }
 }
