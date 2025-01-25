@@ -25,7 +25,7 @@ public class PoseEstimatorCamera {
     this.poseEstimator =
         new PhotonPoseEstimator(
             VisionConstants.kAprilTagFieldLayout,
-            PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
             config.robotToCamera());
   }
 
