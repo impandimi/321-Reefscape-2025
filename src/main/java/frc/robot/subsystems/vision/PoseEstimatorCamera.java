@@ -1,8 +1,8 @@
 /* (C) Robolancers 2025 */
-package frc.robot.vision;
+package frc.robot.subsystems.vision;
 
 import edu.wpi.first.epilogue.Logged;
-import frc.robot.vision.VisionConstants.CameraConfig;
+import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
 import java.util.List;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
