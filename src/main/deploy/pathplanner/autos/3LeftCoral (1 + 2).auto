@@ -19,25 +19,49 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ReefR3 to DownCoral"
+            "pathName": "ReefR3 to LeftCoral3"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "IntakeCoral"
+            "name": "IntakeLeftCoral"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DownCoral to ReefL3"
+            "pathName": "LeftCoral3 to ReefL3"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "OuttakeCoral"
+            "name": "OuttakeLeftCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReefL3 to LeftCoral2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeLeftCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftCoral2 to ReefL2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeLeftCoral"
           }
         }
       ]
