@@ -9,11 +9,9 @@ import frc.robot.subsystems.vision.VisionConstants;
 
 @Logged
 public class RobotContainer {
-  // TODO: add subsystems here
   private Vision vision;
 
   public RobotContainer() {
-    // TODO: init subsystems here
     vision = new Vision(VisionConstants.k427CameraConfig);
 
     configureBindings();

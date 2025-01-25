@@ -14,12 +14,16 @@ import org.photonvision.targeting.PhotonPipelineResult;
 // abstraction for future multicamera setups
 @Logged
 public class PoseEstimatorCamera {
-  PhotonCamera camera;
-  PhotonPoseEstimator poseEstimator;
+  private final String name;
 
-  @Logged EstimatedRobotPose latestEstimate;
+  private final PhotonCamera camera;
+  private final PhotonPoseEstimator poseEstimator;
+
+  private EstimatedRobotPose latestEstimate;
 
   public PoseEstimatorCamera(CameraConfig config) {
+    this.name = config.cameraName();
+
     this.camera = new PhotonCamera(config.cameraName());
 
     this.poseEstimator =
