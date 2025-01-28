@@ -4,7 +4,6 @@ package frc.robot.util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.DoubleSupplier;
 
-// Stolen from 321 Crescendo Code
 public class TunableConstant {
 
   private final DoubleSupplier getter;

@@ -38,7 +38,6 @@ public class ElevatorArm extends SubsystemBase {
 
   // suppliers for game piece detection for variable feedforward for game pieces
   @NotLogged private BooleanSupplier hasCoral = () -> false;
-  @NotLogged private BooleanSupplier hasAlgae = () -> false;
 
   /**
    * Creates an ElevatorArm instance controlling a real or simulated elevator arm based on the
@@ -75,11 +74,11 @@ public class ElevatorArm extends SubsystemBase {
    * @return the amount of feedforward (in volts) to keep the arm with game piece up
    */
   private double calculateGamepieceFeedforward(Angle targetAngle) {
-    // calculate the amount of feedforward needed to keep a coral and / or an algae
+    // calculate the amount of feedforward needed to keep a coral
     double output = 0;
-    if (hasCoral.getAsBoolean()) output += config.kCoralFF() * Math.cos(targetAngle.in(Radians));
-    if (hasAlgae.getAsBoolean())
-      output += config.kAlgaeFF() * Math.cos(targetAngle.plus(Degrees.of(180)).in(Radians));
+    if (hasCoral.getAsBoolean()) {
+      output += config.kCoralFF() * Math.cos(targetAngle.in(Radians));
+    }
     return output;
   }
 
