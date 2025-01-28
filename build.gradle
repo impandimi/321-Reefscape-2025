@@ -1,6 +1,7 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2025.1.1"
+    id "edu.wpi.first.GradleRIO" version "2025.2.1"
+    id "com.diffplug.spotless" version "7.0.0.BETA2"
 }
 
 java {
@@ -34,7 +35,7 @@ deploy {
                     files = project.fileTree('src/main/deploy')
                     directory = '/home/lvuser/deploy'
                     deleteOldFiles = false // Change to true to delete files on roboRIO that no
-                                           // longer exist in deploy directory of this project
+                        // longer exist in deploy directory of this project
                 }
             }
         }
@@ -72,6 +73,7 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 }
 
 test {
@@ -102,3 +104,37 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
+
+spotless {
+//   // optional: limit format enforcement to just the files changed by this feature branch
+//   ratchetFrom 'origin/main'
+
+  enforceCheck = false
+
+  format 'misc', {
+    // define the files to apply `misc` to
+    target '*.gradle', '.gitattributes', '.gitignore'
+
+    // define the steps to apply to those files
+  }
+  java {
+    
+    target 'src/*/java/**/*.java'
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**', '**/.history/**'
+        }
+        toggleOffOn()
+        googleJavaFormat()
+        trimTrailingWhitespace()
+        endWithNewline()
+
+        licenseHeader '/* (C) Robolancers 2025 */'
+    }
+}
+
+task applyHooks(type: Exec) {
+    commandLine 'git', 'config', 'core.hooksPath', '.githooks'
+}
+
+build.dependsOn(applyHooks)
