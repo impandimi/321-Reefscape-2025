@@ -35,4 +35,7 @@ public class ElevatorArmConstants {
   public static final int kCurrentLimit = 40;
   public static final double kNominalVoltage = 12;
   public static final boolean kInverted = false;
+
+  // absolute encoder port on RoboRIO DIO if we need it
+  public static final int kAbsoluteEncoderPort = 0;
 }

@@ -17,18 +17,21 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
 
-/** Implementation of the ElevatorArmIO that controls a real ElevatorArm */
+/**
+ * Implementation of the ElevatorArmIO that controls a real ElevatorArm using a SparkMax motor
+ * controller
+ */
 @Logged
-public class ElevatorArmIOReal implements ElevatorArmIO {
+public class ElevatorArmIOSpark implements ElevatorArmIO {
 
   // tuning config for the ElevatorArmIOReal
   public static final ElevatorArmConfig config = new ElevatorArmConfig(0, 0, 0, 0, 0, 0);
 
-  // the motor that is controlling the arm
+  // the motor that is controlling the arm (using a SparkMax controller)
   private SparkMax armMotor =
       new SparkMax(ElevatorArmConstants.kElevatorArmId, MotorType.kBrushless);
 
-  public ElevatorArmIOReal() {
+  public ElevatorArmIOSpark() {
     // setup arm motor
 
     armMotor.configure(
