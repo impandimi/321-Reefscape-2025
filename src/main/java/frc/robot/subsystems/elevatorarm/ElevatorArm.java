@@ -45,7 +45,7 @@ public class ElevatorArm extends SubsystemBase {
    */
   public static ElevatorArm create() {
     return RobotBase.isReal()
-        ? new ElevatorArm(new ElevatorArmIOReal(), ElevatorArmIOReal.config)
+        ? new ElevatorArm(new ElevatorArmIOSpark(), ElevatorArmIOSpark.config)
         : new ElevatorArm(new ElevatorArmIOSim(), ElevatorArmIOSim.config);
   }
 
