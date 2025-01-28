@@ -1,5 +1,5 @@
 package frc.robot.subsystems.algaeIntakeClimb;
-
+// inputs
 public class AlgaeIntakeClimbInputs {
     public boolean hasAlgae;
     public double velocity;
