@@ -27,7 +27,6 @@ public class AlgaeIntakeClimbConstants {
     public static final double kSimMinAngleRads = 0;
     public static final double kSimMaxAngleRads = 0;
     public static final double kSimStartingAngleRads = 0;
-    public static final double kBeamBreakSimAngle = 0;
 
     //TODO: also need the values for:
     // pid/feedforward config(tuning)
