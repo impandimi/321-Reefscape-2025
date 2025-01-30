@@ -38,4 +38,7 @@ public class ElevatorArmConstants {
 
   // absolute encoder port on RoboRIO DIO if we need it
   public static final int kAbsoluteEncoderPort = 0;
+
+  // absolute encoder offset
+  public static final Angle kAbsoluteEncoderOffset = Degrees.of(0);
 }

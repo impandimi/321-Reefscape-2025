@@ -32,12 +32,14 @@ public class ElevatorArmIOTalon implements ElevatorArmIO {
   private DutyCycleEncoder encoder =
       new DutyCycleEncoder(ElevatorArmConstants.kAbsoluteEncoderPort, 360, 0);
 
+  // TODO: if elec uses a CANdi, use this for encoder output
+  // private CANdi candi = new CANdi(0);
+
   // request to control the arm motor using voltage
   private VoltageOut voltageRequest = new VoltageOut(0);
 
   public ElevatorArmIOTalon() {
     // setup arm motor
-
     armMotor
         .getConfigurator()
         .apply(
@@ -62,7 +64,10 @@ public class ElevatorArmIOTalon implements ElevatorArmIO {
 
   // update inputs from the arm motor
   public void updateInputs(ElevatorArmInputs inputs) {
-    inputs.angle = Degrees.of(encoder.get());
+    inputs.angle = Degrees.of(encoder.get()).plus(ElevatorArmConstants.kAbsoluteEncoderOffset);
+    // TODO: see line 37
+    // inputs.angle =
+    // candi.getPWM1Position(true).getValue().plus(ElevatorArmConstants.kAbsoluteEncoderOffset);
     inputs.velocity = armMotor.getVelocity().getValue();
     inputs.current = armMotor.getTorqueCurrent().getValue();
   }
