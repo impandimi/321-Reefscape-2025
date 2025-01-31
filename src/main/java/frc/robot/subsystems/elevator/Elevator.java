@@ -30,7 +30,7 @@ public class Elevator extends SubsystemBase {
   // or not
   public static Elevator create() {
     return RobotBase.isReal()
-        ? new Elevator(new ElevatorIOReal(), ElevatorIOReal.config)
+        ? new Elevator(new ElevatorIOTalon(), ElevatorIOTalon.config)
         : new Elevator(new ElevatorIOSim(), ElevatorIOSim.config);
   }
 
@@ -103,11 +103,11 @@ public class Elevator extends SubsystemBase {
     TunableConstant kS = new TunableConstant("/Elevator/kS", 0);
     TunableConstant targetHeight = new TunableConstant("/Elevator/targetHeight", 0);
 
-    return goToHeight(
+    return run(
         () -> {
           this.pidController.setPID(kP.get(), kI.get(), kD.get());
           this.feedForward = new ElevatorFeedforward(kS.get(), kG.get(), 0);
-          return Meters.of(targetHeight.get());
+          goToHeight(Meters.of(targetHeight.get()));
         });
   }
 
