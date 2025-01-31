@@ -34,7 +34,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
   // Updates Inputs w/ values from sim (Also tells sim how often to update itself)
   public void updateInputs(ElevatorInputs inputs) {
-    simMotor.update(0.2);
+    simMotor.update(0.02);
     inputs.height = Meters.of(simMotor.getPositionMeters());
     inputs.velocity = MetersPerSecond.of(simMotor.getVelocityMetersPerSecond());
     inputs.current = Amp.of(simMotor.getCurrentDrawAmps());

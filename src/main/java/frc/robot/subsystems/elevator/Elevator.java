@@ -103,11 +103,11 @@ public class Elevator extends SubsystemBase {
     TunableConstant kS = new TunableConstant("/Elevator/kS", 0);
     TunableConstant targetHeight = new TunableConstant("/Elevator/targetHeight", 0);
 
-    return run(
+    return goToHeight(
         () -> {
           this.pidController.setPID(kP.get(), kI.get(), kD.get());
           this.feedForward = new ElevatorFeedforward(kS.get(), kG.get(), 0);
-          goToHeight(Meters.of(targetHeight.get()));
+          return Meters.of(targetHeight.get());
         });
   }
 
