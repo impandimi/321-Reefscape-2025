@@ -1,16 +1,16 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.algaeIntakeClimb;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Volts;
-//skibidi
+
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 // subsystem
 
@@ -33,67 +33,63 @@ public class AlgaeIntakeClimb extends SubsystemBase {
 
   public static AlgaeIntakeClimb create() {
     return RobotBase.isReal()
-        ? new AlgaeIntakeClimb(new AlgaeIntakeClimbIOReal(), AlgaeIntakeClimbIOReal.config)
+        ? new AlgaeIntakeClimb(new AlgaeIntakeClimbIOSpark(), AlgaeIntakeClimbIOSpark.config)
         : new AlgaeIntakeClimb(new AlgaeIntakeClimbIOSim(), AlgaeIntakeClimbIOSim.config);
   }
 
   public static AlgaeIntakeClimb disable() {
     return new AlgaeIntakeClimb(new AlgaeIntakeClimbIOIdeal(), AlgaeIntakeClimbIOIdeal.config);
   }
-//goes to angle
-  public void goToAngle(double desiredAngle) {
-    io.setPivotPower(
-        Volts.of(
-            feedForward.calculate(desiredAngle, 0, 0)
-                + algaeIntakeClimbController.calculate(inputs.currentAngle, desiredAngle)));
-  }
 
-  public void hang(Voltage volts) {
-    io.setPivotPower(volts);
+  // goes to angle
+  public void goToAngle(Angle desiredAngle) {
+    io.setPivotVoltage(
+        Volts.of(
+            feedForward.calculate(desiredAngle.in(Degrees), 0, 0)
+                + algaeIntakeClimbController.calculate(
+                    inputs.currentPivotAngle.in(Degrees), desiredAngle.in(Degrees))));
   }
 
   public void spinRollers(Voltage volts) {
-    io.setRollerPower(volts);
+    io.setRollerVoltage(volts);
   }
 
   // TODO:be careful if rollers need to start slightly after pivot
 
+  public Command outtakePosition() {
+    return run(() -> goToAngle(AlgaeIntakeClimbConstants.kPivotOuttakeAngle));
+  }
+
   public Command outtake() {
-    return run(() -> spinRollers(AlgaeIntakeClimbConstants.kouttakePower))
-        .alongWith(run(() -> goToAngle(AlgaeIntakeClimbConstants.kouttakeAngle)))
+    return run(() -> spinRollers(AlgaeIntakeClimbConstants.kRollerOuttakePower))
         .until(() -> !inputs.hasAlgae);
   }
 
   public Command intake() {
-    return run(() -> spinRollers(AlgaeIntakeClimbConstants.kintakePower))
-        .alongWith(run(() -> goToAngle(AlgaeIntakeClimbConstants.kintakeAngle)))
+    return run(() -> spinRollers(AlgaeIntakeClimbConstants.kRollerIntakePower))
+        .alongWith(run(() -> goToAngle(AlgaeIntakeClimbConstants.kIntakeAngle)))
         .until(() -> inputs.hasAlgae);
   }
 
-  public Command floor() { // to get into climbing position
-    return run(() -> goToAngle(AlgaeIntakeClimbConstants.kfloorAngle));
+  public Command climbFloorPosition() { // to get into climbing position
+    return run(() -> goToAngle(AlgaeIntakeClimbConstants.kPivotFloorAngle));
   }
 
   public Command climb() {
     return run(
         () -> {
-          if (inputs.currentAngle > AlgaeIntakeClimbConstants.kclimbMotorPosition) {
-            hang(AlgaeIntakeClimbConstants.kclimbPower);
-          } else hang(Volts.of(0));
+          if (inputs.currentPivotAngle.in(Degrees)
+              > AlgaeIntakeClimbConstants.kPivotClimbAngle.in(Degrees)) {
+            io.setPivotVoltage(AlgaeIntakeClimbConstants.kPivotClimbPower);
+          } else {
+            io.setPivotVoltage(Volts.of(0));
+          }
+          ;
         });
   }
 
   public Command unclimb() {
-    return run(() -> hang(AlgaeIntakeClimbConstants.kunclimbPower));
-  }
-
-  public Command moveAlgaeIntakeClimb(Supplier<Voltage> rollerVolts, DoubleSupplier pivotAngle) {
-    return run(() -> spinRollers(rollerVolts.get()))
-        .alongWith(run(() -> goToAngle(pivotAngle.getAsDouble())))
-        .until(
-            () ->
-                inputs.hasAlgae
-                    || inputs.currentAngle <= AlgaeIntakeClimbConstants.kclimbMotorPosition);
+    return run(() -> io.setPivotVoltage(AlgaeIntakeClimbConstants.kPivotUnclimbPower));
   }
 
   @Override

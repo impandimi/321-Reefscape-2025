@@ -1,6 +1,10 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.algaeIntakeClimb;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -12,42 +16,63 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AlgaeIntakeClimbIOSim implements AlgaeIntakeClimbIO {
 
-  public static final AlgaeIntakeClimbConfig config = new AlgaeIntakeClimbConfig(4, 3, 2, 1);
+  public static final AlgaeIntakeClimbConfig config = new AlgaeIntakeClimbConfig(0, 0, 0, 0);
 
   DCMotorSim rollerSim;
-  SingleJointedArmSim pivotSim;
+  SingleJointedArmSim pivotSimLeft;
+  SingleJointedArmSim pivotSimRight;
 
   public AlgaeIntakeClimbIOSim() {
-    rollerSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(0, 0), DCMotor.getNEO(1));
-    pivotSim =
+    rollerSim =
+        new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(
+                DCMotor.getNEO(1),
+                AlgaeIntakeClimbConstants.kRollerMOI,
+                AlgaeIntakeClimbConstants.kGearing),
+            DCMotor.getNEO(1));
+    pivotSimLeft =
         new SingleJointedArmSim(
             LinearSystemId.createSingleJointedArmSystem(
                 DCMotor.getNEO(1),
                 AlgaeIntakeClimbConstants.kSimJKgSquaredMeters,
-                AlgaeIntakeClimbConstants.kSimGearing),
+                AlgaeIntakeClimbConstants.kGearing),
             DCMotor.getNEO(1),
-            AlgaeIntakeClimbConstants.kSimGearing,
-            AlgaeIntakeClimbConstants.kSimArmLengthMeters,
-            AlgaeIntakeClimbConstants.kSimMinAngleRads,
-            AlgaeIntakeClimbConstants.kSimMaxAngleRads,
+            AlgaeIntakeClimbConstants.kGearing,
+            AlgaeIntakeClimbConstants.kArmLengthMeters.in(Meters),
+            AlgaeIntakeClimbConstants.kSimMinAngle.in(Radians),
+            AlgaeIntakeClimbConstants.kSimMaxAngle.in(Radians),
             true,
-            AlgaeIntakeClimbConstants.kSimStartingAngleRads);
+            AlgaeIntakeClimbConstants.kSimStartingAngle.in(Radians));
+    SmartDashboard.putBoolean("AlgaeIntakeClimbSim/HasAlgae", false);
+    pivotSimRight =
+        new SingleJointedArmSim(
+            LinearSystemId.createSingleJointedArmSystem(
+                DCMotor.getNEO(1),
+                AlgaeIntakeClimbConstants.kSimJKgSquaredMeters,
+                AlgaeIntakeClimbConstants.kGearing),
+            DCMotor.getNEO(1),
+            AlgaeIntakeClimbConstants.kGearing,
+            AlgaeIntakeClimbConstants.kArmLengthMeters.in(Meters),
+            AlgaeIntakeClimbConstants.kSimMinAngle.in(Radians),
+            AlgaeIntakeClimbConstants.kSimMaxAngle.in(Radians),
+            true,
+            AlgaeIntakeClimbConstants.kSimStartingAngle.in(Radians));
     SmartDashboard.putBoolean("AlgaeIntakeClimbSim/HasAlgae", false);
   }
 
-  public void setPivotPower(Voltage volts) {
-    pivotSim.setInputVoltage(volts.in(Volts));
+  public void setPivotVoltage(Voltage volts) {
+    pivotSimLeft.setInputVoltage(volts.in(Volts));
+    pivotSimRight.setInputVoltage(volts.in(Volts));
   }
 
-  public void setRollerPower(Voltage volts) {
+  public void setRollerVoltage(Voltage volts) {
     rollerSim.setInputVoltage(volts.in(Volts));
   }
 
   public void updateInputs(AlgaeIntakeClimbInputs inputs) {
-    inputs.currentAngle = pivotSim.getAngleRads();
-    inputs.velocity = pivotSim.getVelocityRadPerSec();
-    inputs.rollerVelocity = rollerSim.getAngularVelocityRadPerSec();
-    inputs.rollerAngle = rollerSim.getAngularPositionRad();
+    inputs.currentPivotAngle = Degrees.of(pivotSimLeft.getAngleRads());
+    inputs.pivotVelocity = RPM.of(pivotSimLeft.getVelocityRadPerSec());
+    inputs.rollerVelocity = RPM.of(rollerSim.getAngularVelocityRadPerSec());
     inputs.hasAlgae = SmartDashboard.getBoolean("AlgaeIntakeClimbSim/HasAlgae", false);
   }
 }
