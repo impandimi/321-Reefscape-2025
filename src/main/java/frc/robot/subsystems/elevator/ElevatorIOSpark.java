@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -17,10 +18,10 @@ import edu.wpi.first.units.measure.Voltage;
 
 @Logged
 // For when Elevator is real
-public class ElevatorIOReal implements ElevatorIO {
+public class ElevatorIOSpark implements ElevatorIO {
+  public boolean invertedValue = false;
   // Creates config record w/ values
   public static final ElevatorConfig config = new ElevatorConfig(150, 0, 0.3, 0.43, 0.64);
-
   // Creates motor objects
   public SparkMax elevatorMotorLeft =
       new SparkMax(ElevatorConstants.kLeftMotorID, MotorType.kBrushless);
@@ -31,7 +32,7 @@ public class ElevatorIOReal implements ElevatorIO {
   //       new SparkMax(ElevatorConstants.kRightMotorID, MotorType.kBrushless);
 
   // Constructor: Sets up motors
-  public ElevatorIOReal() {
+  public ElevatorIOSpark() {
     setupMotors();
   }
 
@@ -45,10 +46,13 @@ public class ElevatorIOReal implements ElevatorIO {
   // Method to setup L & R motor & encoders
   // NOTE: Right motor follows left & only left motor encoder is used
   private void setupMotors() {
+    if (ElevatorConstants.kInverted == InvertedValue.Clockwise_Positive) {
+      invertedValue = true;
+    }
     elevatorMotorLeft.configure(
         new SparkMaxConfig()
             .smartCurrentLimit(ElevatorConstants.kCurrentLimit)
-            .inverted(ElevatorConstants.kInverted)
+            .inverted(invertedValue)
             .apply(
                 new EncoderConfig()
                     .velocityConversionFactor(ElevatorConstants.kVelocityConversionFactor)
