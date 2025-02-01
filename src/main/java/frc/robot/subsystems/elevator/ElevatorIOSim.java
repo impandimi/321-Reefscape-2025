@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 // For when simulating the Elevator
 public class ElevatorIOSim implements ElevatorIO {
   // Constant values for the simulation of the elevator
-  public static final ElevatorConfig config = new ElevatorConfig(4, 0, 0, 0.9, 0);
+  public static final ElevatorConfig config = new ElevatorConfig(50, 0, 0, 0.9, 0);
 
   // elevator sim object w/ appropriate paramaters
   // Creates the motor simulation of the elevator

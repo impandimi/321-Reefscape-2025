@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 @Logged
 public class Elevator extends SubsystemBase {
-  // Initialize all parts of Elevator Susbsytem, as well as pid controller
+  // Initialize all parts of Elevator Subsystem, as well as pid controller
   private ElevatorIO io;
   private ElevatorInputs inputs;
   private PIDController pidController;
@@ -34,6 +34,10 @@ public class Elevator extends SubsystemBase {
         : new Elevator(new ElevatorIOSim(), ElevatorIOSim.config);
   }
 
+  public static Elevator disable() {
+    return new Elevator(new ElevatorIOIdeal(), ElevatorIOIdeal.config);
+  }
+
   // Eleavtor Constructor
   // Creates Elevator, sets initialized variables to the real/sim values from create() method above
   public Elevator(ElevatorIO io, ElevatorConfig config) {
@@ -41,6 +45,9 @@ public class Elevator extends SubsystemBase {
     this.inputs = new ElevatorInputs();
     this.pidController = new PIDController(config.kP(), config.kI(), config.kD());
     this.feedForward = new ElevatorFeedforward(config.kS(), config.kG(), 0);
+
+    // set position to starting position
+    // TODO: automatically home on robot start and disable movement if robot isn't homed
     io.setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
   }
 
@@ -68,6 +75,7 @@ public class Elevator extends SubsystemBase {
     setVoltage(Volts.of(motorOutput + ff));
   }
 
+  // returns a Command to go to height
   public Command goToHeight(Supplier<Distance> targetHeight) {
     return run(
         () -> {
@@ -75,16 +83,18 @@ public class Elevator extends SubsystemBase {
         });
   }
 
-  // Command to "home" the encoder(go to starting position & set encoder to said position)
-  // Sets voltage to -1, makes elevator lower
-  // Once current spikes (signaling motor running into resistance) & the V ~0, encoder position is
+  // Command to "home" the encoder (go to starting position & set encoder to said position)
+  // Sets voltage to a constant negative voltage
+  // Once current spikes (signaling motor running into resistance) & the V ~0, encoder speed is
+  // about zero
   // set to 0
   public Command homeEncoder() {
-    return setVoltage(() -> Volts.of(-2))
+    return setVoltage(() -> ElevatorConstants.kHomingVoltage)
         .until(
             () ->
-                (inputs.current.in(Amp) > 25
-                    && Math.abs(inputs.velocity.in(MetersPerSecond)) < 0.5))
+                (inputs.current.in(Amp) > ElevatorConstants.kHomingCurrentThreshold.in(Amp)
+                    && Math.abs(inputs.velocity.in(MetersPerSecond))
+                        < ElevatorConstants.kHomingVelocityThreshold.in(MetersPerSecond)))
         .andThen(
             runOnce(
                 () -> {
@@ -96,11 +106,11 @@ public class Elevator extends SubsystemBase {
   // When command is run, tunable constants are created & PID controller values & target height are
   // set to said tunable values
   public Command tune() {
-    TunableConstant kP = new TunableConstant("/Elevator/kP", 0);
-    TunableConstant kI = new TunableConstant("/Elevator/kI", 0);
-    TunableConstant kD = new TunableConstant("/Elevator/kD", 0);
-    TunableConstant kG = new TunableConstant("/Elevator/kG", 0);
-    TunableConstant kS = new TunableConstant("/Elevator/kS", 0);
+    TunableConstant kP = new TunableConstant("/Elevator/kP", config.kP());
+    TunableConstant kI = new TunableConstant("/Elevator/kI", config.kI());
+    TunableConstant kD = new TunableConstant("/Elevator/kD", config.kD());
+    TunableConstant kG = new TunableConstant("/Elevator/kG", config.kG());
+    TunableConstant kS = new TunableConstant("/Elevator/kS", config.kS());
     TunableConstant targetHeight = new TunableConstant("/Elevator/targetHeight", 0);
 
     return run(

@@ -5,10 +5,11 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volt;
-import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
@@ -17,7 +18,7 @@ import edu.wpi.first.units.measure.Voltage;
 // For when Elevator is real
 public class ElevatorIOTalon implements ElevatorIO {
   // Creates config record w/ values
-  public static final ElevatorConfig config = new ElevatorConfig(150, 0, 0.3, 0.43, 0.64);
+  public static final ElevatorConfig config = new ElevatorConfig(0, 0, 0, 0, 0);
 
   // Creates motor objects
 
@@ -25,7 +26,7 @@ public class ElevatorIOTalon implements ElevatorIO {
 
   // NOTE: Right motor MAY be commented out in order to test one motor
 
-  // public TalonFX elevatorMotorRight = new TalonFX(ElevatorConstants.kRightMotorID);
+  public TalonFX elevatorMotorRight = new TalonFX(ElevatorConstants.kRightMotorID);
 
   // Constructor: Sets up motors
   public ElevatorIOTalon() {
@@ -50,23 +51,27 @@ public class ElevatorIOTalon implements ElevatorIO {
   private void setupMotors() {
     TalonFXConfiguration configuration = new TalonFXConfiguration();
     configuration.CurrentLimits.SupplyCurrentLimit = ElevatorConstants.kCurrentLimit;
-    configuration.MotorOutput.Inverted = ElevatorConstants.kInverted;
-    configuration.Feedback.SensorToMechanismRatio = ElevatorConstants.kPositionConversionFactor;
+    configuration.MotorOutput.Inverted =
+        ElevatorConstants.kLeftInverted
+            ? InvertedValue.CounterClockwise_Positive
+            : InvertedValue.Clockwise_Positive;
+    configuration.Feedback.SensorToMechanismRatio = 1 / ElevatorConstants.kPositionConversionFactor;
+
     elevatorMotorLeft.getConfigurator().apply(configuration);
-
-    // elevatorMotorRight.getConfigurator().apply(configuration);
-    // elevatorMotorRight.setControl(new Follower(elevatorMotorLeft.getDeviceID(), false));
-
+    elevatorMotorRight.getConfigurator().apply(configuration);
   }
 
   // Sets power of motors w/voltage
   public void setVoltage(Voltage Volts) {
     elevatorMotorLeft.setVoltage(Volts.in(Volt));
+    elevatorMotorRight.setControl(
+        new Follower(elevatorMotorLeft.getDeviceID(), ElevatorConstants.kRightInverted));
   }
 
   // Sets encoder pos
   public void setEncoderPosition(Distance position) {
     elevatorMotorLeft.setPosition(position.in(Meters));
+    elevatorMotorRight.setPosition(position.in(Meters));
   }
 
   // Special case where encoder pos is reset to the initial/starting height

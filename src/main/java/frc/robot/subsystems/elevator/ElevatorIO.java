@@ -14,7 +14,7 @@ updateInputs
 setVoltage
   sets power of elevator via voltage
 setEncoderPosition
-  ...Sets the encoder position lol
+  ...Sets the encoder position
 */
 public interface ElevatorIO {
 
