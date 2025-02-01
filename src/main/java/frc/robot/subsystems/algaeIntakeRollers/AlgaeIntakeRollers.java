@@ -1,6 +1,12 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.algaeIntakeRollers;
 
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,34 +18,42 @@ public class AlgaeIntakeRollers extends SubsystemBase {
   private AlgaeIntakeRollersIO io;
   private AlgaeIntakeRollersInputs inputs;
 
-  public AlgaeIntakeRollers(AlgaeIntakeRollersIO io) {
+  private PIDController rollerController;
+  private SimpleMotorFeedforward feedForward;
+
+  public AlgaeIntakeRollers(AlgaeIntakeRollersIO io, AlgaeIntakeRollersConfig config) {
     this.io = io;
     this.inputs = new AlgaeIntakeRollersInputs();
+
+    rollerController = new PIDController(config.kP(), config.kI(), config.kD());
+    feedForward = new SimpleMotorFeedforward(0,config.kV());
   }
 
   public static AlgaeIntakeRollers create() {
-    return RobotBase.isReal() // TODO: possibly change from spark to kraken
+    return RobotBase.isReal()
         ? new AlgaeIntakeRollers(
-            new AlgaeIntakeRollersIOSpark()) // creates real mechanism if robot, sim if no robot,
+            new AlgaeIntakeRollersIOSpark(), AlgaeIntakeRollersIOSpark.config) // creates real mechanism if robot, sim if no robot,
         // ideal if disabled robot
-        : new AlgaeIntakeRollers(new AlgaeIntakeRollersIOSim());
+        : new AlgaeIntakeRollers(new AlgaeIntakeRollersIOSim(), AlgaeIntakeRollersIOSim.config);
   }
 
   public static AlgaeIntakeRollers disable() {
-    return new AlgaeIntakeRollers(new AlgaeIntakeRollersIOIdeal());
+    return new AlgaeIntakeRollers(new AlgaeIntakeRollersIOIdeal(), AlgaeIntakeRollersIOIdeal.config);
   }
 
   public void spinRollers(Voltage volts) {
     io.setRollerVoltage(volts);
   }
 
-  public Command
-      intake() { // intakes algae until beam break breaks and registers algae in the mechanism
-    return run(() -> spinRollers(AlgaeIntakeRollersConstants.kRollerIntakeVoltage))
-        .until(() -> inputs.hasAlgae);
+  public void goToAngularVelocity(AngularVelocity desiredAngularVelocity) {
+    io.setRollerVoltage(
+        Volts.of(
+            rollerController.calculate(inputs.rollerVelocity.in(RPM), desiredAngularVelocity.in(RPM)) 
+            + feedForward.calculate(desiredAngularVelocity.in(RPM))));
   }
 
-  public Command intakeForever() { // intakes without end condition for testing or flexibility
+  public Command
+      intake() { // intakes algae until beam break breaks and registers algae in the mechanism
     return run(() -> spinRollers(AlgaeIntakeRollersConstants.kRollerIntakeVoltage));
   }
 
@@ -49,9 +63,8 @@ public class AlgaeIntakeRollers extends SubsystemBase {
 
   public Command setMechanismVoltage(Voltage volts) { // sets whole mechanism voltage
     return run(
-        () -> {
-          io.setRollerVoltage(volts);
-        });
+        () -> spinRollers(volts)
+        );
   }
 
   @Override // updates inputs constatly

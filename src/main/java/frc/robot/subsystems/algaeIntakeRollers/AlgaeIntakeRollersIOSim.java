@@ -1,7 +1,7 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.algaeIntakeRollers;
 
-import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AlgaeIntakeRollersIOSim implements AlgaeIntakeRollersIO {
 
+  public static final AlgaeIntakeRollersConfig config = new AlgaeIntakeRollersConfig(0, 0, 0, 0);
   private DCMotorSim rollerSim;
 
   public AlgaeIntakeRollersIOSim() {
@@ -30,7 +31,7 @@ public class AlgaeIntakeRollersIOSim implements AlgaeIntakeRollersIO {
   }
 
   public void updateInputs(AlgaeIntakeRollersInputs inputs) {
-    inputs.rollerVelocity = RPM.of(rollerSim.getAngularVelocityRadPerSec()); // gets input info
+    inputs.rollerVelocity = RadiansPerSecond.of(rollerSim.getAngularVelocityRadPerSec()); // gets input info
     inputs.hasAlgae = SmartDashboard.getBoolean("AlgaeIntakeClimbSim/HasAlgae", false);
   }
 }

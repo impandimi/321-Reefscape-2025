@@ -16,10 +16,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class AlgaeIntakeRollersIOSpark implements AlgaeIntakeRollersIO {
 
   // device ids are plcaeholders
+  public static final AlgaeIntakeRollersConfig config = new AlgaeIntakeRollersConfig(0, 0, 0, 0);
+  private DigitalInput algaeSensor = new DigitalInput(AlgaeIntakeRollersConstants.kDigitalInputID);
 
-  private DigitalInput algaeSensor = new DigitalInput(1);
-
-  private SparkMax rollerMotorLeft = new SparkMax(3, MotorType.kBrushless);
+  private SparkMax rollerMotorLeft = new SparkMax(AlgaeIntakeRollersConstants.kMotorID, MotorType.kBrushless);
 
   public AlgaeIntakeRollersIOSpark() {
     configureMotors(); // configures motors once algae spark object is created

@@ -1,11 +1,12 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakeClimb;
+package frc.robot.subsystems.algaeIntakePivot;
 
 import static edu.wpi.first.units.Units.Degrees;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -14,37 +15,38 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
-public class AlgaeIntakeClimbIOKraken implements AlgaeIntakeClimbIO {
+public class AlgaeIntakePivotIOKraken implements AlgaeIntakePivotIO {
   // kraken implementation of real mechanism
-  public static final AlgaeIntakeClimbConfig config = new AlgaeIntakeClimbConfig(0, 0, 0, 0);
+  public static final AlgaeIntakePivotConfig config = new AlgaeIntakePivotConfig(0, 0, 0, 0);
 
   // device ids are plcaeholders
-  TalonFX pivotMotorLeft = new TalonFX(1); // corresponds to the left pivot motor
-  TalonFX pivotMotorRight = new TalonFX(2); // corresponds to the right pivot motor
+  TalonFX pivotMotorLeft = new TalonFX(AlgaeIntakePivotConstants.kPivotMotorLeftIDKraken); // corresponds to the left pivot motor
+  TalonFX pivotMotorRight = new TalonFX(AlgaeIntakePivotConstants.kPivotMotorRightIDKraken); // corresponds to the right pivot motor
   VoltageOut voltageRequest = new VoltageOut(0); // used to set voltage
+  Follower followRequest = new Follower(AlgaeIntakePivotConstants.kPivotMotorLeftIDKraken, AlgaeIntakePivotConstants.kRightInverted);
 
-  private DigitalInput algaeSensor = new DigitalInput(1); // beam break
+  private DigitalInput algaeSensor = new DigitalInput(AlgaeIntakePivotConstants.kDigitalInputID); // beam break
   private DutyCycleEncoder algaeIntakeClimbEncoder =
       new DutyCycleEncoder(
-          1,
+          AlgaeIntakePivotConstants.kEncoderID,
           360,
-          AlgaeIntakeClimbConstants.kPivotZeroOffsetAngle.in(
+          AlgaeIntakePivotConstants.kPivotZeroOffsetAngle.in(
               Degrees)); // absolute encoder + configuration stuff
 
-  public AlgaeIntakeClimbIOKraken() {
+  public AlgaeIntakePivotIOKraken() {
     pivotMotorLeft // sets up and creates left pivot motor
         .getConfigurator()
         .apply(
             new CurrentLimitsConfigs()
                 .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(AlgaeIntakeClimbConstants.kSmartCurrentLimit));
+                .withStatorCurrentLimit(AlgaeIntakePivotConstants.kSmartCurrentLimit));
     pivotMotorLeft
         .getConfigurator()
         .apply(
             new MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Brake)
                 .withInverted(
-                    AlgaeIntakeClimbConstants.kPivotInverted
+                    AlgaeIntakePivotConstants.kPivotInverted
                         ? InvertedValue.CounterClockwise_Positive
                         : InvertedValue.Clockwise_Positive));
     pivotMotorLeft
@@ -52,21 +54,21 @@ public class AlgaeIntakeClimbIOKraken implements AlgaeIntakeClimbIO {
         .apply(
             new FeedbackConfigs()
                 .withSensorToMechanismRatio(
-                    1 / AlgaeIntakeClimbConstants.kPivotPositionConversionFactor));
+                    1 / AlgaeIntakePivotConstants.kPivotPositionConversionFactor));
 
     pivotMotorRight // same thing with right pivot motor
         .getConfigurator()
         .apply(
             new CurrentLimitsConfigs()
                 .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(AlgaeIntakeClimbConstants.kSmartCurrentLimit));
+                .withStatorCurrentLimit(AlgaeIntakePivotConstants.kSmartCurrentLimit));
     pivotMotorRight
         .getConfigurator()
         .apply(
             new MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Brake)
                 .withInverted(
-                    AlgaeIntakeClimbConstants.kPivotInverted
+                    AlgaeIntakePivotConstants.kPivotInverted
                         ? InvertedValue.CounterClockwise_Positive
                         : InvertedValue.Clockwise_Positive));
     pivotMotorRight
@@ -74,16 +76,16 @@ public class AlgaeIntakeClimbIOKraken implements AlgaeIntakeClimbIO {
         .apply(
             new FeedbackConfigs()
                 .withSensorToMechanismRatio(
-                    1 / AlgaeIntakeClimbConstants.kPivotPositionConversionFactor));
+                    1 / AlgaeIntakePivotConstants.kPivotPositionConversionFactor));
   }
 
   public void setPivotVoltage(Voltage volts) {
     pivotMotorLeft.setControl(
         voltageRequest.withOutput(volts)); // kraken implementation of setvoltage
-    pivotMotorRight.setControl(voltageRequest.withOutput(volts));
+    pivotMotorRight.setControl(followRequest);
   }
 
-  public void updateInputs(AlgaeIntakeClimbInputs inputs) { // updates inputs
+  public void updateInputs(AlgaeIntakePivotInputs inputs) { // updates inputs
     inputs.currentPivotAngle = Degrees.of(algaeIntakeClimbEncoder.get());
     inputs.hasAlgae = algaeSensor.get();
   }

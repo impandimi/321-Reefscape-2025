@@ -1,5 +1,5 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakeClimb;
+package frc.robot.subsystems.algaeIntakePivot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Volts;
@@ -16,53 +16,53 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 // spark implementation of real mechanism
 
-public class AlgaeIntakeClimbIOSpark implements AlgaeIntakeClimbIO {
+public class AlgaeIntakePivotIOSpark implements AlgaeIntakePivotIO {
 
-  public static final AlgaeIntakeClimbConfig config = new AlgaeIntakeClimbConfig(0, 0, 0, 0);
+  public static final AlgaeIntakePivotConfig config = new AlgaeIntakePivotConfig(0, 0, 0, 0);
 
   // device ids are plcaeholders
   private SparkMax pivotMotorLeft =
-      new SparkMax(1, MotorType.kBrushless); // corresponds to left and right motors for pivot
-  private SparkMax pivotMotorRight = new SparkMax(3, MotorType.kBrushless);
+      new SparkMax(AlgaeIntakePivotConstants.kPivotMotorLeftIDSpark, MotorType.kBrushless); // corresponds to left and right motors for pivot
+  private SparkMax pivotMotorRight = new SparkMax(AlgaeIntakePivotConstants.kPivotMotorRightIDSpark, MotorType.kBrushless);
   private DutyCycleEncoder algaeIntakeClimbEncoder =
-      new DutyCycleEncoder(1, 360, AlgaeIntakeClimbConstants.kPivotZeroOffsetAngle.in(Degrees));
+      new DutyCycleEncoder(AlgaeIntakePivotConstants.kEncoderID, 360, AlgaeIntakePivotConstants.kPivotZeroOffsetAngle.in(Degrees));
 
-  private DigitalInput algaeSensor = new DigitalInput(1); // beam break
+  private DigitalInput algaeSensor = new DigitalInput(AlgaeIntakePivotConstants.kDigitalInputID); // beam break
 
-  public AlgaeIntakeClimbIOSpark() {
+  public AlgaeIntakePivotIOSpark() {
     configureMotors(); // configures motors once algae spark object
   }
 
   public void configureMotors() {
     pivotMotorLeft.configure( // configures two spark motors
         new SparkMaxConfig()
-            .inverted(AlgaeIntakeClimbConstants.kPivotInverted)
-            .voltageCompensation(AlgaeIntakeClimbConstants.kNominalVoltage.in(Volts))
-            .smartCurrentLimit(AlgaeIntakeClimbConstants.kSmartCurrentLimit)
+            .inverted(AlgaeIntakePivotConstants.kPivotInverted)
+            .voltageCompensation(AlgaeIntakePivotConstants.kNominalVoltage.in(Volts))
+            .smartCurrentLimit(AlgaeIntakePivotConstants.kSmartCurrentLimit)
             .apply(
                 new EncoderConfig()
                     .velocityConversionFactor(
-                        AlgaeIntakeClimbConstants.kPivotVelocityConversionFactor)
+                        AlgaeIntakePivotConstants.kPivotVelocityConversionFactor)
                     .positionConversionFactor(
-                        AlgaeIntakeClimbConstants.kPivotPositionConversionFactor)),
+                        AlgaeIntakePivotConstants.kPivotPositionConversionFactor)),
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
     pivotMotorRight.configure(
         new SparkMaxConfig()
-            .inverted(AlgaeIntakeClimbConstants.kPivotInverted)
-            .voltageCompensation(AlgaeIntakeClimbConstants.kNominalVoltage.in(Volts))
-            .smartCurrentLimit(AlgaeIntakeClimbConstants.kSmartCurrentLimit),
+            .inverted(AlgaeIntakePivotConstants.kPivotInverted)
+            .voltageCompensation(AlgaeIntakePivotConstants.kNominalVoltage.in(Volts))
+            .smartCurrentLimit(AlgaeIntakePivotConstants.kSmartCurrentLimit)
+            .follow(AlgaeIntakePivotConstants.kPivotMotorLeftIDSpark),
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
   }
 
   public void setPivotVoltage(Voltage volts) {
     pivotMotorLeft.setVoltage(volts);
-    pivotMotorRight.setVoltage(volts);
   }
 
-  public void updateInputs(AlgaeIntakeClimbInputs inputs) {
+  public void updateInputs(AlgaeIntakePivotInputs inputs) {
     inputs.currentPivotAngle = Degrees.of(algaeIntakeClimbEncoder.get());
     inputs.hasAlgae = algaeSensor.get();
   }

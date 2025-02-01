@@ -1,13 +1,13 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakeClimb;
+package frc.robot.subsystems.algaeIntakePivot;
 
 import edu.wpi.first.units.measure.Voltage;
 
-public interface AlgaeIntakeClimbIO {
+public interface AlgaeIntakePivotIO {
 
   default void setPivotVoltage(Voltage volts) {}
 
   // sets voltage to the pivot
-  default void updateInputs(AlgaeIntakeClimbInputs inputs) {}
+  default void updateInputs(AlgaeIntakePivotInputs inputs) {}
   // to update inputs
 }
