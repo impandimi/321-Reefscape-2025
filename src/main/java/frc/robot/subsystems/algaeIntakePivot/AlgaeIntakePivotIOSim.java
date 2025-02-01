@@ -11,6 +11,8 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public class AlgaeIntakePivotIOSim implements AlgaeIntakePivotIO {
 
   public static final AlgaeIntakePivotConfig config = new AlgaeIntakePivotConfig(0, 0, 0, 0);
@@ -41,6 +43,7 @@ public class AlgaeIntakePivotIOSim implements AlgaeIntakePivotIO {
   }
 
   public void updateInputs(AlgaeIntakePivotInputs inputs) { // gets info to update inputs
+    pivotSimLeft.update(0.02);
     inputs.currentPivotAngle = Radians.of(pivotSimLeft.getAngleRads());
     inputs.hasAlgae = SmartDashboard.getBoolean("AlgaeIntakeClimbSim/HasAlgae", false);
   }

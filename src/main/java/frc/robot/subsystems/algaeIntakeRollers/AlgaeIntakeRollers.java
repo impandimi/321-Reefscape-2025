@@ -11,8 +11,11 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.TunableConstant;
 
 // the same mechanism as algaeIntakeClimb but this controls the rollers instead of the pivot
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public class AlgaeIntakeRollers extends SubsystemBase {
 
   private AlgaeIntakeRollersIO io;
@@ -21,9 +24,12 @@ public class AlgaeIntakeRollers extends SubsystemBase {
   private PIDController rollerController;
   private SimpleMotorFeedforward feedForward;
 
+  private AlgaeIntakeRollersConfig config;
+
   public AlgaeIntakeRollers(AlgaeIntakeRollersIO io, AlgaeIntakeRollersConfig config) {
     this.io = io;
     this.inputs = new AlgaeIntakeRollersInputs();
+    this.config = config;
 
     rollerController = new PIDController(config.kP(), config.kI(), config.kD());
     feedForward = new SimpleMotorFeedforward(0,config.kV());
@@ -39,6 +45,23 @@ public class AlgaeIntakeRollers extends SubsystemBase {
 
   public static AlgaeIntakeRollers disable() {
     return new AlgaeIntakeRollers(new AlgaeIntakeRollersIOIdeal(), AlgaeIntakeRollersIOIdeal.config);
+  }
+
+ public Command tune() {
+    TunableConstant kP = new TunableConstant("/AlgaeIntakeClimbRollers/kP", config.kP());
+    TunableConstant kI = new TunableConstant("/AlgaeIntakeClimbRollers/kI", config.kI());
+    TunableConstant kD = new TunableConstant("/AlgaeIntakeClimbRollers/kD", config.kD());
+    TunableConstant kV = new TunableConstant("/AlgaeIntakeClimbRollers/kG", config.kV());
+    TunableConstant desiredAngularVelocity = new TunableConstant("/AlgaeIntakeClimbRollers/desiredAngular", 0);
+    // allows us to tune PID and feed forward constants(kP, kI, kD, kG) live on smart dashboard
+    // so that we dont have to re run the code every time we change on of them.
+    return run(
+        () -> {
+          this.rollerController.setPID(kP.get(), kI.get(), kD.get());
+          this.feedForward = new SimpleMotorFeedforward(0,kV.get());
+          goToAngularVelocity(RPM.of(desiredAngularVelocity.get()));
+        }); // we set the tuning constants arbitrarily then set a desired angle to go to so that we
+    // can see how far off it is and which constants need change
   }
 
   public void spinRollers(Voltage volts) {

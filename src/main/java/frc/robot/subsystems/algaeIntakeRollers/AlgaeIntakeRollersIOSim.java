@@ -10,11 +10,14 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public class AlgaeIntakeRollersIOSim implements AlgaeIntakeRollersIO {
 
   public static final AlgaeIntakeRollersConfig config = new AlgaeIntakeRollersConfig(0, 0, 0, 0);
   private DCMotorSim rollerSim;
 
+  
   public AlgaeIntakeRollersIOSim() {
     rollerSim = // creates and configures a single motor sim to represent the mechanism's rollers
         new DCMotorSim(
@@ -31,6 +34,7 @@ public class AlgaeIntakeRollersIOSim implements AlgaeIntakeRollersIO {
   }
 
   public void updateInputs(AlgaeIntakeRollersInputs inputs) {
+    rollerSim.update(0.02);
     inputs.rollerVelocity = RadiansPerSecond.of(rollerSim.getAngularVelocityRadPerSec()); // gets input info
     inputs.hasAlgae = SmartDashboard.getBoolean("AlgaeIntakeClimbSim/HasAlgae", false);
   }

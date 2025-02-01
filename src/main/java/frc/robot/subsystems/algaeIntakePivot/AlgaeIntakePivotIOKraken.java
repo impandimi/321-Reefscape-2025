@@ -15,6 +15,8 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public class AlgaeIntakePivotIOKraken implements AlgaeIntakePivotIO {
   // kraken implementation of real mechanism
   public static final AlgaeIntakePivotConfig config = new AlgaeIntakePivotConfig(0, 0, 0, 0);

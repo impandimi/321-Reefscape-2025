@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.units.measure.Voltage;
 
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public class AlgaeIntakePivotIOIdeal implements AlgaeIntakePivotIO {
   // this class is for when the robot disables
   public static final AlgaeIntakePivotConfig config = new AlgaeIntakePivotConfig(0, 0, 0, 0);

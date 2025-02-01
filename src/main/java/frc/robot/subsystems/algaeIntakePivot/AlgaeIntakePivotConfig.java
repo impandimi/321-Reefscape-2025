@@ -1,6 +1,8 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.algaeIntakePivot;
 
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public record AlgaeIntakePivotConfig(
     double kP, double kI, double kD, double kG) {} // pid/feedforward configuration
 // kP = translation

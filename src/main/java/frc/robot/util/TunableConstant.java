@@ -11,9 +11,9 @@ public class TunableConstant {
 
   public TunableConstant(String key, double defaultValue) {
     // if and only if no constant is there already, set it to the default value
-    SmartDashboard.putNumber(key, SmartDashboard.getNumber(key, defaultValue));
+    SmartDashboard.putNumber("/Tuning" + key, SmartDashboard.getNumber(key, defaultValue));
 
-    this.getter = () -> defaultValue;
+    this.getter = () -> SmartDashboard.getNumber("/Tuning" + key, defaultValue);
   }
 
   public double get() {

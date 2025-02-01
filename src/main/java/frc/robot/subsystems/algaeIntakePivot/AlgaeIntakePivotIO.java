@@ -3,6 +3,8 @@ package frc.robot.subsystems.algaeIntakePivot;
 
 import edu.wpi.first.units.measure.Voltage;
 
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public interface AlgaeIntakePivotIO {
 
   default void setPivotVoltage(Voltage volts) {}

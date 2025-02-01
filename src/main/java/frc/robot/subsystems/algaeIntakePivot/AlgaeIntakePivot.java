@@ -2,6 +2,7 @@
 package frc.robot.subsystems.algaeIntakePivot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -14,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.TunableConstant;
 
 // the mechanism that intakes algae low and pivots back to hang from the deep cage
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public class AlgaeIntakePivot extends SubsystemBase {
 
   private AlgaeIntakePivotIO io;
@@ -72,9 +75,11 @@ public class AlgaeIntakePivot extends SubsystemBase {
   public void goToAngle(Angle desiredAngle) {
     Voltage desiredVoltage =
         Volts.of(
-            feedForward.calculate(desiredAngle.in(Degrees), 0, 0)
+            feedForward.calculate(desiredAngle.in(Radians), 0, 0)
                 + algaeIntakeClimbController.calculate(
                     inputs.currentPivotAngle.in(Degrees), desiredAngle.in(Degrees)));
+
+      System.out.println(inputs.currentPivotAngle.in(Degrees) + " " + desiredAngle.in(Degrees) + " " + desiredVoltage.in(Volts)); 
     io.setPivotVoltage(desiredVoltage);
   }
 

@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 // spark implementation of real mechanism
 
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public class AlgaeIntakePivotIOSpark implements AlgaeIntakePivotIO {
 
   public static final AlgaeIntakePivotConfig config = new AlgaeIntakePivotConfig(0, 0, 0, 0);

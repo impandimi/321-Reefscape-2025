@@ -13,6 +13,8 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 // spark implementation of real mechanism
+import edu.wpi.first.epilogue.Logged;
+@Logged
 public class AlgaeIntakeRollersIOSpark implements AlgaeIntakeRollersIO {
 
   // device ids are plcaeholders

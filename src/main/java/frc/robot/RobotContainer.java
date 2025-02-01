@@ -35,6 +35,8 @@ public class RobotContainer {
 
     // driverController.y().whileTrue(pivot.climbFloorPosition());
     // driverController.x().whileTrue(pivot.climb());
+  
+    driverController.a().whileTrue(pivot.tune());
   }
 
   public Command getAutonomousCommand() {
