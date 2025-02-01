@@ -21,6 +21,9 @@ public class DrivetrainConstants {
           ? new AutoGains(5, 0, 0) // real
           : new AutoGains(5, 0, 0); // sim
 
+  public static final AutoGains tuneTranslationGains = new AutoGains(0, 0, 0); // isn't used yet
+  public static final AutoGains tuneHeadingGains = new AutoGains(0, 0, 0); // for heading controller
+
   public static final double kDriveDeadband = 0.03;
   public static final double kRotationDeadband = 0.03;
   public static final double kMaxAngularVelocity = Math.PI * 6;

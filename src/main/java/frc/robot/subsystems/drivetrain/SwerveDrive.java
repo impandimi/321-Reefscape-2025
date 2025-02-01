@@ -7,7 +7,6 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,8 +16,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.util.MathUtils;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 /*
  * drive interface. A real and sim implementation is made out of this. Using this, so we can implement maplesim
@@ -38,7 +37,12 @@ public interface SwerveDrive extends Subsystem {
           this::resetPose, // Consumer for seeding pose against auto
           this::getChassisSpeeds, // Supplier of current robot speeds
           // Consumer of ChassisSpeeds and feedforwards to drive the robot
-          (speeds, feedforwards) -> driveAuto(speeds, feedforwards),
+          (speeds, feedforwards) ->
+              driveRobotCentric(
+                  () -> speeds.vxMetersPerSecond,
+                  () -> speeds.vyMetersPerSecond,
+                  () -> speeds.omegaRadiansPerSecond,
+                  feedforwards),
           new PPHolonomicDriveController(
               // PID constants for translation
               new PIDConstants(
@@ -62,7 +66,7 @@ public interface SwerveDrive extends Subsystem {
   }
 
   // configure driveToPoseControllers
-  default void configureControllers() {
+  default void configurePoseControllers() {
     xPoseController.setPID(
         DrivetrainConstants.kTranslationGains.kP(),
         DrivetrainConstants.kTranslationGains.kI(),
@@ -80,35 +84,21 @@ public interface SwerveDrive extends Subsystem {
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
-  ;
-
-  // convert joystick inputs to velocities
-  default ChassisSpeeds calculateDriveVelocity(double x, double y, double rotation) {
-    // apply continous deadband first, then convert to velocity
-    double newTranslationX =
-        MathUtil.applyDeadband(x, DrivetrainConstants.kDriveDeadband)
-            * DrivetrainConstants.kMaxLinearVelocity;
-    double newTranslationY =
-        MathUtil.applyDeadband(y, DrivetrainConstants.kDriveDeadband)
-            * DrivetrainConstants.kMaxLinearVelocity;
-
-    // apply deadband, then square input for accuracy, then convert to velocity
-    double newRotation =
-        MathUtils.squareKeepSign(
-                MathUtil.applyDeadband(rotation, DrivetrainConstants.kRotationDeadband))
-            * DrivetrainConstants.kMaxAngularVelocity;
-
-    return new ChassisSpeeds(newTranslationX, newTranslationY, newRotation);
-  }
-
-  // pathplanner chassisSpeeds consumer
-  Command driveAuto(ChassisSpeeds speeds, DriveFeedforwards feedforward);
 
   Command driveFieldCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation);
 
   Command driveRobotCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation);
+
+  Command driveRobotCentric(
+      DoubleSupplier translationX,
+      DoubleSupplier translationY,
+      DoubleSupplier rotation,
+      DriveFeedforwards feedforwards);
+
+  Command driveFixedHeading(
+      DoubleSupplier translationX, DoubleSupplier translationY, Supplier<Rotation2d> rotation);
 
   // auto drive w/ external pid controllers
   Command driveToPose(Pose2d pose);
@@ -117,7 +107,7 @@ public interface SwerveDrive extends Subsystem {
 
   void setSwerveModuleStates(SwerveModuleState[] states);
 
-  SwerveModuleState[] getSwerveModuleStates();
+  SwerveModuleState[] getMeasuredModuleStates();
 
   SwerveModuleState[] getTargetModuleStates();
 
