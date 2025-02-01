@@ -1,0 +1,22 @@
+/* (C) Robolancers 2025 */
+package frc.robot.util;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.function.DoubleSupplier;
+
+// Stolen from Matt's swerve repo
+public class TunableConstant {
+
+  private final DoubleSupplier getter;
+
+  public TunableConstant(String key, double defaultValue) {
+    // if and only if no constant is there already, set it to the default value
+    SmartDashboard.putNumber(key, SmartDashboard.getNumber(key, defaultValue));
+
+    this.getter = () -> defaultValue;
+  }
+
+  public double get() {
+    return this.getter.getAsDouble();
+  }
+}

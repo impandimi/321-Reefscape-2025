@@ -7,7 +7,7 @@ public interface AlgaeIntakeClimbIO {
 
   default void setPivotVoltage(Voltage volts) {}
 
-  default void setRollerVoltage(Voltage volts) {}
-
+  // sets voltage to the pivot
   default void updateInputs(AlgaeIntakeClimbInputs inputs) {}
+  // to update inputs
 }
