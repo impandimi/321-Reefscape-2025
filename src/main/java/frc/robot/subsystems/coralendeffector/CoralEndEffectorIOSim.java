@@ -1,6 +1,7 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.coralendeffector;
 
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
@@ -14,8 +15,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 class CoralEndEffectorIOSim implements CoralEndEffectorIO {
   // Constant values for the simulation of the coral end effector
 
-  // public static final CoralEndEffectorConfig config = new CoralEndEffectorConfig(4, 0, 0, 0.9,
-  // 0); <- do we need this / do we need config at all?
+  public static final CoralEndEffectorConfig config = new CoralEndEffectorConfig(0, 0, 0, 0);
 
   public DCMotorSim simulation =
       new DCMotorSim(
@@ -29,7 +29,7 @@ class CoralEndEffectorIOSim implements CoralEndEffectorIO {
   public void updateInputs(CoralEndEffectorInputs inputs) {
     simulation.update(0.02);
     inputs.voltage = Volts.of(simulation.getInputVoltage());
-    inputs.isBeamBreakBroken = false;
+    inputs.velocity = RPM.of(simulation.getAngularVelocityRPM());
   }
 
   @Override

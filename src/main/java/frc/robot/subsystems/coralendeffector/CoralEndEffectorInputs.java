@@ -2,6 +2,7 @@
 package frc.robot.subsystems.coralendeffector;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 
 // below are inputs that the coral end effector will receive
@@ -9,5 +10,5 @@ import edu.wpi.first.units.measure.Voltage;
 public class CoralEndEffectorInputs {
   public Voltage voltage;
   public boolean hasCoral;
-  public boolean isBeamBreakBroken;
+  public AngularVelocity velocity;
 }

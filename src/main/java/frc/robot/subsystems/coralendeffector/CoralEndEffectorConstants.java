@@ -1,8 +1,10 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.coralendeffector;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 
 // list of constants for the coral end effector
@@ -16,8 +18,7 @@ public class CoralEndEffectorConstants {
   public static final double momentOfInertia = 1;
   public static final double gearing = 1;
 
-  public static final int kTimeOfFlightID = 0;
-  public static final double kDetectionRange = 0;
+  public static final Distance kDetectionRange = Meters.of(0);
 
-  public static final int kTouchSensorPort = 0;
+  public static final int kTimeOfFlightId = 0;
 }
