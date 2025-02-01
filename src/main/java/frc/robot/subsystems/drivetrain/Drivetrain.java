@@ -1,116 +1,182 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.drivetrain;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveModule.ModuleRequest;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.util.MathUtils;
-
-@Logged
+import java.util.function.DoubleSupplier;
 
 /*
- * Drivetrain based on CTR SwerveDrive
+ * Real Drivetrain using CTRE SwerveDrivetrain and SwerveRequests
  */
 
-public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> implements Subsystem {
-  // auto gains
-  public record Gains(double kP, double kI, double kD) {}
-
-  public static final Gains kPPDrive = new Gains(5, 0, 0);
-  public static final Gains kPPTurn = new Gains(5, 0, 0);
-
-  // no sim b/c sim runs in simulationPeriodic
-  public Drivetrain create() {
-    return RobotBase.isReal()
-        ? new Drivetrain(
-            TunerConstants.DrivetrainConstants,
-            TunerConstants.FrontLeft,
-            TunerConstants.FrontRight,
-            TunerConstants.BackLeft,
-            TunerConstants.BackRight)
-        : new DrivetrainSim(
-            TunerConstants.DrivetrainConstants,
-            TunerConstants.FrontLeft,
-            TunerConstants.FrontRight,
-            TunerConstants.BackLeft,
-            TunerConstants.BackRight);
-  }
+@Logged
+public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
+    implements SwerveDrive {
 
   public Drivetrain(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
+    // create CTRE Swervedrivetrain
     super(TalonFX::new, TalonFX::new, CANcoder::new, drivetrainConstants, modules);
+    configNeutralMode(NeutralModeValue.Brake);
     configureAutoBuilder();
+    configureControllers();
   }
 
-  public void configureAutoBuilder() {
-    try { // try and catch for config exception
-      var config = RobotConfig.fromGUISettings();
-      AutoBuilder.configure(
-          this::getPose, // Supplier of current robot pose
-          this::resetPose, // Consumer for seeding pose against auto
-          this::getChassisSpeeds, // Supplier of current robot speeds
-          // Consumer of ChassisSpeeds and feedforwards to drive the robot
-          (speeds, feedforwards) ->
-              setControl(
-                  new SwerveRequest.ApplyRobotSpeeds()
-                      .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                      .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-          new PPHolonomicDriveController(
-              // PID constants for translation
-              new PIDConstants(kPPDrive.kP(), kPPDrive.kI(), kPPDrive.kD()),
-              // PID constants for rotation
-              new PIDConstants(kPPTurn.kP(), kPPTurn.kI(), kPPTurn.kD())),
-          config,
-          // Assume the path needs to be flipped for Red vs Blue, this is normally the case
-          () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-          this // Subsystem for requirements
-          );
-    } catch (Exception ex) {
-      DriverStation.reportError(
-          "Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
+  @Override
+  public Command driveAuto(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+    return run(
+        () ->
+            setControl(
+                new SwerveRequest.ApplyRobotSpeeds()
+                    .withSpeeds(speeds)
+                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())));
+  }
+
+  @Override
+  public Command driveFieldCentric(
+      DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
+    var speeds =
+        ChassisSpeeds.discretize(
+            calculateDriveVelocity(
+                translationX.getAsDouble(), translationY.getAsDouble(), rotation.getAsDouble()),
+            DrivetrainConstants.kLoopDt.magnitude());
+
+    // x braking
+    // if(Math.abs(newTranslationX) < DriveConstants.kDriveDeadband &&
+    // Math.abs(newTranslationY) < DriveConstants.kDriveDeadband &&
+    // Math.abs(newRotation) < DriveConstants.kRotationDeadband){
+
+    // return run (
+    //     () -> {
+    //       io.setControl(new SwerveRequest.SwerveDriveBrake());
+    //     }
+    //   );
+    // }
+
+    return run(
+        () ->
+            setControl(
+                new SwerveRequest.FieldCentric()
+                    .withDriveRequestType(DriveRequestType.Velocity)
+                    .withVelocityX(speeds.vxMetersPerSecond)
+                    .withVelocityY(speeds.vyMetersPerSecond)
+                    .withRotationalRate(speeds.omegaRadiansPerSecond)));
+  }
+  ;
+
+  @Override
+  public Command driveRobotCentric(
+      DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
+    var speeds =
+        ChassisSpeeds.discretize(
+            calculateDriveVelocity(
+                translationX.getAsDouble(), translationY.getAsDouble(), rotation.getAsDouble()),
+            DrivetrainConstants.kLoopDt.magnitude());
+
+    return run(
+        () ->
+            setControl(
+                new SwerveRequest.ApplyRobotSpeeds()
+                    .withSpeeds(speeds)
+                    .withDriveRequestType(DriveRequestType.Velocity)));
+  }
+
+  @Override
+  public Command driveToPose(Pose2d pose) {
+    return runOnce(
+            () -> {
+              xPoseController.reset();
+              yPoseController.reset();
+              thetaController.reset();
+            })
+        .andThen(
+            () -> {
+              var targetSpeeds =
+                  new ChassisSpeeds(
+                      xPoseController.calculate(getPose().getX(), pose.getX())
+                          * DrivetrainConstants.kMaxLinearVelocity,
+                      yPoseController.calculate(getPose().getY(), pose.getY())
+                          * DrivetrainConstants.kMaxLinearVelocity,
+                      thetaController.calculate(
+                              getPose().getRotation().getRadians(), pose.getRotation().getRadians())
+                          * DrivetrainConstants.kMaxAngularVelocity);
+
+              setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(targetSpeeds));
+            });
+  }
+
+  // drive with absolute heading control
+  // public Command driveFixedHeading(
+  //     DoubleSupplier translationX, DoubleSupplier translationY, Supplier<Rotation2d> rotation) {
+  //   var speeds =
+  //       ChassisSpeeds.discretize(
+  //           calculateDriveVelocity(translationX.getAsDouble(), translationY.getAsDouble(), 0),
+  //           DrivetrainConstants.kLoopDt.magnitude());
+
+  //   return run(
+  //       () ->
+  //           setControl(
+  //               new SwerveRequest.FieldCentricFacingAngle()
+  //                   .withDriveRequestType(DriveRequestType.Velocity)
+  //                   .withVelocityX(speeds.vxMetersPerSecond)
+  //                   .withVelocityY(speeds.vyMetersPerSecond)
+  //                   .withTargetDirection(rotation.get())));
+  // }
+
+  @Override
+  public void resetPose(Pose2d pose) {
+    super.resetPose(pose);
+  }
+
+  @Override
+  public void setSwerveModuleStates(SwerveModuleState[] states) {
+    for (int i = 0; i < super.getModules().length; i++) {
+      super.getModule(i).apply(new ModuleRequest().withState(states[i]));
     }
   }
 
-  // default drive command
-  public Command driveFieldCentric(double translationX, double translationY, double rotation) {
-    return run(
-        () -> {
-          this.setControl(
-              new SwerveRequest.FieldCentric()
-                  .withDriveRequestType(DriveRequestType.Velocity)
-                  .withDeadband(DrivetrainConstants.kDriveDeadband)
-                  .withRotationalDeadband(DrivetrainConstants.kRotationDeadband)
-                  .withVelocityX(translationX * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond))
-                  .withVelocityY(translationY * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond))
-                  .withRotationalRate(
-                      MathUtils.squareKeepSign(rotation)
-                          * DrivetrainConstants.kMaxAngularVelocity));
-        });
+  @Override
+  public SwerveModuleState[] getSwerveModuleStates() {
+    return super.getState().ModuleStates;
   }
 
+  @Override
+  public SwerveModuleState[] getTargetModuleStates() {
+    return super.getState().ModuleTargets;
+  }
+
+  @Override
   public Pose2d getPose() {
-    return this.getState().Pose;
+    return super.getState().Pose;
   }
 
+  @Override
   public ChassisSpeeds getChassisSpeeds() {
-    return this.getState().Speeds;
+    return super.getState().Speeds;
+  }
+
+  @Override
+  public Rotation2d getHeading() {
+    return Rotation2d.fromDegrees(super.getPigeon2().getYaw().getValueAsDouble());
+  }
+
+  @Override
+  public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+    super.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
   }
 }
