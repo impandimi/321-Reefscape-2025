@@ -49,7 +49,7 @@ public class CoralEndEffector extends SubsystemBase {
         });
   }
 
-// stalls coral
+  // stalls coral
   public Command stallCoral() {
     return run(
         () -> {

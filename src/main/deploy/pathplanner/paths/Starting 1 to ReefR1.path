@@ -12,20 +12,20 @@
         "y": 6.0335
       },
       "isLocked": false,
-      "linkedName": "Start point 1"
+      "linkedName": "Starting 1"
     },
     {
       "anchor": {
-        "x": 5.21625,
-        "y": 5.1754999999999995
+        "x": 5.358504098360656,
+        "y": 5.38560450819672
       },
       "prevControl": {
-        "x": 5.840249999999999,
-        "y": 5.57525
+        "x": 5.982504098360656,
+        "y": 5.78535450819672
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ReefR1"
     }
   ],
   "rotationTargets": [],

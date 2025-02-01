@@ -13,8 +13,11 @@ public class CoralEndEffectorConstants {
   public static final Voltage kIntakeVoltage = Volts.of(9);
   public static final Voltage kOuttakeVoltage = Volts.of(-9);
   public static final Voltage kStallVoltage = Volts.of(1.2);
+  public static final double momentOfInertia = 1;
+  public static final double gearing = 1;
 
-  public static final int kBeamBreakPort = 0;
+  public static final int kTimeOfFlightID = 0;
+  public static final double kDetectionRange = 0;
 
   public static final int kTouchSensorPort = 0;
 }

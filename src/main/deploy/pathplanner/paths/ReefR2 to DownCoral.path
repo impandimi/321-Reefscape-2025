@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.849999999999999,
-        "y": 3.983043032786885
+        "x": 6.125717213114753,
+        "y": 4.0549692622950815
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.909938524590164,
-        "y": 1.9571209016393447
+        "x": 6.185655737704918,
+        "y": 2.029047131147541
       },
       "isLocked": false,
-      "linkedName": "Reef Right 2"
+      "linkedName": "ReefR2"
     },
     {
       "anchor": {
-        "x": 1.1987704918032787,
-        "y": 1.0820184426229513
+        "x": 1.17,
+        "y": 1.0804999999999996
       },
       "prevControl": {
-        "x": 4.483401639344262,
-        "y": 0.9261782786885235
+        "x": 4.454631147540983,
+        "y": 0.9246598360655718
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Coral"
+      "linkedName": "DownCoral"
     }
   ],
   "rotationTargets": [],
@@ -49,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -125.00000000000001
+    "rotation": -130.0
   },
   "reversed": false,
   "folder": "Paths",
