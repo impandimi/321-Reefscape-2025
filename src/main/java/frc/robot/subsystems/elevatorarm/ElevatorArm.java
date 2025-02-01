@@ -18,8 +18,9 @@ import frc.robot.util.TunableConstant;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-// NOTE: Convention if we use an arm with two mechanism is: zeroed at CORAL INTAKE on the RIGHT
-// TO ZERO: move CORAL all teh way down (use gravity if needed), zero, then move it to 90 deg, then
+// NOTE: Convention is: zeroed when coral intake CG is 90 degrees
+// TO ZERO: move coral intake such that CG is all the way down due to gravity, zero, then move it to
+// 90 deg, then
 // zero again
 
 // Elevator Arm subsystem - represents the arm/pivot on the elevator

@@ -14,7 +14,7 @@ import edu.wpi.first.units.measure.Voltage;
  */
 @Logged
 public class ElevatorArmIOIdeal implements ElevatorArmIO {
-  public static final ElevatorArmConfig config = new ElevatorArmConfig(0, 0, 0, 0, 0, 0);
+  public static final ElevatorArmConfig config = new ElevatorArmConfig(0, 0, 0, 0, 0);
 
   public void updateInputs(ElevatorArmInputs inputs) {
     inputs.angle = Radians.of(0);
