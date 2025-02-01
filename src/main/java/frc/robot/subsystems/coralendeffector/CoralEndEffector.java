@@ -10,8 +10,8 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.TunableConstant;
 import java.util.function.Supplier;
 
 // coral end effector subsystem
@@ -22,6 +22,8 @@ public class CoralEndEffector extends SubsystemBase {
 
   private PIDController endEffectorController;
   private SimpleMotorFeedforward feedforward;
+
+  private CoralEndEffectorConfig config;
 
   public static CoralEndEffector create() {
     return RobotBase.isReal()
@@ -36,6 +38,7 @@ public class CoralEndEffector extends SubsystemBase {
   public CoralEndEffector(CoralEndEffectorIO io, CoralEndEffectorConfig config) {
     this.io = io;
     this.inputs = new CoralEndEffectorInputs();
+    this.config = config;
     this.endEffectorController = new PIDController(config.kP(), config.kI(), config.kD());
     this.feedforward = new SimpleMotorFeedforward(0, config.kV());
   }
@@ -46,17 +49,24 @@ public class CoralEndEffector extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
+  // run the end effector at a certain specified velocity using PIDFF control
+  // Will only run once; For a continuous method, see runAtVelocity(Supplier<AngularVelocity>)
+  public void runAtVelocity(AngularVelocity velocity) {
+    double output =
+        endEffectorController.calculate(inputs.velocity.in(RPM), velocity.in(RPM))
+            + feedforward.calculate(velocity.in(RPM));
+    io.setVoltage(Volts.of(output));
+  }
+
+  // continuously run the end effector at a certain velocity supplied by the velocity supplier
   public Command runAtVelocity(Supplier<AngularVelocity> velocity) {
     return run(
         () -> {
-          double output =
-              endEffectorController.calculate(inputs.velocity.in(RPM), velocity.get().in(RPM))
-                  + feedforward.calculate(velocity.get().in(RPM));
-          io.setVoltage(Volts.of(output));
+          runAtVelocity(velocity.get());
         });
   }
 
-  // intakes coral
+  // shortcut to intake coral
   public Command intakeCoral() {
     return run(
         () -> {
@@ -64,7 +74,7 @@ public class CoralEndEffector extends SubsystemBase {
         });
   }
 
-  // outtakes coral
+  // shortcut to outtake coral
   public Command outtakeCoral() {
     return run(
         () -> {
@@ -84,8 +94,19 @@ public class CoralEndEffector extends SubsystemBase {
         });
   }
 
+  // tune PIDFF of end effector
   public Command tune() {
-    // TODO: implement
-    return Commands.none();
+    TunableConstant kP = new TunableConstant("/CoralEndEffector/kP", config.kP());
+    TunableConstant kI = new TunableConstant("/CoralEndEffector/kI", config.kI());
+    TunableConstant kD = new TunableConstant("/CoralEndEffector/kD", config.kD());
+    TunableConstant kV = new TunableConstant("/CoralEndEffector/kV", config.kV());
+    TunableConstant targetRPM = new TunableConstant("/CoralEndEffector/TargetRPM", 0);
+
+    return run(
+        () -> {
+          endEffectorController.setPID(kP.get(), kI.get(), kD.get());
+          feedforward = new SimpleMotorFeedforward(0, kV.get());
+          runAtVelocity(RPM.of(targetRPM.get()));
+        });
   }
 }
