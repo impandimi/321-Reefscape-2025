@@ -43,6 +43,7 @@ public class Elevator extends SubsystemBase {
   public Elevator(ElevatorIO io, ElevatorConfig config) {
     this.io = io;
     this.inputs = new ElevatorInputs();
+    this.config = config;
     this.pidController = new PIDController(config.kP(), config.kI(), config.kD());
     this.feedForward = new ElevatorFeedforward(config.kS(), config.kG(), 0);
 
