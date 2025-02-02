@@ -2,6 +2,7 @@
 package frc.robot.subsystems.drivetrain;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -14,13 +15,16 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.ModuleRequest;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.MyAlliance;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -31,6 +35,28 @@ import java.util.function.Supplier;
 @Logged
 public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     implements SwerveDrive {
+
+  private SwerveRequest.ForwardPerspectiveValue forwardPerspective =
+      MyAlliance.isRed()
+          ? ForwardPerspectiveValue.OperatorPerspective
+          : ForwardPerspectiveValue.BlueAlliance;
+
+  private final SwerveRequest.FieldCentric fieldCentricRequest =
+      new SwerveRequest.FieldCentric()
+          .withDriveRequestType(DriveRequestType.Velocity)
+          .withDesaturateWheelSpeeds(true)
+          .withForwardPerspective(forwardPerspective);
+
+  private final SwerveRequest.ApplyRobotSpeeds robotCentricRequest =
+      new SwerveRequest.ApplyRobotSpeeds()
+          .withDriveRequestType(DriveRequestType.Velocity)
+          .withDesaturateWheelSpeeds(true);
+
+  private final SwerveRequest.FieldCentricFacingAngle fieldCentricFacingAngleRequest =
+      new SwerveRequest.FieldCentricFacingAngle()
+          .withDriveRequestType(DriveRequestType.Velocity)
+          .withDesaturateWheelSpeeds(true)
+          .withForwardPerspective(forwardPerspective);
 
   public Drivetrain(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
@@ -60,11 +86,11 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
           // setControl(new SwerveRequest.SwerveDriveBrake())};
 
           setControl(
-              new SwerveRequest.FieldCentric()
-                  .withDriveRequestType(DriveRequestType.Velocity)
+              fieldCentricRequest
                   .withVelocityX(speeds.vxMetersPerSecond)
                   .withVelocityY(speeds.vyMetersPerSecond)
-                  .withRotationalRate(speeds.omegaRadiansPerSecond));
+                  .withRotationalRate(speeds.omegaRadiansPerSecond)
+                  .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
         });
   }
   ;
@@ -90,7 +116,7 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
             translationX, translationY, rotation, DrivetrainConstants.kLoopDt.in(Seconds));
 
     setControl(
-        new SwerveRequest.ApplyRobotSpeeds()
+        robotCentricRequest
             .withSpeeds(speeds)
             .withDriveRequestType(DriveRequestType.Velocity)
             .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
@@ -153,7 +179,7 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                           DrivetrainConstants.kLoopDt.in(Seconds));
 
                   setControl(
-                      new SwerveRequest.FieldCentric()
+                      fieldCentricRequest
                           .withDriveRequestType(DriveRequestType.Velocity)
                           .withVelocityX(targetSpeeds.vxMetersPerSecond)
                           .withVelocityY(targetSpeeds.vyMetersPerSecond)
@@ -175,17 +201,12 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                   DrivetrainConstants.kLoopDt.in(Seconds));
 
           setControl(
-              new SwerveRequest.FieldCentricFacingAngle()
+              fieldCentricFacingAngleRequest
                   .withDriveRequestType(DriveRequestType.Velocity)
                   .withVelocityX(speeds.vxMetersPerSecond)
                   .withVelocityY(speeds.vyMetersPerSecond)
                   .withTargetDirection(rotation.get()));
         });
-  }
-
-  @Override
-  public void resetPose(Pose2d pose) {
-    super.resetPose(pose);
   }
 
   @Override
@@ -195,35 +216,39 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     }
   }
 
-  @Logged(name = "MeasuredSwerveStates")
+  @Logged(name = "MeasuredModuleStates")
   @Override
   public SwerveModuleState[] getMeasuredModuleStates() {
     return super.getState().ModuleStates;
   }
 
-  @Logged(name = "TargetSwerveStates")
+  @Logged(name = "MeasuredModulePositions")
+  @Override
+  public SwerveModulePosition[] getModulePositions() {
+    return super.getState().ModulePositions;
+  }
+
+  @Logged(name = "TargetModuleStates")
   @Override
   public SwerveModuleState[] getTargetModuleStates() {
     return super.getState().ModuleTargets;
   }
 
+  @Logged(name = "MeasuredRobotPose")
   @Override
   public Pose2d getPose() {
     return super.getState().Pose;
   }
 
+  @Logged(name = "MeasuredRobotRelativeChassisSpeeds")
   @Override
   public ChassisSpeeds getChassisSpeeds() {
     return super.getState().Speeds;
   }
 
+  @Logged(name = "MeasuredHeadingRad")
   @Override
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(super.getPigeon2().getYaw().getValueAsDouble());
-  }
-
-  @Override
-  public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-    super.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
+    return new Rotation2d(super.getPigeon2().getYaw().getValue().in(Radians));
   }
 }

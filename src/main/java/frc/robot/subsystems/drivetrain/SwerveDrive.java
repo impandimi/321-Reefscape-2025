@@ -7,11 +7,15 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -110,6 +114,8 @@ public interface SwerveDrive extends Subsystem {
 
   SwerveModuleState[] getMeasuredModuleStates();
 
+  SwerveModulePosition[] getModulePositions();
+
   SwerveModuleState[] getTargetModuleStates();
 
   Pose2d getPose();
@@ -119,4 +125,7 @@ public interface SwerveDrive extends Subsystem {
   Rotation2d getHeading();
 
   void addVisionMeasurement(Pose2d visionRobotPose, double timeStampSeconds);
+
+  void addVisionMeasurement(
+      Pose2d visionRobotPose, double timeStampSeconds, Matrix<N3, N1> standardDeviations);
 }

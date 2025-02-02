@@ -1,12 +1,14 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -27,6 +29,9 @@ public class DrivetrainConstants {
 
   public static final AutoGains tuneTranslationGains = new AutoGains(0, 0, 0); // isn't used
   public static final AutoGains tuneHeadingGains = new AutoGains(6, 0, 0); // for heading controller
+
+  public static final Distance kTrackWidth = Inches.of(29);
+  public static final Distance kWheelBase = Inches.of(29);
 
   public static final double kDriveDeadband = 0.03;
   public static final double kRotationDeadband = 0.03;

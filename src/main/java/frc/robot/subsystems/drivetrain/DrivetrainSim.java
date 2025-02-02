@@ -8,21 +8,25 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.SelfControlledSwerveDriveSimulationWrapper;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
@@ -31,13 +35,10 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
  */
 @Logged
 public class DrivetrainSim implements SwerveDrive {
-  // sim
-  private final SelfControlledSwerveDriveSimulation simulatedDrive;
+  private final SelfControlledSwerveDriveSimulationWrapper simulatedDrive;
   private final Field2d field2d;
   final DriveTrainSimulationConfig simConfig;
   PIDController headingController;
-
-  // drive to pose controllers
 
   public DrivetrainSim() {
     this.simConfig =
@@ -50,13 +51,16 @@ public class DrivetrainSim implements SwerveDrive {
                     COTS.WHEELS.COLSONS.cof, // Use the COF for Colson Wheels
                     3)) // L3 Gear ratio
             // Configures the track length and track width (spacing between swerve modules)
-            .withTrackLengthTrackWidth(Inches.of(29), Inches.of(29))
+            .withTrackLengthTrackWidth(
+                DrivetrainConstants.kWheelBase, DrivetrainConstants.kTrackWidth)
             // Configures the bumper size (dimensions of the robot bumper) trackwidth + 6 inches
-            .withBumperSize(Inches.of(35), Inches.of(35))
+            .withBumperSize(
+                DrivetrainConstants.kWheelBase.plus(Inches.of(6)),
+                DrivetrainConstants.kTrackWidth.plus(Inches.of(6)))
             .withRobotMass(Pounds.of(113));
 
     this.simulatedDrive =
-        new SelfControlledSwerveDriveSimulation(
+        new SelfControlledSwerveDriveSimulationWrapper(
             new SwerveDriveSimulation(simConfig, new Pose2d(2, 2, new Rotation2d())));
 
     this.headingController =
@@ -192,28 +196,41 @@ public class DrivetrainSim implements SwerveDrive {
     simulatedDrive.runSwerveStates(states);
   }
 
-  @Logged(name = "MeasuredSwerveStates")
+  @Logged(name = "MeasuredModuleStates")
   @Override
   public SwerveModuleState[] getMeasuredModuleStates() {
     return simulatedDrive.getMeasuredStates();
   }
 
-  @Logged(name = "TargetSwerveStates")
+  @Override
+  public SwerveModulePosition[] getModulePositions() {
+    return simulatedDrive.getLatestModulePositions();
+  }
+
+  @Logged(name = "TargetModuleStates")
   @Override
   public SwerveModuleState[] getTargetModuleStates() {
     return simulatedDrive.getSetPointsOptimized();
   }
 
+  @Logged(name = "MeasuredRobotPose")
   @Override
   public Pose2d getPose() {
     return simulatedDrive.getOdometryEstimatedPose();
   }
 
-  @Override
-  public ChassisSpeeds getChassisSpeeds() {
-    return simulatedDrive.getActualSpeedsRobotRelative();
+  @Logged(name = "ActualRobotPose")
+  public Pose2d getActualPose() {
+    return simulatedDrive.getActualPoseInSimulationWorld();
   }
 
+  @Logged(name = "MeasuredRobotRelativeChassisSpeeds")
+  @Override
+  public ChassisSpeeds getChassisSpeeds() {
+    return simulatedDrive.getMeasuredSpeedsRobotRelative(false);
+  }
+
+  @Logged(name = "MeasuredHeadingRad")
   @Override
   public Rotation2d getHeading() {
     return simulatedDrive.getDriveTrainSimulation().getGyroSimulation().getGyroReading();
@@ -222,6 +239,12 @@ public class DrivetrainSim implements SwerveDrive {
   @Override
   public void addVisionMeasurement(Pose2d visionRobotPose, double timeStampSeconds) {
     simulatedDrive.addVisionEstimation(visionRobotPose, timeStampSeconds);
+  }
+
+  @Override
+  public void addVisionMeasurement(
+      Pose2d visionRobotPose, double timeStampSeconds, Matrix<N3, N1> standardDeviations) {
+    simulatedDrive.addVisionEstimation(visionRobotPose, timeStampSeconds, standardDeviations);
   }
 
   @Override
