@@ -37,8 +37,7 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   private final SwerveRequest.FieldCentric fieldCentricRequest =
       new SwerveRequest.FieldCentric()
           .withDriveRequestType(DriveRequestType.Velocity)
-          .withDesaturateWheelSpeeds(true)
-          .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
+          .withDesaturateWheelSpeeds(true);
 
   private final SwerveRequest.ApplyRobotSpeeds robotCentricRequest =
       new SwerveRequest.ApplyRobotSpeeds()
@@ -48,8 +47,7 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   private final SwerveRequest.FieldCentricFacingAngle fieldCentricFacingAngleRequest =
       new SwerveRequest.FieldCentricFacingAngle()
           .withDriveRequestType(DriveRequestType.Velocity)
-          .withDesaturateWheelSpeeds(true)
-          .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
+          .withDesaturateWheelSpeeds(true);
 
   public Drivetrain(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
@@ -58,6 +56,12 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     configNeutralMode(NeutralModeValue.Brake);
     configureAutoBuilder();
     configurePoseControllers();
+  }
+
+  @Override
+  public Command teleopDrive(
+      DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
+    return run(() -> driveFieldCentric(translationX, translationY, rotation));
   }
 
   @Override
@@ -91,7 +95,6 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   @Override
   public Command driveRobotCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
-
     return run(
         () ->
             driveRobotCentric(
@@ -176,7 +179,8 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                           .withDriveRequestType(DriveRequestType.Velocity)
                           .withVelocityX(targetSpeeds.vxMetersPerSecond)
                           .withVelocityY(targetSpeeds.vyMetersPerSecond)
-                          .withRotationalRate(targetSpeeds.omegaRadiansPerSecond));
+                          .withRotationalRate(targetSpeeds.omegaRadiansPerSecond)
+                          .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
                 }));
   }
 
@@ -198,7 +202,8 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                   .withDriveRequestType(DriveRequestType.Velocity)
                   .withVelocityX(speeds.vxMetersPerSecond)
                   .withVelocityY(speeds.vyMetersPerSecond)
-                  .withTargetDirection(rotation.get()));
+                  .withTargetDirection(rotation.get())
+                  .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
         });
   }
 

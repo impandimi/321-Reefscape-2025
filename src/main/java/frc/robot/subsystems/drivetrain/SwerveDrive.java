@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.util.MyAlliance;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -87,6 +88,16 @@ public interface SwerveDrive extends Subsystem {
   default void configurePoseControllers() {
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
+
+  default ChassisSpeeds flipFieldSpeeds(ChassisSpeeds speeds) {
+    return MyAlliance.isRed()
+        ? new ChassisSpeeds(
+            -speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond)
+        : speeds;
+  }
+
+  Command teleopDrive(
+      DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation);
 
   Command driveFieldCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation);

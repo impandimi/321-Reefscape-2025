@@ -82,6 +82,21 @@ public class DrivetrainSim implements SwerveDrive {
   }
 
   @Override
+  public Command teleopDrive(
+      DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
+    return run(
+        () -> {
+          ChassisSpeeds speeds =
+              flipFieldSpeeds(
+                  new ChassisSpeeds(
+                      translationX.getAsDouble(),
+                      translationY.getAsDouble(),
+                      rotation.getAsDouble()));
+          simulatedDrive.runChassisSpeeds(speeds, new Translation2d(), true, false);
+        });
+  }
+
+  @Override
   public Command driveFieldCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
 

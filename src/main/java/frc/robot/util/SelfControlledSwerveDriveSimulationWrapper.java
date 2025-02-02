@@ -55,17 +55,7 @@ public class SelfControlledSwerveDriveSimulationWrapper
 
     ChassisSpeeds desatSpeeds = swerveKinematics.toChassisSpeeds(states);
 
-    ChassisSpeeds targetSpeeds = MyAlliance.isRed() ? flipFieldSpeeds(desatSpeeds) : desatSpeeds;
-
     super.runChassisSpeeds(
-        targetSpeeds, centerOfRotationMeters, fieldCentricDrive, discretizeSpeeds);
-  }
-
-  // stolen from PP flipping util
-  public ChassisSpeeds flipFieldSpeeds(ChassisSpeeds fieldSpeeds) {
-    return new ChassisSpeeds(
-        -fieldSpeeds.vxMetersPerSecond,
-        fieldSpeeds.vyMetersPerSecond,
-        -fieldSpeeds.omegaRadiansPerSecond);
+        desatSpeeds, centerOfRotationMeters, fieldCentricDrive, discretizeSpeeds);
   }
 }
