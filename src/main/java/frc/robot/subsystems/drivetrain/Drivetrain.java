@@ -1,6 +1,8 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -71,35 +73,33 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   public Command driveRobotCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
 
-    return driveRobotCentric(translationX, translationY, rotation, DriveFeedforwards.zeros(4));
-  }
-
-  @Override
-  public Command driveRobotCentric(
-      DoubleSupplier translationX,
-      DoubleSupplier translationY,
-      DoubleSupplier rotation,
-      DriveFeedforwards feedforwards) {
     return run(
-        () -> {
-          var speeds =
-              ChassisSpeeds.discretize(
-                  translationX.getAsDouble(),
-                  translationY.getAsDouble(),
-                  rotation.getAsDouble(),
-                  DrivetrainConstants.kLoopDt.in(Seconds));
-
-          setControl(
-              new SwerveRequest.ApplyRobotSpeeds()
-                  .withSpeeds(speeds)
-                  .withDriveRequestType(DriveRequestType.Velocity)
-                  .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                  .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons()));
-        });
+        () ->
+            driveRobotCentric(
+                translationX.getAsDouble(),
+                translationY.getAsDouble(),
+                rotation.getAsDouble(),
+                DriveFeedforwards.zeros(4)));
   }
 
   @Override
-  public Command driveToPose(Pose2d pose) {
+  public void driveRobotCentric(
+      double translationX, double translationY, double rotation, DriveFeedforwards feedforwards) {
+    var speeds =
+        ChassisSpeeds.discretize(
+            translationX, translationY, rotation, DrivetrainConstants.kLoopDt.in(Seconds));
+
+    setControl(
+        new SwerveRequest.ApplyRobotSpeeds()
+            .withSpeeds(speeds)
+            .withDriveRequestType(DriveRequestType.Velocity)
+            .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+            .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons()));
+  }
+  ;
+
+  @Override
+  public Command driveToRobotPose(Supplier<Pose2d> pose) {
     return runOnce(
             () -> {
               xPoseController.reset();
@@ -111,17 +111,53 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                 () -> {
                   var targetSpeeds =
                       ChassisSpeeds.discretize(
-                          xPoseController.calculate(getPose().getX(), pose.getX())
-                              * DrivetrainConstants.kMaxLinearVelocity,
-                          yPoseController.calculate(getPose().getY(), pose.getY())
-                              * DrivetrainConstants.kMaxLinearVelocity,
+                          xPoseController.calculate(getPose().getX(), pose.get().getX())
+                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
+                          yPoseController.calculate(getPose().getY(), pose.get().getY())
+                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
                           thetaController.calculate(
                                   getPose().getRotation().getRadians(),
-                                  pose.getRotation().getRadians())
-                              * DrivetrainConstants.kMaxAngularVelocity,
+                                  pose.get().getRotation().getRadians())
+                              * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond),
                           DrivetrainConstants.kLoopDt.in(Seconds));
 
-                  setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(targetSpeeds));
+                  driveRobotCentric(
+                      targetSpeeds.vxMetersPerSecond,
+                      targetSpeeds.vyMetersPerSecond,
+                      targetSpeeds.omegaRadiansPerSecond,
+                      DriveFeedforwards.zeros(4));
+                }));
+  }
+
+  @Override
+  public Command driveToFieldPose(Supplier<Pose2d> pose) {
+    return runOnce(
+            () -> {
+              xPoseController.reset();
+              yPoseController.reset();
+              thetaController.reset();
+            })
+        .andThen(
+            run(
+                () -> {
+                  var targetSpeeds =
+                      ChassisSpeeds.discretize(
+                          xPoseController.calculate(getPose().getX(), pose.get().getX())
+                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
+                          yPoseController.calculate(getPose().getY(), pose.get().getY())
+                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
+                          thetaController.calculate(
+                                  getPose().getRotation().getRadians(),
+                                  pose.get().getRotation().getRadians())
+                              * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond),
+                          DrivetrainConstants.kLoopDt.in(Seconds));
+
+                  setControl(
+                      new SwerveRequest.FieldCentric()
+                          .withDriveRequestType(DriveRequestType.Velocity)
+                          .withVelocityX(targetSpeeds.vxMetersPerSecond)
+                          .withVelocityY(targetSpeeds.vyMetersPerSecond)
+                          .withRotationalRate(targetSpeeds.omegaRadiansPerSecond));
                 }));
   }
 

@@ -1,10 +1,13 @@
 /* (C) Robolancers 2025 */
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerPath;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -14,7 +17,6 @@ import frc.robot.subsystems.drivetrain.DrivetrainConstants;
 import frc.robot.subsystems.drivetrain.DrivetrainSim;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.drivetrain.TunerConstants;
-import frc.robot.util.MathUtils;
 
 @Logged
 public class RobotContainer {
@@ -30,21 +32,33 @@ public class RobotContainer {
                 TunerConstants.kTunerDrivetrain.getModuleConstants())
             : new DrivetrainSim();
 
+    //
     drivetrain.setDefaultCommand(
-        drivetrain.driveFieldCentric(
+        drivetrain.driveFixedHeading(
             () ->
                 -MathUtil.applyDeadband(
                         driverController.getLeftY(), DrivetrainConstants.kDriveDeadband)
-                    * DrivetrainConstants.kMaxLinearVelocity,
+                    * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
             () ->
                 -MathUtil.applyDeadband(
                         driverController.getLeftX(), DrivetrainConstants.kDriveDeadband)
-                    * DrivetrainConstants.kMaxLinearVelocity,
+                    * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
             () ->
-                -MathUtils.squareKeepSign(
-                        MathUtil.applyDeadband(
-                            driverController.getRightX(), DrivetrainConstants.kRotationDeadband))
-                    * DrivetrainConstants.kMaxAngularVelocity));
+                Rotation2d.fromRadians(
+                    -Math.PI / 2
+                        + Math.atan2(
+                            MathUtil.applyDeadband(
+                                -driverController.getRightY(),
+                                DrivetrainConstants.kRotationDeadband),
+                            MathUtil.applyDeadband(
+                                driverController.getRightX(),
+                                DrivetrainConstants.kRotationDeadband)))));
+
+    driverController
+        .a()
+        .whileTrue(
+            drivetrain.driveToFieldPose(
+                () -> new Pose2d(new Translation2d(2, 2), new Rotation2d())));
 
     configureBindings();
   }
@@ -52,10 +66,6 @@ public class RobotContainer {
   private void configureBindings() {}
 
   public Command getAutonomousCommand() {
-    try {
-      return AutoBuilder.followPath(PathPlannerPath.fromPathFile("Example Path"));
-    } catch (Exception e) {
-      return Commands.none();
-    }
+    return Commands.none();
   }
 }

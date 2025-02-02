@@ -2,7 +2,9 @@
 package frc.robot.subsystems.drivetrain;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
@@ -11,7 +13,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -34,7 +35,6 @@ public class DrivetrainSim implements SwerveDrive {
   private final SelfControlledSwerveDriveSimulation simulatedDrive;
   private final Field2d field2d;
   final DriveTrainSimulationConfig simConfig;
-  SwerveDriveKinematics swerveKinematics;
   PIDController headingController;
 
   // drive to pose controllers
@@ -59,28 +59,13 @@ public class DrivetrainSim implements SwerveDrive {
         new SelfControlledSwerveDriveSimulation(
             new SwerveDriveSimulation(simConfig, new Pose2d(2, 2, new Rotation2d())));
 
-    this.swerveKinematics =
-        new SwerveDriveKinematics(
-            new Translation2d[] {
-              new Translation2d(
-                  0.5 * simulatedDrive.trackWidthY().in(Inches),
-                  0.5 * simulatedDrive.trackLengthX().in(Inches)), // front left
-              new Translation2d(
-                  0.5 * simulatedDrive.trackWidthY().in(Inches),
-                  -0.5 * simulatedDrive.trackLengthX().in(Inches)), // front right
-              new Translation2d(
-                  -0.5 * simulatedDrive.trackWidthY().in(Inches),
-                  -0.5 * simulatedDrive.trackLengthX().in(Inches)), // back right
-              new Translation2d(
-                  -0.5 * simulatedDrive.trackWidthY().in(Inches),
-                  0.5 * simulatedDrive.trackLengthX().in(Inches)) // back left
-            });
-
     this.headingController =
         new PIDController(
             DrivetrainConstants.tuneHeadingGains.kP(),
             DrivetrainConstants.tuneHeadingGains.kI(),
             DrivetrainConstants.tuneHeadingGains.kD());
+
+    this.headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     SimulatedArena.getInstance().addDriveTrainSimulation(simulatedDrive.getDriveTrainSimulation());
 
@@ -103,33 +88,30 @@ public class DrivetrainSim implements SwerveDrive {
                     translationX.getAsDouble(), translationY.getAsDouble(), rotation.getAsDouble()),
                 new Translation2d(),
                 true,
-                true));
+                false));
   }
 
   @Override
   public Command driveRobotCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
-    return driveRobotCentric(translationX, translationY, rotation, DriveFeedforwards.zeros(4));
-  }
-
-  @Override
-  public Command driveRobotCentric(
-      DoubleSupplier translationX,
-      DoubleSupplier translationY,
-      DoubleSupplier rotation,
-      DriveFeedforwards feedforwards) {
     return run(
         () ->
-            simulatedDrive.runChassisSpeeds(
-                new ChassisSpeeds(
-                    translationX.getAsDouble(), translationY.getAsDouble(), rotation.getAsDouble()),
-                new Translation2d(),
-                false,
-                true));
+            driveRobotCentric(
+                translationX.getAsDouble(),
+                translationY.getAsDouble(),
+                rotation.getAsDouble(),
+                DriveFeedforwards.zeros(4)));
   }
 
   @Override
-  public Command driveToPose(Pose2d pose) {
+  public void driveRobotCentric(
+      double translationX, double translationY, double rotation, DriveFeedforwards feedforwards) {
+    simulatedDrive.runChassisSpeeds(
+        new ChassisSpeeds(translationX, translationY, rotation), new Translation2d(), false, false);
+  }
+
+  @Override
+  public Command driveToRobotPose(Supplier<Pose2d> pose) {
     return runOnce(
             () -> {
               xPoseController.reset();
@@ -141,16 +123,46 @@ public class DrivetrainSim implements SwerveDrive {
                 () -> {
                   ChassisSpeeds targetSpeeds =
                       new ChassisSpeeds(
-                          xPoseController.calculate(getPose().getX(), pose.getX())
-                              * DrivetrainConstants.kMaxLinearVelocity,
-                          yPoseController.calculate(getPose().getY(), pose.getY())
-                              * DrivetrainConstants.kMaxLinearVelocity,
+                          xPoseController.calculate(getPose().getX(), pose.get().getX())
+                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
+                          yPoseController.calculate(getPose().getY(), pose.get().getY())
+                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
                           thetaController.calculate(
                                   getPose().getRotation().getRadians(),
-                                  pose.getRotation().getRadians())
-                              * DrivetrainConstants.kMaxAngularVelocity);
+                                  pose.get().getRotation().getRadians())
+                              * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond));
 
-                  simulatedDrive.runChassisSpeeds(targetSpeeds, Translation2d.kZero, false, true);
+                  driveRobotCentric(
+                      targetSpeeds.vxMetersPerSecond,
+                      targetSpeeds.vyMetersPerSecond,
+                      targetSpeeds.omegaRadiansPerSecond,
+                      DriveFeedforwards.zeros(4));
+                }));
+  }
+
+  @Override
+  public Command driveToFieldPose(Supplier<Pose2d> pose) {
+    return runOnce(
+            () -> {
+              xPoseController.reset();
+              yPoseController.reset();
+              thetaController.reset();
+            })
+        .andThen(
+            run(
+                () -> {
+                  ChassisSpeeds targetSpeeds =
+                      new ChassisSpeeds(
+                          xPoseController.calculate(getPose().getX(), pose.get().getX())
+                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
+                          yPoseController.calculate(getPose().getY(), pose.get().getY())
+                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
+                          thetaController.calculate(
+                                  getPose().getRotation().getRadians(),
+                                  pose.get().getRotation().getRadians())
+                              * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond));
+
+                  simulatedDrive.runChassisSpeeds(targetSpeeds, Translation2d.kZero, true, false);
                 }));
   }
 
@@ -160,16 +172,13 @@ public class DrivetrainSim implements SwerveDrive {
     return run(
         () -> {
           ChassisSpeeds speeds =
-              ChassisSpeeds.fromFieldRelativeSpeeds(
+              new ChassisSpeeds(
                   translationX.getAsDouble(),
                   translationY.getAsDouble(),
                   headingController.calculate(
-                      getPose().getRotation().getRadians(), rotation.get().getRadians()),
-                  getHeading());
+                      getPose().getRotation().getRadians(), rotation.get().getRadians()));
 
-          SwerveModuleState[] targetStates = swerveKinematics.toSwerveModuleStates(speeds);
-
-          simulatedDrive.runSwerveStates(targetStates);
+          simulatedDrive.runChassisSpeeds(speeds, new Translation2d(), true, false);
         });
   }
 

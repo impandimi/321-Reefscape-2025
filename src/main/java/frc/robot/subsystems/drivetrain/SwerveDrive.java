@@ -20,14 +20,29 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 /*
- * drive interface. A real and sim implementation is made out of this. Using this, so we can implement maplesim
+ * drive interface. A real and sim implementation is made out of this. Using this, so we can implement maplesim.
  */
 @Logged
 public interface SwerveDrive extends Subsystem {
 
-  PIDController xPoseController = new PIDController(0, 0, 0);
-  PIDController yPoseController = new PIDController(0, 0, 0);
-  PIDController thetaController = new PIDController(0, 0, 0);
+  // driveToPose PID controllers
+  PIDController xPoseController =
+      new PIDController(
+          DrivetrainConstants.kTranslationGains.kP(),
+          DrivetrainConstants.kTranslationGains.kI(),
+          DrivetrainConstants.kTranslationGains.kD());
+
+  PIDController yPoseController =
+      new PIDController(
+          DrivetrainConstants.kTranslationGains.kP(),
+          DrivetrainConstants.kTranslationGains.kI(),
+          DrivetrainConstants.kTranslationGains.kD());
+
+  PIDController thetaController =
+      new PIDController(
+          DrivetrainConstants.kHeadingGains.kP(),
+          DrivetrainConstants.kHeadingGains.kI(),
+          DrivetrainConstants.kHeadingGains.kD());
 
   public default void configureAutoBuilder() {
     try { // try and catch for config exception
@@ -39,9 +54,9 @@ public interface SwerveDrive extends Subsystem {
           // Consumer of ChassisSpeeds and feedforwards to drive the robot
           (speeds, feedforwards) ->
               driveRobotCentric(
-                  () -> speeds.vxMetersPerSecond,
-                  () -> speeds.vyMetersPerSecond,
-                  () -> speeds.omegaRadiansPerSecond,
+                  speeds.vxMetersPerSecond,
+                  speeds.vyMetersPerSecond,
+                  speeds.omegaRadiansPerSecond,
                   feedforwards),
           new PPHolonomicDriveController(
               // PID constants for translation
@@ -65,23 +80,7 @@ public interface SwerveDrive extends Subsystem {
     }
   }
 
-  // configure driveToPoseControllers
   default void configurePoseControllers() {
-    xPoseController.setPID(
-        DrivetrainConstants.kTranslationGains.kP(),
-        DrivetrainConstants.kTranslationGains.kI(),
-        DrivetrainConstants.kTranslationGains.kD());
-
-    yPoseController.setPID(
-        DrivetrainConstants.kTranslationGains.kP(),
-        DrivetrainConstants.kTranslationGains.kI(),
-        DrivetrainConstants.kTranslationGains.kD());
-
-    thetaController.setPID(
-        DrivetrainConstants.kHeadingGains.kP(),
-        DrivetrainConstants.kHeadingGains.kI(),
-        DrivetrainConstants.kHeadingGains.kD());
-
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
@@ -91,17 +90,19 @@ public interface SwerveDrive extends Subsystem {
   Command driveRobotCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation);
 
-  Command driveRobotCentric(
-      DoubleSupplier translationX,
-      DoubleSupplier translationY,
-      DoubleSupplier rotation,
-      DriveFeedforwards feedforwards);
+  // pathplanner chassis speeds consumer. Overload of driveRobotCentric
+  void driveRobotCentric(
+      double translationX, double translationY, double rotation, DriveFeedforwards feedforwards);
 
+  // drive with heading controlled by PID
   Command driveFixedHeading(
       DoubleSupplier translationX, DoubleSupplier translationY, Supplier<Rotation2d> rotation);
 
-  // auto drive w/ external pid controllers
-  Command driveToPose(Pose2d pose);
+  // robot relative auto drive w/ external pid controllers
+  Command driveToRobotPose(Supplier<Pose2d> pose);
+
+  // field relative auto drive w/ external pid controllers
+  Command driveToFieldPose(Supplier<Pose2d> pose);
 
   void resetPose(Pose2d pose);
 
