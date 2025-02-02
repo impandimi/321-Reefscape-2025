@@ -1,5 +1,5 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakerollers;
+package frc.robot.subsystems.algaeIntakeRollers;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -14,7 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 @Logged
 public class AlgaeIntakeRollersIOSim implements AlgaeIntakeRollersIO {
 
-  public static final AlgaeIntakeRollersConfig config = new AlgaeIntakeRollersConfig(0, 0, 0, 0);
+  public static final AlgaeIntakeRollersConfig config =
+      new AlgaeIntakeRollersConfig(0.1, 0, 0, 0.002075);
   private DCMotorSim rollerSim;
 
   public AlgaeIntakeRollersIOSim() {
