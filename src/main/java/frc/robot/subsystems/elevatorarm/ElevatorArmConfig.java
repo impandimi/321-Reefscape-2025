@@ -1,6 +1,8 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.elevatorarm;
 
+import edu.wpi.first.epilogue.Logged;
+
 /**
  * Contains the tuning parameters for the ElevatorArm
  *
@@ -9,4 +11,5 @@ package frc.robot.subsystems.elevatorarm;
  * horizontal kCoralFF - The ADDITIONAL voltage required to keep the arm with the coral up when it
  * is horizontal
  */
+@Logged
 public record ElevatorArmConfig(double kP, double kI, double kD, double kG, double kCoralFF) {}
