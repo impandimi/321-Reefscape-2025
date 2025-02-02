@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.06325,
+        "y": 6.131
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.7025000000000015,
+        "y": 6.0335
+      },
+      "isLocked": false,
+      "linkedName": "Starting 1"
+    },
+    {
+      "anchor": {
+        "x": 5.358504098360656,
+        "y": 5.38560450819672
+      },
+      "prevControl": {
+        "x": 5.982504098360656,
+        "y": 5.78535450819672
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "ReefR1"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "ArmCoralOuttake",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -119.99999999999999
+  },
+  "reversed": false,
+  "folder": "Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}
