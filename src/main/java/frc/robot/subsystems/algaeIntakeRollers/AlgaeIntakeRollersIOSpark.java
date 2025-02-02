@@ -1,5 +1,5 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakeRollers;
+package frc.robot.subsystems.algaeIntakerollers;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
@@ -9,19 +9,20 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 // spark implementation of real mechanism
-import edu.wpi.first.epilogue.Logged;
 @Logged
 public class AlgaeIntakeRollersIOSpark implements AlgaeIntakeRollersIO {
 
-  // device ids are plcaeholders
+  // device ids are placeholders
   public static final AlgaeIntakeRollersConfig config = new AlgaeIntakeRollersConfig(0, 0, 0, 0);
-  private DigitalInput algaeSensor = new DigitalInput(AlgaeIntakeRollersConstants.kDigitalInputID);
+  private DigitalInput algaeSensor = new DigitalInput(AlgaeIntakeRollersConstants.kBeamBreakId);
 
-  private SparkMax rollerMotorLeft = new SparkMax(AlgaeIntakeRollersConstants.kMotorID, MotorType.kBrushless);
+  private SparkMax rollerMotorLeft =
+      new SparkMax(AlgaeIntakeRollersConstants.kMotorId, MotorType.kBrushless);
 
   public AlgaeIntakeRollersIOSpark() {
     configureMotors(); // configures motors once algae spark object is created
