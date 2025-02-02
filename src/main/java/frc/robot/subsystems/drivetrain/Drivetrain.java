@@ -24,7 +24,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.util.MyAlliance;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -35,17 +34,11 @@ import java.util.function.Supplier;
 @Logged
 public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     implements SwerveDrive {
-
-  private SwerveRequest.ForwardPerspectiveValue forwardPerspective =
-      MyAlliance.isRed()
-          ? ForwardPerspectiveValue.OperatorPerspective
-          : ForwardPerspectiveValue.BlueAlliance;
-
   private final SwerveRequest.FieldCentric fieldCentricRequest =
       new SwerveRequest.FieldCentric()
           .withDriveRequestType(DriveRequestType.Velocity)
           .withDesaturateWheelSpeeds(true)
-          .withForwardPerspective(forwardPerspective);
+          .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
 
   private final SwerveRequest.ApplyRobotSpeeds robotCentricRequest =
       new SwerveRequest.ApplyRobotSpeeds()
@@ -56,7 +49,7 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
       new SwerveRequest.FieldCentricFacingAngle()
           .withDriveRequestType(DriveRequestType.Velocity)
           .withDesaturateWheelSpeeds(true)
-          .withForwardPerspective(forwardPerspective);
+          .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
 
   public Drivetrain(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
