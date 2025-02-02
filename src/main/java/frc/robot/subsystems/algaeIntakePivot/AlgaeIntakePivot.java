@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.TunableConstant;
+import java.util.function.Supplier;
 
 // the mechanism that intakes algae low and pivots back to hang from the deep cage
 @Logged
@@ -79,6 +80,13 @@ public class AlgaeIntakePivot extends SubsystemBase {
                     inputs.pivotAngle.in(Degrees), desiredAngle.in(Degrees)));
 
     io.setPivotVoltage(desiredVoltage);
+  }
+
+  public Command goToAngle(Supplier<Angle> desiredAngle) {
+    return run(
+        () -> {
+          goToAngle(desiredAngle.get());
+        });
   }
 
   public Command outtakePosition() {

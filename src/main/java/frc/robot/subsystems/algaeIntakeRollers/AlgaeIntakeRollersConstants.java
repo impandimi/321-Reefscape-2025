@@ -16,6 +16,7 @@ public class AlgaeIntakeRollersConstants {
   // function constants
   public static final Voltage kRollerIntakeVoltage = Volts.of(8); // test
   public static final Voltage kRollerOuttakeVoltage = Volts.of(-5); // test
+  public static final Voltage kStallVoltage = Volts.of(1);
 
   // motor configurations
   public static final boolean kRollerInverted = false;

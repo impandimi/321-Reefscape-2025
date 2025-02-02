@@ -22,17 +22,19 @@ public class AlgaeIntakePivotConstants {
   // setpoint constants
   public static final Angle kPivotIntakeAngle = Degrees.of(80); // test
   public static final Angle kPivotOuttakeAngle = Degrees.of(90); // test
-  public static final Voltage kPivotClimbVoltage = Volts.of(8); // test
+  public static final Angle kPivotStoreAngle =
+      Degrees.of(70); // the angle the pivot will be at by default
   public static final Angle kPivotClimbAngle = Degrees.of(135); // test
   public static final Angle kPivotFloorAngle = Degrees.of(0); // test
+  public static final Voltage kPivotClimbVoltage = Volts.of(8); // test
 
   // motor configurations
-  public static final boolean kPivotInverted = false;
+  public static final boolean kLeftInverted = false;
+  public static final boolean kRightInverted = false;
   public static final int kSmartCurrentLimit = 40;
   public static final double kPivotVelocityConversionFactor = 2; // ask mech
   public static final double kPivotPositionConversionFactor = 120; // ask mech
   public static final Voltage kNominalVoltage = Volts.of(12);
-  public static final boolean kRightInverted = false;
 
   // physical constants
   public static final double kPivotGearing = 50; // ask mech

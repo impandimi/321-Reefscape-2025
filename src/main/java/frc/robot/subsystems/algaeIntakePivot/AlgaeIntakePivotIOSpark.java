@@ -42,7 +42,7 @@ public class AlgaeIntakePivotIOSpark implements AlgaeIntakePivotIO {
   public void configureMotors() {
     pivotMotorLeft.configure( // configures two spark motors
         new SparkMaxConfig()
-            .inverted(AlgaeIntakePivotConstants.kPivotInverted)
+            .inverted(AlgaeIntakePivotConstants.kLeftInverted)
             .voltageCompensation(AlgaeIntakePivotConstants.kNominalVoltage.in(Volts))
             .smartCurrentLimit(AlgaeIntakePivotConstants.kSmartCurrentLimit)
             .apply(
@@ -56,10 +56,12 @@ public class AlgaeIntakePivotIOSpark implements AlgaeIntakePivotIO {
 
     pivotMotorRight.configure(
         new SparkMaxConfig()
-            .inverted(AlgaeIntakePivotConstants.kPivotInverted)
+            .inverted(AlgaeIntakePivotConstants.kRightInverted)
             .voltageCompensation(AlgaeIntakePivotConstants.kNominalVoltage.in(Volts))
             .smartCurrentLimit(AlgaeIntakePivotConstants.kSmartCurrentLimit)
-            .follow(AlgaeIntakePivotConstants.kPivotMotorLeftId),
+            .follow(
+                AlgaeIntakePivotConstants.kPivotMotorLeftId,
+                AlgaeIntakePivotConstants.kRightInverted),
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
   }

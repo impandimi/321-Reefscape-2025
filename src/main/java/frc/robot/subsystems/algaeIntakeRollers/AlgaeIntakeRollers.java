@@ -97,6 +97,18 @@ public class AlgaeIntakeRollers extends SubsystemBase {
     return run(() -> spinRollers(volts));
   }
 
+  // stall the algae motor if we see that we have an algae. Should be the default command
+  public Command stallIfHasAlgae() {
+    return run(
+        () -> {
+          if (inputs.hasAlgae) {
+            spinRollers(AlgaeIntakeRollersConstants.kStallVoltage);
+          } else {
+            spinRollers(Volts.zero());
+          }
+        });
+  }
+
   @Override // updates inputs constatly
   public void periodic() {
     io.updateInputs(inputs);

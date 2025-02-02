@@ -52,7 +52,7 @@ public class AlgaeIntakePivotIOKraken implements AlgaeIntakePivotIO {
             new MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Brake)
                 .withInverted(
-                    AlgaeIntakePivotConstants.kPivotInverted
+                    AlgaeIntakePivotConstants.kLeftInverted
                         ? InvertedValue.CounterClockwise_Positive
                         : InvertedValue.Clockwise_Positive));
     pivotMotorLeft
@@ -74,7 +74,7 @@ public class AlgaeIntakePivotIOKraken implements AlgaeIntakePivotIO {
             new MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Brake)
                 .withInverted(
-                    AlgaeIntakePivotConstants.kPivotInverted
+                    AlgaeIntakePivotConstants.kRightInverted
                         ? InvertedValue.CounterClockwise_Positive
                         : InvertedValue.Clockwise_Positive));
     pivotMotorRight
