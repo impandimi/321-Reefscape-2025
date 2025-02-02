@@ -1,10 +1,11 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakePivot;
+package frc.robot.subsystems.algaeIntakepivot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Angle;
@@ -15,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.TunableConstant;
 
 // the mechanism that intakes algae low and pivots back to hang from the deep cage
-import edu.wpi.first.epilogue.Logged;
 @Logged
 public class AlgaeIntakePivot extends SubsystemBase {
 
@@ -36,21 +36,21 @@ public class AlgaeIntakePivot extends SubsystemBase {
     feedForward = new ArmFeedforward(0, config.kG(), 0); // creates pid controller and feed forward
   }
 
+  // Tune PID and feed forward constants(kP, kI, kD, kG) live on smart dashboard / ascope
+  // so that we dont have to re run the code every time we change on of them.
   public Command tune() {
     TunableConstant kP = new TunableConstant("/AlgaeIntakeClimbPivot/kP", config.kP());
     TunableConstant kI = new TunableConstant("/AlgaeIntakeClimbPivot/kI", config.kI());
     TunableConstant kD = new TunableConstant("/AlgaeIntakeClimbPivot/kD", config.kD());
     TunableConstant kG = new TunableConstant("/AlgaeIntakeClimbPivot/kG", config.kG());
     TunableConstant desiredAngle = new TunableConstant("/AlgaeIntakeClimbPivot/desiredAngle", 0);
-    // allows us to tune PID and feed forward constants(kP, kI, kD, kG) live on smart dashboard
-    // so that we dont have to re run the code every time we change on of them.
+
     return run(
         () -> {
           this.algaeIntakeClimbController.setPID(kP.get(), kI.get(), kD.get());
           this.feedForward = new ArmFeedforward(0, kG.get(), 0);
           goToAngle(Degrees.of(desiredAngle.get()));
-        }); // we set the tuning constants arbitrarily then set a desired angle to go to so that we
-    // can see how far off it is and which constants need change
+        });
   }
 
   public static AlgaeIntakePivot create() {
@@ -65,10 +65,9 @@ public class AlgaeIntakePivot extends SubsystemBase {
                 .config); // creates a sim mechanism if the code is not on a real robot
   }
 
+  // creates placeholder implementation to disable robot
   public static AlgaeIntakePivot disable() {
-    return new AlgaeIntakePivot(
-        new AlgaeIntakePivotIOIdeal(),
-        AlgaeIntakePivotIOIdeal.config); // creates ideal mechanism for disabled robot
+    return new AlgaeIntakePivot(new AlgaeIntakePivotIOIdeal(), AlgaeIntakePivotIOIdeal.config);
   }
 
   // get to a desired angle by setting pivot voltage to sum of calculated pid and feedforward
@@ -77,17 +76,12 @@ public class AlgaeIntakePivot extends SubsystemBase {
         Volts.of(
             feedForward.calculate(desiredAngle.in(Radians), 0, 0)
                 + algaeIntakeClimbController.calculate(
-                    inputs.currentPivotAngle.in(Degrees), desiredAngle.in(Degrees)));
+                    inputs.pivotAngle.in(Degrees), desiredAngle.in(Degrees)));
 
-      System.out.println(inputs.currentPivotAngle.in(Degrees) + " " + desiredAngle.in(Degrees) + " " + desiredVoltage.in(Volts)); 
     io.setPivotVoltage(desiredVoltage);
   }
 
-  // TODO:be careful if rollers need to start slightly after pivot
-
-  public Command
-      outtakePosition() { // position commands only go to the positions for each action, do not
-    // execute actions
+  public Command outtakePosition() {
     return run(() -> goToAngle(AlgaeIntakePivotConstants.kPivotOuttakeAngle));
   }
 
@@ -95,27 +89,27 @@ public class AlgaeIntakePivot extends SubsystemBase {
     return run(() -> goToAngle(AlgaeIntakePivotConstants.kPivotIntakeAngle));
   }
 
-  public Command
-      climbFloorPosition() { // flips intake to the floor in preparation for climb, which consists
-    // of the mechanism pivoting back and clamping onto the cage
+  // flips intake to the floor in preparation for climb, which consists
+  // of the mechanism pivoting back and clamping onto the cage
+  public Command climbFloorPosition() {
     return run(() -> goToAngle(AlgaeIntakePivotConstants.kPivotFloorAngle));
   }
 
-  public Command climb() { // mechanism clamps onto cage by rotating via pivot
+  // mechanism clamps onto cage by rotating via pivot
+  public Command climb() {
     return run(
         () -> {
-          if (inputs.currentPivotAngle.in(Degrees)
+          if (inputs.pivotAngle.in(Degrees)
               > AlgaeIntakePivotConstants.kPivotClimbAngle.in(Degrees)) {
             io.setPivotVoltage(AlgaeIntakePivotConstants.kPivotClimbVoltage);
           } else {
             io.setPivotVoltage(Volts.of(0));
           }
-          ;
         });
   }
 
-  public Command setMechanismVoltage(
-      Voltage volts) { // sets voltage to the whole mechanism, used for default command
+  // sets voltage to the whole mechanism
+  public Command setMechanismVoltage(Voltage volts) {
     return run(
         () -> {
           io.setPivotVoltage(volts);

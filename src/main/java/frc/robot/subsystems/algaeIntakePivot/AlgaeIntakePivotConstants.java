@@ -1,20 +1,25 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakePivot;
+package frc.robot.subsystems.algaeIntakepivot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 
-import edu.wpi.first.epilogue.Logged;
 @Logged
 public class AlgaeIntakePivotConstants {
-//TODO: get all these constants
+  // TODO: get all these constants
 
-  // function constants
+  // motor, encoder, sensor IDs
+  public static final int kPivotMotorLeftId = 0;
+  public static final int kPivotMotorRightId = 0;
+  public static final int kEncoderId = 0;
+
+  // setpoint constants
   public static final Angle kPivotIntakeAngle = Degrees.of(80); // test
   public static final Angle kPivotOuttakeAngle = Degrees.of(90); // test
   public static final Voltage kPivotClimbVoltage = Volts.of(8); // test
@@ -31,19 +36,10 @@ public class AlgaeIntakePivotConstants {
 
   // physical constants
   public static final double kPivotGearing = 50; // ask mech
-  public static final Distance kPivotLengthMeters = Meters.of(0.6); // ask CAD
+  public static final Distance kPivotLength = Meters.of(0.6); // ask CAD
   public static final Angle kPivotMinAngle = Degrees.of(0); // find
   public static final Angle kPivotMaxAngle = Degrees.of(180); // find
   public static final Angle kPivotStartingAngle = Degrees.of(0); // find
   public static final double kPivotMOI = 1; // ask stanley
   public static final Angle kPivotZeroOffsetAngle = Degrees.of(0); // find
-
-// motor, encoder, sensor IDs
-public static final int kPivotMotorLeftIDKraken = 0;
-public static final int kPivotMotorRightIDKraken = 0;
-public static final int kDigitalInputID = 0;
-public static final int kEncoderID = 0;
-public static final int kPivotMotorLeftIDSpark = 0;
-public static final int kPivotMotorRightIDSpark = 0;
-
 }

@@ -1,10 +1,10 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakePivot;
+package frc.robot.subsystems.algaeIntakepivot;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.units.measure.Angle;
+
 @Logged
 public class AlgaeIntakePivotInputs {
-  public boolean hasAlgae; // if the mechanism has algae
-  public Angle currentPivotAngle; // current pivot angle
+  public Angle pivotAngle; // current pivot angle
 }

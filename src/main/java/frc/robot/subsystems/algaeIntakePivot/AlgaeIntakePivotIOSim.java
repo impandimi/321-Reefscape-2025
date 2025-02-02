@@ -1,28 +1,28 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakePivot;
+package frc.robot.subsystems.algaeIntakepivot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import edu.wpi.first.epilogue.Logged;
 @Logged
 public class AlgaeIntakePivotIOSim implements AlgaeIntakePivotIO {
 
-  public static final AlgaeIntakePivotConfig config = new AlgaeIntakePivotConfig(0, 0, 0, 0);
+  public static final AlgaeIntakePivotConfig config =
+      new AlgaeIntakePivotConfig(0.2, 0, 0.01, 1.13);
 
-  private SingleJointedArmSim pivotSimLeft;
+  private SingleJointedArmSim pivotSim;
 
   public
   AlgaeIntakePivotIOSim() { // configures a simulated arm with two pivot motors controlling one
     // pivot point
-    pivotSimLeft =
+    pivotSim =
         new SingleJointedArmSim(
             LinearSystemId.createSingleJointedArmSystem(
                 DCMotor.getNEO(2),
@@ -30,21 +30,19 @@ public class AlgaeIntakePivotIOSim implements AlgaeIntakePivotIO {
                 AlgaeIntakePivotConstants.kPivotGearing),
             DCMotor.getNEO(2),
             AlgaeIntakePivotConstants.kPivotGearing,
-            AlgaeIntakePivotConstants.kPivotLengthMeters.in(Meters),
+            AlgaeIntakePivotConstants.kPivotLength.in(Meters),
             AlgaeIntakePivotConstants.kPivotMinAngle.in(Radians),
             AlgaeIntakePivotConstants.kPivotMaxAngle.in(Radians),
             true,
             AlgaeIntakePivotConstants.kPivotStartingAngle.in(Radians));
-    SmartDashboard.putBoolean("AlgaeIntakeClimbSim/HasAlgae", false);
   }
 
   public void setPivotVoltage(Voltage volts) {
-    pivotSimLeft.setInputVoltage(volts.in(Volts));
+    pivotSim.setInputVoltage(volts.in(Volts));
   }
 
   public void updateInputs(AlgaeIntakePivotInputs inputs) { // gets info to update inputs
-    pivotSimLeft.update(0.02);
-    inputs.currentPivotAngle = Radians.of(pivotSimLeft.getAngleRads());
-    inputs.hasAlgae = SmartDashboard.getBoolean("AlgaeIntakeClimbSim/HasAlgae", false);
+    pivotSim.update(0.02);
+    inputs.pivotAngle = Radians.of(pivotSim.getAngleRads());
   }
 }

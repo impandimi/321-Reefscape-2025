@@ -1,9 +1,9 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakePivot;
-
-import edu.wpi.first.units.measure.Voltage;
+package frc.robot.subsystems.algaeIntakepivot;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.units.measure.Voltage;
+
 @Logged
 public interface AlgaeIntakePivotIO {
 
