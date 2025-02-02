@@ -1,5 +1,5 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakerollers;
+package frc.robot.subsystems.algaeIntakeRollers;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.TunableConstant;
+import java.util.function.Supplier;
 
 // the same mechanism as algaeIntakeClimb but this controls the rollers instead of the pivot
 @Logged
@@ -77,6 +78,10 @@ public class AlgaeIntakeRollers extends SubsystemBase {
             rollerController.calculate(
                     inputs.rollerVelocity.in(RPM), desiredAngularVelocity.in(RPM))
                 + feedForward.calculate(desiredAngularVelocity.in(RPM))));
+  }
+
+  public Command goToAngularVelocity(Supplier<AngularVelocity> angVel) {
+    return run(() -> goToAngularVelocity(angVel.get()));
   }
 
   public Command

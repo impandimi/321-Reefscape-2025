@@ -1,5 +1,5 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakerollers;
+package frc.robot.subsystems.algaeIntakeRollers;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;

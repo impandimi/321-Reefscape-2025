@@ -1,5 +1,5 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.algaeIntakepivot;
+package frc.robot.subsystems.algaeIntakePivot;
 
 import edu.wpi.first.epilogue.Logged;
 
