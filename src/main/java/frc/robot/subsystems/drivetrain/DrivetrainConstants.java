@@ -20,7 +20,7 @@ public class DrivetrainConstants {
   public static final AutoGains kTranslationGains =
       RobotBase.isReal()
           ? new AutoGains(5, 0, 0) // real
-          : new AutoGains(4, 0, 0); // sim
+          : new AutoGains(4, 0, 0.2); // sim
 
   public static final AutoGains kHeadingGains =
       RobotBase.isReal()

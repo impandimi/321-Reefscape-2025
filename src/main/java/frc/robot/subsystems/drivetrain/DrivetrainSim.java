@@ -97,6 +97,31 @@ public class DrivetrainSim implements SwerveDrive {
   }
 
   @Override
+  public Command teleopDriveFixedHeading(
+      DoubleSupplier translationX,
+      DoubleSupplier translationY,
+      DoubleSupplier rotationX,
+      DoubleSupplier rotationY) {
+    return run(
+        () -> {
+          Rotation2d desiredRotation =
+              flipRotation(
+                  Rotation2d.fromRadians(
+                      Math.atan2(rotationX.getAsDouble(), rotationY.getAsDouble())));
+
+          ChassisSpeeds speeds =
+              flipFieldSpeeds(
+                  new ChassisSpeeds(
+                      translationX.getAsDouble(),
+                      translationY.getAsDouble(),
+                      headingController.calculate(
+                          getPose().getRotation().getRadians(), desiredRotation.getRadians())));
+
+          simulatedDrive.runChassisSpeeds(speeds, new Translation2d(), true, false);
+        });
+  }
+
+  @Override
   public Command driveFieldCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
 
@@ -191,11 +216,12 @@ public class DrivetrainSim implements SwerveDrive {
     return run(
         () -> {
           ChassisSpeeds speeds =
-              new ChassisSpeeds(
-                  translationX.getAsDouble(),
-                  translationY.getAsDouble(),
-                  headingController.calculate(
-                      getPose().getRotation().getRadians(), rotation.get().getRadians()));
+              flipFieldSpeeds(
+                  new ChassisSpeeds(
+                      translationX.getAsDouble(),
+                      translationY.getAsDouble(),
+                      headingController.calculate(
+                          getPose().getRotation().getRadians(), rotation.get().getRadians())));
 
           simulatedDrive.runChassisSpeeds(speeds, new Translation2d(), true, false);
         });

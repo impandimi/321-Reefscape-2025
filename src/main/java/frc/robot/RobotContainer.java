@@ -2,6 +2,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
@@ -34,7 +35,7 @@ public class RobotContainer {
 
     //
     drivetrain.setDefaultCommand(
-        drivetrain.driveFixedHeading(
+        drivetrain.teleopDrive(
             () ->
                 -MathUtil.applyDeadband(
                         driverController.getLeftY(), DrivetrainConstants.kDriveDeadband)
@@ -44,15 +45,20 @@ public class RobotContainer {
                         driverController.getLeftX(), DrivetrainConstants.kDriveDeadband)
                     * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
             () ->
-                Rotation2d.fromRadians(
-                    -Math.PI / 2
-                        + Math.atan2(
-                            MathUtil.applyDeadband(
-                                -driverController.getRightY(),
-                                DrivetrainConstants.kRotationDeadband),
-                            MathUtil.applyDeadband(
-                                driverController.getRightX(),
-                                DrivetrainConstants.kRotationDeadband)))));
+                -MathUtil.applyDeadband(
+                        driverController.getRightX(), DrivetrainConstants.kRotationDeadband)
+                    * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond)));
+
+    // math for drive fixed heading. Not sure if we need it.
+    // Rotation2d.fromRadians(
+    //     -Math.PI / 2
+    //         + Math.atan2(
+    //             MathUtil.applyDeadband(
+    //                 -driverController.getRightY(),
+    //                 DrivetrainConstants.kRotationDeadband),
+    //             MathUtil.applyDeadband(
+    //                 driverController.getRightX(),
+    //                 DrivetrainConstants.kRotationDeadband)))
 
     driverController
         .a()

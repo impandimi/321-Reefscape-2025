@@ -96,8 +96,18 @@ public interface SwerveDrive extends Subsystem {
         : speeds;
   }
 
+  default Rotation2d flipRotation(Rotation2d rotation) {
+    return MyAlliance.isRed() ? rotation.plus(Rotation2d.k180deg) : rotation;
+  }
+
   Command teleopDrive(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation);
+
+  Command teleopDriveFixedHeading(
+      DoubleSupplier translationX,
+      DoubleSupplier translationY,
+      DoubleSupplier rotationX,
+      DoubleSupplier rotationY);
 
   Command driveFieldCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation);

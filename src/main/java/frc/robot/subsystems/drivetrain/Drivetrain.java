@@ -61,12 +61,6 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   @Override
   public Command teleopDrive(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
-    return run(() -> driveFieldCentric(translationX, translationY, rotation));
-  }
-
-  @Override
-  public Command driveFieldCentric(
-      DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
     return run(
         () -> {
           var speeds =
@@ -90,6 +84,56 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                   .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
         });
   }
+
+  @Override
+  public Command teleopDriveFixedHeading(
+      DoubleSupplier translationX,
+      DoubleSupplier translationY,
+      DoubleSupplier rotationX,
+      DoubleSupplier rotationY) {
+    return run(
+        () -> {
+          Rotation2d desiredRotation =
+              flipRotation(
+                  Rotation2d.fromRadians(
+                      Math.atan2(rotationX.getAsDouble(), rotationY.getAsDouble())));
+
+          var speeds =
+              ChassisSpeeds.discretize(
+                  translationX.getAsDouble(),
+                  translationY.getAsDouble(),
+                  0,
+                  DrivetrainConstants.kLoopDt.in(Seconds));
+
+          setControl(
+              fieldCentricFacingAngleRequest
+                  .withDriveRequestType(DriveRequestType.Velocity)
+                  .withVelocityX(speeds.vxMetersPerSecond)
+                  .withVelocityY(speeds.vyMetersPerSecond)
+                  .withTargetDirection(desiredRotation)
+                  .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
+        });
+  }
+
+  @Override
+  public Command driveFieldCentric(
+      DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
+    return run(
+        () -> {
+          var speeds =
+              ChassisSpeeds.discretize(
+                  translationX.getAsDouble(),
+                  translationY.getAsDouble(),
+                  rotation.getAsDouble(),
+                  DrivetrainConstants.kLoopDt.in(Seconds));
+
+          setControl(
+              fieldCentricRequest
+                  .withVelocityX(speeds.vxMetersPerSecond)
+                  .withVelocityY(speeds.vyMetersPerSecond)
+                  .withRotationalRate(speeds.omegaRadiansPerSecond));
+        });
+  }
   ;
 
   @Override
@@ -107,9 +151,11 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   @Override
   public void driveRobotCentric(
       double translationX, double translationY, double rotation, DriveFeedforwards feedforwards) {
-    var speeds =
-        ChassisSpeeds.discretize(
-            translationX, translationY, rotation, DrivetrainConstants.kLoopDt.in(Seconds));
+    // var speeds =
+    //     ChassisSpeeds.discretize(
+    //         translationX, translationY, rotation, DrivetrainConstants.kLoopDt.in(Seconds));
+
+    var speeds = new ChassisSpeeds(translationX, translationY, rotation);
 
     setControl(
         robotCentricRequest
@@ -179,8 +225,7 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                           .withDriveRequestType(DriveRequestType.Velocity)
                           .withVelocityX(targetSpeeds.vxMetersPerSecond)
                           .withVelocityY(targetSpeeds.vyMetersPerSecond)
-                          .withRotationalRate(targetSpeeds.omegaRadiansPerSecond)
-                          .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
+                          .withRotationalRate(targetSpeeds.omegaRadiansPerSecond));
                 }));
   }
 
@@ -203,7 +248,7 @@ public class Drivetrain extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                   .withVelocityX(speeds.vxMetersPerSecond)
                   .withVelocityY(speeds.vyMetersPerSecond)
                   .withTargetDirection(rotation.get())
-                  .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
+                  .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
         });
   }
 
