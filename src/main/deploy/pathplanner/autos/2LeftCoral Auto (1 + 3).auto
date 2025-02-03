@@ -1,0 +1,97 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Starting 2 to ReefR2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReefR2 to Algae 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeLeftCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftCoral1 to ReefL2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeLeftCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReefL2 to LeftCoral2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeLeftCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftCoral2 to ReefL2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeLeftCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReefL2 to LeftCoral3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeLeftCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftCoral3 to ReefL3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OuttakeLeftCoral"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Middle Starting Position",
+  "choreoAuto": false
+}
