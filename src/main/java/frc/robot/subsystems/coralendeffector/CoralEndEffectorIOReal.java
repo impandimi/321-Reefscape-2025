@@ -1,8 +1,11 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.coralendeffector;
 
+import static edu.wpi.first.units.Units.Millimeter;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.playingwithfusion.TimeOfFlight;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -11,17 +14,19 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Voltage;
 
-import com.playingwithfusion.TimeOfFlight;
-
-// implementation of the CoralEndEffectorIO that controls the real coral end effector
+// implementation of the CoralEndEffectorIO that controls the real coral end effector using a
+// SparkMax motoro
 @Logged
 public class CoralEndEffectorIOReal implements CoralEndEffectorIO {
 
-  private SparkMax motor;
-  private TimeOfFlight touchSensor;
-  private TimeOfFlight beamBreak; // beambreak and touch sensor not in use right now
+  public static CoralEndEffectorConfig config = new CoralEndEffectorConfig(0, 0, 0, 0);
+
+  private SparkMax motor; // motor controlling the end effector wheels
+  private TimeOfFlight
+      distSensor; // TOF distance sensor for detecting whether or not there is a coral in the intake
 
   public CoralEndEffectorIOReal() {
+    // motor initializatio & configuration
     this.motor = new SparkMax(CoralEndEffectorConstants.kMotorPort, MotorType.kBrushless);
     motor.configure(
         new SparkMaxConfig()
@@ -30,22 +35,22 @@ public class CoralEndEffectorIOReal implements CoralEndEffectorIO {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-
-    touchSensor = new TimeOfFlight(CoralEndEffectorConstants.kTouchSensorPort);
-    beamBreak = new TimeOfFlight(CoralEndEffectorConstants.kTimeOfFlightID);
+    // init distance sensor
+    distSensor = new TimeOfFlight(CoralEndEffectorConstants.kTimeOfFlightId);
   }
 
-  // sets voltage
+  // sets voltage of the coral intake wheels
   @Override
   public void setVoltage(Voltage voltage) {
     motor.setVoltage(voltage);
   }
 
-  // updates inputs
+  // update inputs from the coral intake sensors
   @Override
   public void updateInputs(CoralEndEffectorInputs inputs) {
     inputs.voltage = Volts.of(motor.getBusVoltage());
-    inputs.hasCoral = touchSensor.getRange() < CoralEndEffectorConstants.kDetectionRange; // ask if this works ?
-    inputs.isBeamBreakBroken = beamBreak.getRange() < CoralEndEffectorConstants.kDetectionRange;
+    inputs.hasCoral =
+        distSensor.getRange() < CoralEndEffectorConstants.kDetectionRange.in(Millimeter);
+    inputs.velocity = RPM.of(this.motor.getEncoder().getVelocity());
   }
 }
