@@ -2,6 +2,7 @@
 package frc.robot.subsystems.algaeIntakePivot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -72,5 +73,6 @@ public class AlgaeIntakePivotIOSpark implements AlgaeIntakePivotIO {
 
   public void updateInputs(AlgaeIntakePivotInputs inputs) {
     inputs.pivotAngle = Degrees.of(pivotEncoder.get());
+    inputs.pivotVelocity = DegreesPerSecond.of(pivotMotorLeft.getEncoder().getVelocity()); 
   }
 }

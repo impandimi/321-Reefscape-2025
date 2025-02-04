@@ -81,8 +81,7 @@ public class AlgaeIntakePivotIOKraken implements AlgaeIntakePivotIO {
         .getConfigurator()
         .apply(
             new FeedbackConfigs()
-                .withSensorToMechanismRatio(
-                    1 / AlgaeIntakePivotConstants.kPivotPositionConversionFactor));
+                .withSensorToMechanismRatio(AlgaeIntakePivotConstants.kPivotGearing));
   }
 
   public void setPivotVoltage(Voltage volts) {
@@ -93,5 +92,6 @@ public class AlgaeIntakePivotIOKraken implements AlgaeIntakePivotIO {
 
   public void updateInputs(AlgaeIntakePivotInputs inputs) { // updates inputs
     inputs.pivotAngle = Degrees.of(algaeIntakeClimbEncoder.get());
+    inputs.pivotVelocity = pivotMotorLeft.getVelocity().getValue(); 
   }
 }

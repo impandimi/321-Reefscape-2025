@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotConstants;
 import frc.robot.util.TunableConstant;
 import java.util.function.Supplier;
 
@@ -75,7 +76,7 @@ public class AlgaeIntakePivot extends SubsystemBase {
   public void goToAngle(Angle desiredAngle) {
     Voltage desiredVoltage =
         Volts.of(
-            feedForward.calculate(desiredAngle.in(Radians), 0, 0)
+            feedForward.calculate(desiredAngle.in(Radians), 0)
                 + algaeIntakeClimbController.calculate(
                     inputs.pivotAngle.in(Degrees), desiredAngle.in(Degrees)));
 
@@ -135,5 +136,12 @@ public class AlgaeIntakePivot extends SubsystemBase {
 
   public boolean atSetpoint() {
     return algaeIntakeClimbController.atSetpoint();
+  }
+
+  public boolean inCollisionZone() {
+    Angle effectiveAngle = inputs.pivotAngle.plus(inputs.pivotVelocity.times(RobotConstants.kPeriod.times(2))); // angle after looking forward in time n loops based on current arm velocity
+
+    return effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMinBlockedAngle) >= 0 && effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMaxBlockedAngle) <= 0; 
+
   }
 }

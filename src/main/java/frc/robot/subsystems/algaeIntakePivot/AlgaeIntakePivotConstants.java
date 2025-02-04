@@ -28,22 +28,23 @@ public class AlgaeIntakePivotConstants {
   public static final Angle kPivotFloorAngle = Degrees.of(0); // test
   public static final Voltage kPivotClimbVoltage = Volts.of(8); // test
 
-  public static final Angle kMinFreeAngle = Degrees.of(20);
-
-  // motor configurations
-  public static final boolean kLeftInverted = false;
-  public static final boolean kRightInverted = false;
-  public static final int kSmartCurrentLimit = 40;
-  public static final double kPivotVelocityConversionFactor = 2; // ask mech
-  public static final double kPivotPositionConversionFactor = 120; // ask mech
-  public static final Voltage kNominalVoltage = Volts.of(12);
+  public static final Angle kMinBlockedAngle = Degrees.of(20);
+  public static final Angle kMaxBlockedAngle = Degrees.of(40);
 
   // physical constants
-  public static final double kPivotGearing = 50; // ask mech
+  public static final double kPivotGearing = 150; // ask mech
   public static final Distance kPivotLength = Meters.of(0.6); // ask CAD
   public static final Angle kPivotMinAngle = Degrees.of(0); // find
   public static final Angle kPivotMaxAngle = Degrees.of(180); // find
   public static final Angle kPivotStartingAngle = Degrees.of(0); // find
   public static final double kPivotMOI = 1; // ask stanley
   public static final Angle kPivotZeroOffsetAngle = Degrees.of(0); // find
+
+  // motor configurations
+  public static final boolean kLeftInverted = false;
+  public static final boolean kRightInverted = false;
+  public static final int kSmartCurrentLimit = 40;
+  public static final double kPivotPositionConversionFactor = 360 / kPivotGearing; 
+  public static final double kPivotVelocityConversionFactor = kPivotPositionConversionFactor / 60; 
+  public static final Voltage kNominalVoltage = Volts.of(12);
 }

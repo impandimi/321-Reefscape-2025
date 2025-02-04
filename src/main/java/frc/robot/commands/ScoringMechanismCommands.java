@@ -33,11 +33,11 @@ public class ScoringMechanismCommands {
           Angle currentAngle = pivot.getAngle();
           if (elevator.getHeight().compareTo(ElevatorConstants.kElevatorDangerHeight) < 0
               && // elevator in danger zone
-              ((currentAngle.compareTo(AlgaeIntakePivotConstants.kMinFreeAngle) > 0
+              ((currentAngle.compareTo(AlgaeIntakePivotConstants.kMaxBlockedAngle) > 0
                       && // we're transitioning between
-                      angle.compareTo(AlgaeIntakePivotConstants.kMinFreeAngle) < 0)
-                  || (currentAngle.compareTo(AlgaeIntakePivotConstants.kMinFreeAngle) < 0
-                      && angle.compareTo(AlgaeIntakePivotConstants.kMinFreeAngle) > 0))) {
+                      angle.compareTo(AlgaeIntakePivotConstants.kMaxBlockedAngle) < 0)
+                  || (currentAngle.compareTo(AlgaeIntakePivotConstants.kMaxBlockedAngle) < 0
+                      && angle.compareTo(AlgaeIntakePivotConstants.kMaxBlockedAngle) > 0))) {
             return elevator
                 .goToHeight(() -> ElevatorConstants.kElevatorDangerHeight.plus(Meters.of(0.1)))
                 .alongWith(pivot.goToAngle(() -> angle))

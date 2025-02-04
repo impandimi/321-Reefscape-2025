@@ -3,6 +3,7 @@ package frc.robot.subsystems.algaeIntakePivot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
@@ -44,5 +45,6 @@ public class AlgaeIntakePivotIOSim implements AlgaeIntakePivotIO {
   public void updateInputs(AlgaeIntakePivotInputs inputs) { // gets info to update inputs
     pivotSim.update(0.02);
     inputs.pivotAngle = Radians.of(pivotSim.getAngleRads());
+    inputs.pivotVelocity = RadiansPerSecond.of(pivotSim.getVelocityRadPerSec());
   }
 }

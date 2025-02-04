@@ -131,4 +131,8 @@ public class Elevator extends SubsystemBase {
   public Distance getHeight() {
     return inputs.height;
   }
+
+  public boolean inCollisionZone() {
+    return getHeight().compareTo(ElevatorConstants.kElevatorDangerHeight) < 0; 
+  }
 }
