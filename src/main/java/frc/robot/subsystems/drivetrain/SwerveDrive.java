@@ -18,6 +18,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.util.MyAlliance;
@@ -48,6 +49,14 @@ public interface SwerveDrive extends Subsystem {
           DrivetrainConstants.kHeadingGains.kP(),
           DrivetrainConstants.kHeadingGains.kI(),
           DrivetrainConstants.kHeadingGains.kD());
+
+  public static SwerveDrive create() {
+    return RobotBase.isReal()
+        ? new DrivetrainReal(
+            TunerConstants.kTunerDrivetrain.getDriveTrainConstants(),
+            TunerConstants.kTunerDrivetrain.getModuleConstants())
+        : new DrivetrainSim();
+  }
 
   public default void configureAutoBuilder() {
     try { // try and catch for config exception

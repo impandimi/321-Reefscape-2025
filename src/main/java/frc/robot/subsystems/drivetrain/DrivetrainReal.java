@@ -51,7 +51,6 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
 
   public DrivetrainReal(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
-
     // create CTRE Swervedrivetrain
     super(TalonFX::new, TalonFX::new, CANcoder::new, drivetrainConstants, modules);
     configNeutralMode(NeutralModeValue.Brake);
@@ -87,6 +86,36 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   }
 
   @Override
+  public Command teleopDriveFixedHeading(
+      DoubleSupplier translationX,
+      DoubleSupplier translationY,
+      DoubleSupplier rotationX,
+      DoubleSupplier rotationY) {
+    return run(
+        () -> {
+          Rotation2d desiredRotation =
+              flipRotation(
+                  Rotation2d.fromRadians(
+                      Math.atan2(rotationX.getAsDouble(), rotationY.getAsDouble())));
+
+          var speeds =
+              ChassisSpeeds.discretize(
+                  translationX.getAsDouble(),
+                  translationY.getAsDouble(),
+                  0,
+                  DrivetrainConstants.kLoopDt.in(Seconds));
+
+          setControl(
+              fieldCentricFacingAngleRequest
+                  .withDriveRequestType(DriveRequestType.Velocity)
+                  .withVelocityX(speeds.vxMetersPerSecond)
+                  .withVelocityY(speeds.vyMetersPerSecond)
+                  .withTargetDirection(desiredRotation)
+                  .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
+        });
+  }
+
+  @Override
   public Command driveFieldCentric(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation) {
     return run(
@@ -98,20 +127,14 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                   rotation.getAsDouble(),
                   DrivetrainConstants.kLoopDt.in(Seconds));
 
-          // x braking
-          // if(Math.abs(newTranslationX) < DriveConstants.kDriveDeadband &&
-          // Math.abs(newTranslationY) < DriveConstants.kDriveDeadband &&
-          // Math.abs(newRotation) < DriveConstants.kRotationDeadband){
-          // setControl(new SwerveRequest.SwerveDriveBrake())};
-
           setControl(
               fieldCentricRequest
                   .withVelocityX(speeds.vxMetersPerSecond)
                   .withVelocityY(speeds.vyMetersPerSecond)
-                  .withRotationalRate(speeds.omegaRadiansPerSecond)
-                  .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
+                  .withRotationalRate(speeds.omegaRadiansPerSecond));
         });
   }
+  ;
 
   @Override
   public Command driveRobotCentric(
@@ -128,9 +151,11 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   @Override
   public void driveRobotCentric(
       double translationX, double translationY, double rotation, DriveFeedforwards feedforwards) {
+    // var speeds =
+    //     ChassisSpeeds.discretize(
+    //         translationX, translationY, rotation, DrivetrainConstants.kLoopDt.in(Seconds));
+
     var speeds = new ChassisSpeeds(translationX, translationY, rotation);
-    // ChassisSpeeds.discretize(
-    //     translationX, translationY, rotation, DrivetrainConstants.kLoopDt.in(Seconds));
 
     setControl(
         robotCentricRequest
@@ -139,8 +164,8 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
             .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
             .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons()));
   }
+  ;
 
-  // TODO: remove this; incorrect implementation and not gonna use anyways most likely
   @Override
   public Command driveToRobotPose(Supplier<Pose2d> pose) {
     return runOnce(
@@ -200,12 +225,11 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                           .withDriveRequestType(DriveRequestType.Velocity)
                           .withVelocityX(targetSpeeds.vxMetersPerSecond)
                           .withVelocityY(targetSpeeds.vyMetersPerSecond)
-                          .withRotationalRate(targetSpeeds.omegaRadiansPerSecond)
-                          .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
+                          .withRotationalRate(targetSpeeds.omegaRadiansPerSecond));
                 }));
   }
 
-  // drive with absolute heading control (used for code only)
+  // drive with absolute heading control
   @Override
   public Command driveFixedHeading(
       DoubleSupplier translationX, DoubleSupplier translationY, Supplier<Rotation2d> rotation) {
@@ -225,37 +249,6 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                   .withVelocityY(speeds.vyMetersPerSecond)
                   .withTargetDirection(rotation.get())
                   .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
-        });
-  }
-
-  // drive with absolute heading control (for drivers)
-  @Override
-  public Command teleopDriveFixedHeading(
-      DoubleSupplier translationX,
-      DoubleSupplier translationY,
-      DoubleSupplier rotateForward,
-      DoubleSupplier rotateSideways) {
-    return run(
-        () -> {
-          Rotation2d desired =
-              flipRotation(
-                  Rotation2d.fromRadians(
-                      Math.atan2(rotateForward.getAsDouble(), rotateSideways.getAsDouble())));
-
-          var speeds =
-              ChassisSpeeds.discretize(
-                  translationX.getAsDouble(),
-                  translationY.getAsDouble(),
-                  0,
-                  DrivetrainConstants.kLoopDt.in(Seconds));
-
-          setControl(
-              fieldCentricFacingAngleRequest
-                  .withDriveRequestType(DriveRequestType.Velocity)
-                  .withVelocityX(speeds.vxMetersPerSecond)
-                  .withVelocityY(speeds.vyMetersPerSecond)
-                  .withTargetDirection(desired)
-                  .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
         });
   }
 
