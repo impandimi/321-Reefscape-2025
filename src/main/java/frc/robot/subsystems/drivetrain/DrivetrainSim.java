@@ -243,6 +243,7 @@ public class DrivetrainSim implements SwerveDrive {
     return simulatedDrive.getMeasuredStates();
   }
 
+  @Logged(name = "MeasuredModulePositions")
   @Override
   public SwerveModulePosition[] getModulePositions() {
     return simulatedDrive.getLatestModulePositions();
@@ -271,7 +272,7 @@ public class DrivetrainSim implements SwerveDrive {
     return simulatedDrive.getMeasuredSpeedsRobotRelative(false);
   }
 
-  @Logged(name = "MeasuredHeadingRad")
+  @Logged(name = "MeasuredHeading")
   @Override
   public Rotation2d getHeading() {
     return simulatedDrive.getDriveTrainSimulation().getGyroSimulation().getGyroReading();
