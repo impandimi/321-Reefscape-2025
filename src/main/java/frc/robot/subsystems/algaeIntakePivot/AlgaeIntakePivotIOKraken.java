@@ -92,6 +92,6 @@ public class AlgaeIntakePivotIOKraken implements AlgaeIntakePivotIO {
 
   public void updateInputs(AlgaeIntakePivotInputs inputs) { // updates inputs
     inputs.pivotAngle = Degrees.of(algaeIntakeClimbEncoder.get());
-    inputs.pivotVelocity = pivotMotorLeft.getVelocity().getValue(); 
+    inputs.pivotVelocity = pivotMotorLeft.getVelocity().getValue();
   }
 }

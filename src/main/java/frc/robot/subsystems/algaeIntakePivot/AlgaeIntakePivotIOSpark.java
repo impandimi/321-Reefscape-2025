@@ -73,6 +73,6 @@ public class AlgaeIntakePivotIOSpark implements AlgaeIntakePivotIO {
 
   public void updateInputs(AlgaeIntakePivotInputs inputs) {
     inputs.pivotAngle = Degrees.of(pivotEncoder.get());
-    inputs.pivotVelocity = DegreesPerSecond.of(pivotMotorLeft.getEncoder().getVelocity()); 
+    inputs.pivotVelocity = DegreesPerSecond.of(pivotMotorLeft.getEncoder().getVelocity());
   }
 }

@@ -133,6 +133,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean inCollisionZone() {
-    return getHeight().compareTo(ElevatorConstants.kElevatorDangerHeight) < 0; 
+    if (getHeight() == null) return false;
+    return getHeight().compareTo(ElevatorConstants.kElevatorDangerHeight) < 0;
   }
 }

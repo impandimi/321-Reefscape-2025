@@ -139,9 +139,15 @@ public class AlgaeIntakePivot extends SubsystemBase {
   }
 
   public boolean inCollisionZone() {
-    Angle effectiveAngle = inputs.pivotAngle.plus(inputs.pivotVelocity.times(RobotConstants.kPeriod.times(2))); // angle after looking forward in time n loops based on current arm velocity
+    if (inputs.pivotAngle == null || inputs.pivotVelocity == null) return false;
+    Angle effectiveAngle =
+        inputs.pivotAngle.plus(
+            inputs.pivotVelocity.times(
+                RobotConstants.kPeriod.times(
+                    2))); // angle after looking forward in time n loops based on current arm
+    // velocity
 
-    return effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMinBlockedAngle) >= 0 && effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMaxBlockedAngle) <= 0; 
-
+    return effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMinBlockedAngle) >= 0
+        && effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMaxBlockedAngle) <= 0;
   }
 }
