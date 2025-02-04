@@ -128,4 +128,12 @@ public class AlgaeIntakePivot extends SubsystemBase {
   public void periodic() { // updating inputs
     io.updateInputs(inputs);
   }
+
+  public Angle getAngle() {
+    return inputs.pivotAngle;
+  }
+
+  public boolean atSetpoint() {
+    return algaeIntakeClimbController.atSetpoint();
+  }
 }

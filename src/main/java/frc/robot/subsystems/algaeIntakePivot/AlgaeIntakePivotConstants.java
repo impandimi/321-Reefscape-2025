@@ -28,6 +28,8 @@ public class AlgaeIntakePivotConstants {
   public static final Angle kPivotFloorAngle = Degrees.of(0); // test
   public static final Voltage kPivotClimbVoltage = Volts.of(8); // test
 
+  public static final Angle kMinFreeAngle = Degrees.of(20);
+
   // motor configurations
   public static final boolean kLeftInverted = false;
   public static final boolean kRightInverted = false;
