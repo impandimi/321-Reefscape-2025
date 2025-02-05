@@ -127,4 +127,8 @@ public class Elevator extends SubsystemBase {
     // Constantly updates inputs
     io.updateInputs(inputs);
   }
+
+  public Distance getHeight() {
+    return inputs.height;
+  }
 }

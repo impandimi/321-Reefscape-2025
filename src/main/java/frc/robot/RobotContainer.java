@@ -1,10 +1,14 @@
 /* (C) Robolancers 2025 */
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
@@ -22,8 +26,13 @@ public class RobotContainer {
 
   private CommandXboxController driver = new CommandXboxController(0);
   private CommandXboxController manipulator = new CommandXboxController(1);
+  private SuperstructureVisualizer visualizer =
+      new SuperstructureVisualizer(
+          () -> elevator.getHeight().in(Meters), () -> elevatorArm.getAngle().in(Degrees));
 
   public RobotContainer() {
+
+    driver.a().onTrue(elevator.goToHeight(() -> Meters.of(1)));
 
     configureBindings();
   }
