@@ -1,9 +1,6 @@
 /* (C) Robolancers 2025 */
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -13,7 +10,9 @@ import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
+import frc.robot.subsystems.elevatorarm.ElevatorArmConstants;
 
 @Logged
 public class RobotContainer {
@@ -26,13 +25,17 @@ public class RobotContainer {
 
   private CommandXboxController driver = new CommandXboxController(0);
   private CommandXboxController manipulator = new CommandXboxController(1);
+
   private SuperstructureVisualizer visualizer =
-      new SuperstructureVisualizer(
-          () -> elevator.getHeight().in(Meters), () -> elevatorArm.getAngle().in(Degrees));
+      new SuperstructureVisualizer(() -> elevator.getHeight(), () -> elevatorArm.getAngle());
 
   public RobotContainer() {
 
-    driver.a().onTrue(elevator.goToHeight(() -> Meters.of(1)));
+    driver.y().onTrue(elevator.goToHeight(() -> ElevatorConstants.kElevatorMaximumHeight)); // v
+    driver.x().onTrue(elevator.goToHeight(() -> ElevatorConstants.kElevatorMinimumHeight)); // c
+
+    driver.b().onTrue(elevatorArm.goToAngle(() -> ElevatorArmConstants.kMaxAngle)); // x
+    driver.a().onTrue(elevatorArm.goToAngle(() -> ElevatorArmConstants.kMinAngle)); // z
 
     configureBindings();
   }
