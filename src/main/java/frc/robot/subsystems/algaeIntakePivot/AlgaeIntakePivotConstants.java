@@ -20,12 +20,8 @@ public class AlgaeIntakePivotConstants {
   public static final int kEncoderId = 0;
 
   // setpoint constants
-  public static final Angle kPivotIntakeAngle = Degrees.of(80); // test
-  public static final Angle kPivotOuttakeAngle = Degrees.of(90); // test
-  public static final Angle kPivotStoreAngle =
-      Degrees.of(70); // the angle the pivot will be at by default
-  public static final Angle kPivotClimbAngle = Degrees.of(135); // test
-  public static final Angle kPivotFloorAngle = Degrees.of(0); // test
+  public static final Angle kPivotClimbThreshold =
+      Degrees.of(135); // the angle to climb to; NOT a direct setpoint
   public static final Voltage kPivotClimbVoltage = Volts.of(8); // test
 
   public static final Angle kMinBlockedAngle = Degrees.of(20);

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotConstants;
+import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.util.TunableConstant;
 import java.util.function.Supplier;
 
@@ -91,17 +92,17 @@ public class AlgaeIntakePivot extends SubsystemBase {
   }
 
   public Command outtakePosition() {
-    return run(() -> goToAngle(AlgaeIntakePivotConstants.kPivotOuttakeAngle));
+    return run(() -> goToAngle(AlgaeSetpoint.OUTTAKE.getAlgaeAngle()));
   }
 
   public Command intakePosition() {
-    return run(() -> goToAngle(AlgaeIntakePivotConstants.kPivotIntakeAngle));
+    return run(() -> goToAngle(AlgaeSetpoint.INTAKE.getAlgaeAngle()));
   }
 
   // flips intake to the floor in preparation for climb, which consists
   // of the mechanism pivoting back and clamping onto the cage
   public Command climbFloorPosition() {
-    return run(() -> goToAngle(AlgaeIntakePivotConstants.kPivotFloorAngle));
+    return run(() -> goToAngle(AlgaeSetpoint.CLIMB_PREP.getAlgaeAngle()));
   }
 
   // mechanism clamps onto cage by rotating via pivot
@@ -109,7 +110,7 @@ public class AlgaeIntakePivot extends SubsystemBase {
     return run(
         () -> {
           if (inputs.pivotAngle.in(Degrees)
-              > AlgaeIntakePivotConstants.kPivotClimbAngle.in(Degrees)) {
+              > AlgaeIntakePivotConstants.kPivotClimbThreshold.in(Degrees)) {
             io.setPivotVoltage(AlgaeIntakePivotConstants.kPivotClimbVoltage);
           } else {
             io.setPivotVoltage(Volts.of(0));
