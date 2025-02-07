@@ -5,6 +5,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.ReefAlign;
 import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
@@ -26,11 +27,22 @@ public class RobotContainer {
   private CommandXboxController manipulator = new CommandXboxController(1);
 
   public RobotContainer() {
+    drivetrain.setDefaultCommand(
+        drivetrain.teleopDrive(
+            () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
 
     configureBindings();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    driver.leftBumper().whileTrue(ReefAlign.goToNearestLeftAlign(drivetrain));
+    driver.rightBumper().whileTrue(ReefAlign.goToNearestRightAlign(drivetrain));
+    driver
+        .y()
+        .whileTrue(
+            ReefAlign.rotateToNearest(
+                drivetrain, () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+  }
 
   public Command getAutonomousCommand() {
     return Commands.none();
