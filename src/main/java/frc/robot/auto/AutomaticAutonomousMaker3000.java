@@ -10,13 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.ScoringMechanismCommands;
-import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
+import frc.robot.subsystems.CoralSuperstructure;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
-import frc.robot.subsystems.coralendeffector.CoralEndEffectorConstants;
 
 public class AutomaticAutonomousMaker3000 {
     
@@ -31,7 +27,7 @@ public class AutomaticAutonomousMaker3000 {
         startingPosition.addOption("Middle", StartingPosition.MIDDLE);
         startingPosition.addOption("Bottom", StartingPosition.BOTTOM);
 
-        reefSide.setDefaultOption("Null", ReefSide.NOCHOICE);
+        reefSide.setDefaultOption("No choice", ReefSide.NOCHOICE);
         reefSide.addOption("ReefL1", ReefSide.REEFL1);
         reefSide.addOption("ReefL2", ReefSide.REEFL2);
         reefSide.addOption("ReefL3", ReefSide.REEFL3); 
@@ -46,23 +42,20 @@ public class AutomaticAutonomousMaker3000 {
         }
     } 
 
-    public Command buildAuto() {
+    public Command buildAuto(CoralEndEffector coralEndEffector, CoralSuperstructure coralSuperstructure) {
         Command auto = Commands.none();
-        auto = auto.andThen(getAutonomousCommand(startingPosition.getSelected().pathID 
+        auto = auto.andThen(withScoring(getAutonomousCommand(startingPosition.getSelected().pathID 
         + " to " 
-        + scoringGroups.get(0).reefSide.getSelected().pathID))
-        .andThen(new WaitCommand(2.5));
-
+        + scoringGroups.get(0).reefSide.getSelected().pathID), coralSuperstructure));
         
         for (int i = 0; i < scoringGroups.size() - 1; i++) {
-            auto = auto.andThen(getAutonomousCommand(scoringGroups.get(i).reefSide.getSelected().pathID 
+
+            auto = auto.andThen(withIntaking(getAutonomousCommand(scoringGroups.get(i).reefSide.getSelected().pathID 
             + " to " 
-            + scoringGroups.get(i).alternateDestination.getSelected().pathID))
-            .andThen(new WaitCommand(2.5))
-            .andThen(getAutonomousCommand(scoringGroups.get(i).alternateDestination.getSelected().pathID 
+            + scoringGroups.get(i).alternateDestination.getSelected().pathID), coralEndEffector))
+            .andThen(withScoring(getAutonomousCommand(scoringGroups.get(i).alternateDestination.getSelected().pathID 
             + " to " 
-            + scoringGroups.get(i + 1).reefSide.getSelected().pathID))
-            .andThen(new WaitCommand(2.5));
+            + scoringGroups.get(i + 1).reefSide.getSelected().pathID), coralSuperstructure));
         }
 
         return auto;
@@ -72,8 +65,8 @@ public class AutomaticAutonomousMaker3000 {
         return path.alongWith(coralendeffector.intakeCoral()).until(coralendeffector::hasCoral);
     }
 
-    public Command withScoring(Command path, ScoringMechanismCommands scoringMechanismCommands) {
-        return path.alongWith(scoringMechanismCommands.goToSetpoint()).until();
+    public Command withScoring(Command path, CoralSuperstructure coralSuperstructure)  {
+        return path.andThen(coralSuperstructure.outtakeCoral());
     }
 
     public Command getAutonomousCommand(String pathName) {
