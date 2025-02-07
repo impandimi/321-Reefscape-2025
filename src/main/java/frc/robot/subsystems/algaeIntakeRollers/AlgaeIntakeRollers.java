@@ -84,8 +84,7 @@ public class AlgaeIntakeRollers extends SubsystemBase {
     return run(() -> goToAngularVelocity(angVel.get()));
   }
 
-  public Command
-      intake() { // intakes algae until beam break breaks and registers algae in the mechanism
+  public Command intake() { // intakes algae until beam break breaks and registers algae in the mechanism
     return run(() -> spinRollers(AlgaeIntakeRollersConstants.kRollerIntakeVoltage));
   }
 
