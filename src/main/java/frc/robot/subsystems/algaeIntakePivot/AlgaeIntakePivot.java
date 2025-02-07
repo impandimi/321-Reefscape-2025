@@ -91,18 +91,22 @@ public class AlgaeIntakePivot extends SubsystemBase {
         });
   }
 
+  public Command goToAngle(AlgaeSetpoint setpoint) {
+    return goToAngle(() -> setpoint.getAlgaeAngle());
+  }
+
   public Command outtakePosition() {
-    return run(() -> goToAngle(AlgaeSetpoint.OUTTAKE.getAlgaeAngle()));
+    return goToAngle(AlgaeSetpoint.OUTTAKE);
   }
 
   public Command intakePosition() {
-    return run(() -> goToAngle(AlgaeSetpoint.INTAKE.getAlgaeAngle()));
+    return goToAngle(AlgaeSetpoint.INTAKE);
   }
 
   // flips intake to the floor in preparation for climb, which consists
   // of the mechanism pivoting back and clamping onto the cage
   public Command climbFloorPosition() {
-    return run(() -> goToAngle(AlgaeSetpoint.CLIMB_PREP.getAlgaeAngle()));
+    return goToAngle(AlgaeSetpoint.CLIMB_PREP);
   }
 
   // mechanism clamps onto cage by rotating via pivot

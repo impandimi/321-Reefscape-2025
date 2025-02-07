@@ -24,16 +24,19 @@ public class AlgaeSuperstructure {
   // moves the entire elevator+arm superstructure to a desired state; this should be the go-to way
   // of moving the superstructure, aside from the default subsystem commands
   public Command goToSetpoint(AlgaeSetpoint setpoint) {
-    return Commands.runOnce(() -> targetState = setpoint)
-        .andThen(pivot.goToAngle(() -> setpoint.getAlgaeAngle()));
+    return Commands.runOnce(() -> targetState = setpoint).andThen(pivot.goToAngle(setpoint));
   }
 
   public Command intakeAlgae() {
     return goToSetpoint(AlgaeSetpoint.INTAKE).alongWith(this.rollers.intake());
   }
 
+  public Command outtakeAlgaePosition() {
+    return goToSetpoint(AlgaeSetpoint.OUTTAKE);
+  }
+
   public Command outtakeAlgae() {
-    return goToSetpoint(AlgaeSetpoint.OUTTAKE).alongWith(this.rollers.outtake());
+    return this.rollers.outtake();
   }
 
   public Command prepareClimb() {
