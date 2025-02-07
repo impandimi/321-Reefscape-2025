@@ -50,7 +50,6 @@ public class Elevator extends SubsystemBase {
     this.feedForward = new ElevatorFeedforward(config.kS(), config.kG(), 0);
 
     // set position to starting position
-    // TODO: automatically home on robot start and disable movement if robot isn't homed
     io.setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
   }
 
@@ -142,5 +141,9 @@ public class Elevator extends SubsystemBase {
   public boolean inCollisionZone() {
     if (getHeight() == null) return false;
     return getHeight().compareTo(ElevatorConstants.kElevatorDangerHeight) < 0;
+  }
+
+  public boolean atSetpoint() {
+    return pidController.atSetpoint();
   }
 }
