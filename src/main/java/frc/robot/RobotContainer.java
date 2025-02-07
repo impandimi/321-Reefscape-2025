@@ -15,7 +15,6 @@ import frc.robot.subsystems.elevatorarm.ElevatorArm;
 
 @Logged
 public class RobotContainer {
-
   private SwerveDrive drivetrain = SwerveDrive.create();
   private AlgaeIntakePivot algaePivot = AlgaeIntakePivot.create();
   private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.create();
@@ -42,6 +41,8 @@ public class RobotContainer {
         .whileTrue(
             ReefAlign.rotateToNearest(
                 drivetrain, () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+
+    driver.a().whileTrue(ReefAlign.goToNearestCenterAlign(drivetrain));
   }
 
   public Command getAutonomousCommand() {

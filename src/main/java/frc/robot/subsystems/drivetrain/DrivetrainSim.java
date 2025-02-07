@@ -303,16 +303,12 @@ public class DrivetrainSim implements SwerveDrive {
 
   @Logged(name = "RobotLeftAligned")
   public Pose2d robotLeftAligned() {
-    return ReefAlign.getNearestLeftAlign(
-        ReefAlign.getClosestReefID(ReefAlign.getClosestReefPose(getPose())));
-    // ReefAlign.getClosestReefID(ReefAlign.getClosestReefPose(getPose())));
+    return ReefAlign.leftAlignPoses.get(ReefAlign.getClosestReefID(getPose()));
   }
 
   @Logged(name = "RobotRightAligned")
   public Pose2d robotRightAligned() {
-    return ReefAlign.getNearestRightAlign(
-        ReefAlign.getClosestReefID(ReefAlign.getClosestReefPose(getPose())));
-    // ReefAlign.getClosestReefID(ReefAlign.getClosestReefPose(getPose())));
+    return ReefAlign.rightAlignPoses.get(ReefAlign.getClosestReefID(getPose()));
   }
 
   @Logged(name = "ClosestAprilTag")

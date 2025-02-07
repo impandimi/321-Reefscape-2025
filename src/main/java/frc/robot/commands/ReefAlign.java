@@ -2,6 +2,7 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,16 +15,20 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
+import frc.robot.util.MyAlliance;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 public class ReefAlign {
+  public static final Map<Integer, Pose2d> leftAlignPoses = null;
+  public static final Map<Integer, Pose2d> rightAlignPoses = null;
+
   private static final Distance kLeftAlignDistance = Inches.of(-6.5);
   private static final Distance kReefDistance = Inches.of(14.5);
   private static final Distance kRightAlignDistance = Inches.of(6.5);
   private static final Rotation2d kReefAlignmentRotation = Rotation2d.fromDegrees(180);
-
   private static final List<Integer> blueReefIDs = List.of(17, 18, 19, 20, 21, 22);
   private static final List<Integer> redReefIDs = List.of(6, 7, 8, 9, 10, 11);
   private static final List<AprilTag> blueReefTags =
@@ -34,6 +39,20 @@ public class ReefAlign {
       Constants.kAprilTagFieldLayout.getTags().stream()
           .filter(tag -> redReefIDs.contains(tag.ID))
           .toList();
+
+  public static void loadReefAlignmentPoses() {
+    if (MyAlliance.isRed()) {
+      for (Integer i : redReefIDs) {
+        leftAlignPoses.computeIfAbsent(i, ReefAlign::getNearestLeftAlign);
+        rightAlignPoses.computeIfAbsent(i, ReefAlign::getNearestRightAlign);
+      }
+    } else {
+      for (Integer i : blueReefIDs) {
+        leftAlignPoses.computeIfAbsent(i, ReefAlign::getNearestLeftAlign);
+        rightAlignPoses.computeIfAbsent(i, ReefAlign::getNearestRightAlign);
+      }
+    }
+  }
 
   public static Pose2d getClosestReefPose(Pose2d robotPose) {
     Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -61,7 +80,7 @@ public class ReefAlign {
         .ID;
   }
 
-  public static Pose2d getNearestLeftAlign(int reefTagID) {
+  private static Pose2d getNearestLeftAlign(int reefTagID) {
     Optional<Pose3d> tagPose = Constants.kAprilTagFieldLayout.getTagPose(reefTagID);
 
     if (tagPose.isEmpty()) return null;
@@ -77,7 +96,7 @@ public class ReefAlign {
     return resultPose;
   }
 
-  public static Pose2d getNearestRightAlign(int reefTagID) {
+  private static Pose2d getNearestRightAlign(int reefTagID) {
     Optional<Pose3d> tagPose = Constants.kAprilTagFieldLayout.getTagPose(reefTagID);
 
     if (tagPose.isEmpty()) return null;
@@ -91,6 +110,13 @@ public class ReefAlign {
     // new Pose2d(kReefDistance, kRightAlignDistance, kReefAlignmentRotation)
     //         .relativeTo(aprilTagPose);
     return resultPose;
+  }
+
+  public static Command goToNearestCenterAlign(SwerveDrive swerveDrive) {
+    return swerveDrive.driveToFieldPose(
+        () ->
+            getClosestReefPose(swerveDrive.getPose())
+                .plus(new Transform2d(kReefDistance, Meter.zero(), kReefAlignmentRotation)));
   }
 
   public static Command goToNearestLeftAlign(SwerveDrive swerveDrive) {
