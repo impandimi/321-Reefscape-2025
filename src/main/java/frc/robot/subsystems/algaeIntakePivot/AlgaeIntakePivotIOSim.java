@@ -1,6 +1,7 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.algaeIntakePivot;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -46,5 +47,6 @@ public class AlgaeIntakePivotIOSim implements AlgaeIntakePivotIO {
     pivotSim.update(0.02);
     inputs.pivotAngle = Radians.of(pivotSim.getAngleRads());
     inputs.pivotVelocity = RadiansPerSecond.of(pivotSim.getVelocityRadPerSec());
+    inputs.pivotCurrent = Amps.of(pivotSim.getCurrentDrawAmps());
   }
 }

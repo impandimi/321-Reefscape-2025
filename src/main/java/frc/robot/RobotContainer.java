@@ -8,7 +8,9 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.HomingCommands;
 import frc.robot.subsystems.AlgaeSuperstructure;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.subsystems.CoralSuperstructure;
@@ -65,6 +67,10 @@ public class RobotContainer {
   private Trigger isClimbMode = new Trigger(() -> mode == RobotMode.CLIMB);
 
   public RobotContainer() {
+
+    RobotModeTriggers.disabled()
+        .negate()
+        .onTrue(HomingCommands.homeEverything(elevator, algaePivot));
 
     drivetrain.setDefaultCommand(drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn));
 

@@ -26,6 +26,8 @@ public class Elevator extends SubsystemBase {
   private ElevatorFeedforward feedForward;
   private ElevatorConfig config;
 
+  private boolean isHomed = false;
+
   // Method that creates the Elevator object as the real/sim io by checking if we're running a sim
   // or not
   public static Elevator create() {
@@ -101,6 +103,7 @@ public class Elevator extends SubsystemBase {
                 () -> {
                   io.setEncoderPosition(
                       Meters.of(ElevatorConstants.kElevatorStartingHeight.in(Meters)));
+                  isHomed = true;
                 }));
   }
 
@@ -130,6 +133,10 @@ public class Elevator extends SubsystemBase {
 
   public Distance getHeight() {
     return inputs.height;
+  }
+
+  public boolean elevatorIsHomed() {
+    return isHomed;
   }
 
   public boolean inCollisionZone() {

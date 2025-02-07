@@ -1,7 +1,9 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.algaeIntakePivot;
 
+import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -29,6 +31,8 @@ public class AlgaeIntakePivot extends SubsystemBase {
   private ArmFeedforward feedForward; // feed forward for pivot
 
   private AlgaeIntakePivotConfig config;
+
+  private boolean isHomed = false;
 
   public AlgaeIntakePivot(AlgaeIntakePivotIO io, AlgaeIntakePivotConfig config) {
     this.io = io;
@@ -122,6 +126,22 @@ public class AlgaeIntakePivot extends SubsystemBase {
         });
   }
 
+  public Command homeMechanism() {
+    return setMechanismVoltage(AlgaeIntakePivotConstants.kHomingVoltage)
+        .until(
+            () ->
+                (inputs.pivotCurrent.in(Amp)
+                        > AlgaeIntakePivotConstants.kHomingCurrentThreshold.in(Amp)
+                    && Math.abs(inputs.pivotVelocity.in(DegreesPerSecond))
+                        < AlgaeIntakePivotConstants.kHomingVelocityThreshold.in(DegreesPerSecond)))
+        .andThen(
+            runOnce(
+                () -> {
+                  io.resetEncoder(AlgaeIntakePivotConstants.kPivotStartingAngle);
+                  isHomed = true;
+                }));
+  }
+
   // sets voltage to the whole mechanism
   public Command setMechanismVoltage(Voltage volts) {
     return run(
@@ -141,6 +161,10 @@ public class AlgaeIntakePivot extends SubsystemBase {
 
   public boolean atSetpoint() {
     return algaeIntakeClimbController.atSetpoint();
+  }
+
+  public boolean pivotIsHomed() {
+    return isHomed;
   }
 
   public boolean inCollisionZone() {
