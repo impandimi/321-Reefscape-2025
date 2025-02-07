@@ -29,7 +29,6 @@ import java.util.function.DoubleSupplier;
 
 @Logged
 public class RobotContainer {
-
   private SwerveDrive drivetrain = SwerveDrive.create();
   private AlgaeIntakePivot algaePivot = AlgaeIntakePivot.create();
   private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.create();
@@ -66,6 +65,9 @@ public class RobotContainer {
   private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
 
   public RobotContainer() {
+    drivetrain.setDefaultCommand(
+        drivetrain.teleopDrive(
+            () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
 
     RobotModeTriggers.disabled()
         .negate()
