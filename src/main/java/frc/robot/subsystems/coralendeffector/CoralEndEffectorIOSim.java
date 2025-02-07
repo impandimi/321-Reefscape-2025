@@ -28,7 +28,7 @@ class CoralEndEffectorIOSim implements CoralEndEffectorIO {
           DCMotor.getNEO(1));
 
   public CoralEndEffectorIOSim() {
-    SmartDashboard.putBoolean("/CoralEndEffectorSim/Inputs/hasCoral", false);
+    SmartDashboard.putBoolean("/SimInputs/CoralEndEffector/HasCoral", false);
   }
 
   @Override
@@ -36,7 +36,7 @@ class CoralEndEffectorIOSim implements CoralEndEffectorIO {
     simulation.update(0.02);
     inputs.voltage = Volts.of(simulation.getInputVoltage());
     inputs.velocity = RPM.of(simulation.getAngularVelocityRPM());
-    inputs.hasCoral = SmartDashboard.getBoolean("/CoralEndEffectorSim/Inputs/hasCoral", false);
+    inputs.hasCoral = SmartDashboard.getBoolean("/SimInputs/CoralEndEffector/HasCoral", false);
   }
 
   @Override
