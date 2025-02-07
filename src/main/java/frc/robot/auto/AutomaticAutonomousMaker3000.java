@@ -10,13 +10,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.auto.AutomaticAutonomousMaker3000.ScoringGroup;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.ScoringMechanismCommands;
+import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
+import frc.robot.subsystems.coralendeffector.CoralEndEffector;
+import frc.robot.subsystems.coralendeffector.CoralEndEffectorConstants;
 
 public class AutomaticAutonomousMaker3000 {
     
     private SendableChooser<StartingPosition> startingPosition;
     private SendableChooser<ReefSide> reefSide;
-    
 
     private ArrayList<ScoringGroup> scoringGroups = new ArrayList<>(); 
 
@@ -40,31 +45,54 @@ public class AutomaticAutonomousMaker3000 {
             scoringGroups.add(new ScoringGroup()); 
         }
     } 
-public Command getAutonomousCommand() {
-    try{
-        // Load the path you want to follow using its name in the GUI
-        PathPlannerPath path = PathPlannerPath.fromPathFile("Example Path");
 
-        // Create a path following command using AutoBuilder. This will also trigger event markers.
-        return AutoBuilder.followPath(path);
-    } catch (Exception e) {
-        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-        return Commands.none();
-    }
-  }
     public Command buildAuto() {
-        Command auto;
-        auto = auto.andThen(AutoBuilder.followPath(startingPosition.getSelected()));
-        for (ScoringGroup group : scoringGroups) {
-            auto 
+        Command auto = Commands.none();
+        auto = auto.andThen(getAutonomousCommand(startingPosition.getSelected().pathID 
+        + " to " 
+        + scoringGroups.get(0).reefSide.getSelected().pathID))
+        .andThen(new WaitCommand(2.5));
+
+        
+        for (int i = 0; i < scoringGroups.size() - 1; i++) {
+            auto = auto.andThen(getAutonomousCommand(scoringGroups.get(i).reefSide.getSelected().pathID 
+            + " to " 
+            + scoringGroups.get(i).alternateDestination.getSelected().pathID))
+            .andThen(new WaitCommand(2.5))
+            .andThen(getAutonomousCommand(scoringGroups.get(i).alternateDestination.getSelected().pathID 
+            + " to " 
+            + scoringGroups.get(i + 1).reefSide.getSelected().pathID))
+            .andThen(new WaitCommand(2.5));
         }
+
         return auto;
     }
 
+    public Command withIntaking(Command path, CoralEndEffector coralendeffector) {
+        return path.alongWith(coralendeffector.intakeCoral()).until(coralendeffector::hasCoral);
+    }
+
+    public Command withScoring(Command path, ScoringMechanismCommands scoringMechanismCommands) {
+        return path.alongWith(scoringMechanismCommands.goToSetpoint()).until();
+    }
+
+    public Command getAutonomousCommand(String pathName) {
+        try{
+        // Load the path you want to follow using its name in the GUI
+            PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+            
+        // Create a path following command using AutoBuilder. This will also trigger event markers.
+            return AutoBuilder.followPath(path);
+        } catch (Exception e) {
+            DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+            return Commands.none();
+        }
+    }
+
     enum StartingPosition { 
-        TOP("Starting 1 to ReefR1.path"), 
-        MIDDLE("Starting 2 to ReefR2.path"), 
-        BOTTOM("Starting 3 to ReefR3.path"); 
+        TOP("Starting 1"), 
+        MIDDLE("Starting 2"), 
+        BOTTOM("Starting 3"); 
 
         private String pathID;
         StartingPosition(String pathID) {
@@ -73,13 +101,13 @@ public Command getAutonomousCommand() {
     }
 
     enum ReefSide{
-        NOCHOICE(""),
-        REEFR1(""),
-        REEFR2(""),
-        REEFR3(""),
-        REEFL1(""),
-        REEFL2(""),
-        REEFL3("");
+        NOCHOICE("Brake"),
+        REEFR1("ReefR1"),
+        REEFR2("ReefR2"),
+        REEFR3("ReefR3"),
+        REEFL1("ReefL1"),
+        REEFL2("ReefL2"),
+        REEFL3("ReefL3");
 
         private String pathID;
         ReefSide(String pathID) {
@@ -112,10 +140,12 @@ public Command getAutonomousCommand() {
     }
 
     enum AlternateDestination {
-        NOCHOICE(""),
-        LEFTCORAL(""),
-        UPCORAL(""),
-        DOWNCORAL("");
+        NOCHOICE("Brake"),
+        LEFTCORAL1("LeftCoral1"),
+        LEFTCORAL2("LeftCoral2"),
+        LEFTCORAL3("LeftCoral3"),
+        UPCORAL("UpCoral"),
+        DOWNCORAL("DownCoral");
 
         private String pathID = "";
         AlternateDestination(String pathID) {
@@ -153,9 +183,11 @@ public Command getAutonomousCommand() {
         pole.addOption("Left", Pole.LEFTPOLE);
 
         alternateDestination.setDefaultOption("No Choice", AlternateDestination.NOCHOICE);
-        alternateDestination.setDefaultOption("Left Coral", AlternateDestination.LEFTCORAL);
-        alternateDestination.setDefaultOption("Down Coral", AlternateDestination.DOWNCORAL);
-        alternateDestination.setDefaultOption("Up Coral", AlternateDestination.UPCORAL);
+        alternateDestination.addOption("Left Coral 1", AlternateDestination.LEFTCORAL1);
+        alternateDestination.addOption("Left Coral 2", AlternateDestination.LEFTCORAL2);
+        alternateDestination.addOption("Left Coral 3", AlternateDestination.LEFTCORAL3);
+        alternateDestination.addOption("Down Coral", AlternateDestination.DOWNCORAL);
+        alternateDestination.addOption("Up Coral", AlternateDestination.UPCORAL);
         }
     }
 }
