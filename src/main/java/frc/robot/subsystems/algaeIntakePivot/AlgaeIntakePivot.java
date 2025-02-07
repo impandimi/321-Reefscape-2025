@@ -85,6 +85,8 @@ public class AlgaeIntakePivot extends SubsystemBase {
                 + algaeIntakeClimbController.calculate(
                     inputs.pivotAngle.in(Degrees), desiredAngle.in(Degrees)));
 
+    System.out.println(desiredAngle.in(Degrees) + " " + desiredVoltage.in(Volts));
+
     io.setPivotVoltage(desiredVoltage);
   }
 

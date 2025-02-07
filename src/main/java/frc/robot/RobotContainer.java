@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -42,29 +43,27 @@ public class RobotContainer {
       new AlgaeSuperstructure(algaePivot, algaeRollers);
 
   private CommandXboxController driver = new CommandXboxController(0);
-  private CommandXboxController manipulator = new CommandXboxController(1);
+  private XboxController manipulator = new XboxController(1);
 
   private Trigger isSlowMode = driver.leftBumper();
 
   private DoubleSupplier driverForward =
       () ->
-          MathUtils.deadband(driver.getLeftY(), 0.05)
+          -MathUtils.deadband(driver.getLeftY(), 0.05)
               * (isSlowMode.getAsBoolean()
                   ? 2
                   : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
   private DoubleSupplier driverStrafe =
       () ->
-          MathUtils.deadband(driver.getLeftX(), 0.05)
+          -MathUtils.deadband(driver.getLeftX(), 0.05)
               * (isSlowMode.getAsBoolean()
                   ? 2
                   : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
-  private DoubleSupplier driverTurn = () -> MathUtils.deadband(driver.getRightX(), 0.05) * 5;
+  private DoubleSupplier driverTurn = () -> -MathUtils.deadband(driver.getRightX(), 0.05) * 5;
 
-  private RobotMode mode = RobotMode.CORAL;
-
-  private Trigger isCoralMode = new Trigger(() -> mode == RobotMode.CORAL);
-  private Trigger isAlgaeMode = new Trigger(() -> mode == RobotMode.ALGAE);
-  private Trigger isClimbMode = new Trigger(() -> mode == RobotMode.CLIMB);
+  // robot queued states
+  private ReefPosition queuedReefPosition = ReefPosition.NONE;
+  private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
 
   public RobotContainer() {
 
@@ -98,33 +97,110 @@ public class RobotContainer {
 
   private void configureBindings() {
     // driver controls
-    // TODO: Reef Align (RB, LT, RT)
-    // TODO: Coral Align (X)
+    driver.y().onTrue(algaeSuperstructure.prepareClimb());
+    driver.a().onTrue(algaeSuperstructure.climb());
 
-    // manipulator controls
-    // switching modes
-    // TODO: may need to debounce
+    driver.leftTrigger().whileTrue(coralSuperstructure.outtakeCoral());
 
-    // coral setpoints
+    // manip controls
+    // 0 to 3 - right side L1-L4
+    // 4 to 7 - left side L1-L4
+    // 8 to 9 - algae low / high
+    // 10 - intake
 
-    // algae setpoints
+    manipTrigger(0)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.RIGHT;
+                  queuedSetpoint = CoralScorerSetpoint.L1;
+                }));
 
-    // "action" button; will hopefully do different actions at different setpoints
+    manipTrigger(1)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.RIGHT;
+                  queuedSetpoint = CoralScorerSetpoint.L2;
+                }));
 
-    // algae intake
+    manipTrigger(2)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.RIGHT;
+                  queuedSetpoint = CoralScorerSetpoint.L3;
+                }));
 
-    // climb
+    manipTrigger(3)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.RIGHT;
+                  queuedSetpoint = CoralScorerSetpoint.L4;
+                }));
 
-    // intake coral
+    manipTrigger(4)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.LEFT;
+                  queuedSetpoint = CoralScorerSetpoint.L1;
+                }));
+
+    manipTrigger(5)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.LEFT;
+                  queuedSetpoint = CoralScorerSetpoint.L2;
+                }));
+
+    manipTrigger(6)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.LEFT;
+                  queuedSetpoint = CoralScorerSetpoint.L3;
+                }));
+
+    manipTrigger(7)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.LEFT;
+                  queuedSetpoint = CoralScorerSetpoint.L4;
+                }));
+
+    manipTrigger(8)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.ALGAE;
+                  queuedSetpoint = CoralScorerSetpoint.ALGAE_LOW;
+                }));
+
+    manipTrigger(9)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.ALGAE;
+                  queuedSetpoint = CoralScorerSetpoint.ALGAE_HIGH;
+                }));
+  }
+
+  private Trigger manipTrigger(int button) {
+    return new Trigger(() -> manipulator.getRawButton(button));
   }
 
   public Command getAutonomousCommand() {
     return Commands.none();
   }
 
-  enum RobotMode {
-    CORAL,
+  enum ReefPosition {
+    NONE,
+    LEFT,
     ALGAE,
-    CLIMB;
+    RIGHT;
   }
 }

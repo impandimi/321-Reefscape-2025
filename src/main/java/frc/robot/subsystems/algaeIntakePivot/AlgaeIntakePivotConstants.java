@@ -39,7 +39,7 @@ public class AlgaeIntakePivotConstants {
   public static final Angle kPivotMinAngle = Degrees.of(0);
   public static final Angle kPivotMaxAngle = Degrees.of(180);
   public static final Angle kPivotStartingAngle = Degrees.of(0);
-  public static final double kPivotMOI = 1; // this
+  public static final double kPivotMOI = 0.1; // this
 
   // motor configurations
   public static final boolean kLeftInverted = false;

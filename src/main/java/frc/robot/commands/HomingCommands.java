@@ -14,7 +14,11 @@ public class HomingCommands {
         .homeEncoder()
         .onlyIf(() -> !elevator.elevatorIsHomed())
         .andThen(
-            elevator.goToHeight(() -> ElevatorConstants.kElevatorDangerHeight.plus(Meters.of(0.1))))
-        .andThen(pivot.homeMechanism().onlyIf(() -> !pivot.pivotIsHomed()));
+            pivot
+                .homeMechanism()
+                .onlyIf(() -> !pivot.pivotIsHomed())
+                .deadlineFor(
+                    elevator.goToHeight(
+                        () -> ElevatorConstants.kElevatorDangerHeight.plus(Meters.of(0.1)))));
   }
 }

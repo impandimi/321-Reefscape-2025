@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 public class AlgaeIntakePivotIOSim implements AlgaeIntakePivotIO {
 
   public static final AlgaeIntakePivotConfig config =
-      new AlgaeIntakePivotConfig(0.2, 0, 0.01, 1.13);
+      new AlgaeIntakePivotConfig(0.2, 0, 0.01, 1.484);
 
   private SingleJointedArmSim pivotSim;
 
