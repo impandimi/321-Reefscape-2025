@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
+import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import frc.robot.subsystems.vision.Vision;
@@ -17,6 +18,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 public class RobotContainer {
   private Vision vision;
 
+  private SwerveDrive drivetrain = SwerveDrive.create();
   private AlgaeIntakePivot algaePivot = AlgaeIntakePivot.create();
   private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.create();
   private CoralEndEffector coralEndEffector = CoralEndEffector.create();
@@ -35,6 +37,6 @@ public class RobotContainer {
   private void configureBindings() {}
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return Commands.none();
   }
 }
