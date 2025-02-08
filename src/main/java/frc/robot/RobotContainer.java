@@ -104,7 +104,11 @@ public class RobotContainer {
     driver.a().onTrue(algaeSuperstructure.climb());
 
     driver.x().whileTrue(StationAlign.goToNearestCenterAlign(drivetrain));
-    driver.b().whileTrue(StationAlign.rotateToNearestStationTag(drivetrain, ()->-driver.getLeftY(), ()->-driver.getLeftX()));
+    driver
+        .b()
+        .whileTrue(
+            StationAlign.rotateToNearestStationTag(
+                drivetrain, () -> -driver.getLeftY(), () -> -driver.getLeftX()));
 
     driver.leftTrigger().whileTrue(coralSuperstructure.outtakeCoral());
 

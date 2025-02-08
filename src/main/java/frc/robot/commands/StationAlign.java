@@ -23,14 +23,14 @@ import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 public class StationAlign {
- 
+
   public static final Map<Integer, Pose2d> StationPoses = new HashMap<>();
 
   private static final Distance kStationDistance = Inches.of(14);
   private static final Rotation2d kStationAlignmentRotation = Rotation2d.fromDegrees(0);
 
-  private static final List<Integer> blueStationTagIDs = List.of(12,13);
-  private static final List<Integer> redStationTagIDs = List.of(1,2);
+  private static final List<Integer> blueStationTagIDs = List.of(12, 13);
+  private static final List<Integer> redStationTagIDs = List.of(1, 2);
 
   private static final List<AprilTag> blueStationTags =
       RobotConstants.kAprilTagFieldLayout.getTags().stream()
@@ -59,7 +59,7 @@ public class StationAlign {
   }
 
   /**
-   * Finds the pose of the nearest station tag 
+   * Finds the pose of the nearest station tag
    *
    * @param robotPose the pose of the robot to find the nearest station tag pose for
    * @return null if robot alliance is unknown, otherwise a valid station tag pose
@@ -99,11 +99,11 @@ public class StationAlign {
   }
 
   /**
-   * Intended for aligning to the station 
+   * Intended for aligning to the station
    *
    * @param stationTagID a valid station tag ID
-   * @return null if no station tag of the ID specified is found, otherwise a valid robot pose aligned
-   *     with the center of the nearest station tag
+   * @return null if no station tag of the ID specified is found, otherwise a valid robot pose
+   *     aligned with the center of the nearest station tag
    */
   private static Pose2d getNearestCenterAlign(int stationTagID) {
     // `Optional` here means there may not be a tag with the specified ID, again must be handled
@@ -114,7 +114,8 @@ public class StationAlign {
     Pose2d aprilTagPose = tagPose.get().toPose2d();
 
     Pose2d resultPose =
-        aprilTagPose.plus(new Transform2d(kStationDistance, Meter.zero(), kStationAlignmentRotation));
+        aprilTagPose.plus(
+            new Transform2d(kStationDistance, Meter.zero(), kStationAlignmentRotation));
 
     return resultPose;
   }
@@ -129,9 +130,6 @@ public class StationAlign {
   public static Command rotateToNearestStationTag(
       SwerveDrive swerveDrive, DoubleSupplier x, DoubleSupplier y) {
     return swerveDrive.driveFixedHeading(
-        x,
-        y,
-        () -> getNearestStationPose(swerveDrive.getPose()).getRotation());
-      }
+        x, y, () -> getNearestStationPose(swerveDrive.getPose()).getRotation());
   }
-
+}
