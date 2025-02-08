@@ -52,7 +52,6 @@ public class ReefAlign {
    * only the poses on the alliance reef are loaded
    */
   public static void loadReefAlignmentPoses() {
-    System.out.println("Hi");
     if (MyAlliance.isRed()) {
       for (Integer id : redReefTagIDs) {
         leftAlignPoses.computeIfAbsent(id, ReefAlign::getNearestLeftAlign);

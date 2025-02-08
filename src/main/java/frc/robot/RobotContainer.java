@@ -108,7 +108,8 @@ public class RobotContainer {
         .b()
         .whileTrue(
             StationAlign.rotateToNearestStationTag(
-                drivetrain, () -> -driver.getLeftY(), () -> -driver.getLeftX()));
+                drivetrain, () -> -driver.getLeftY(), () -> -driver.getLeftX())
+                .alongWith(coralSuperstructure.feedCoral()));
 
     driver.leftTrigger().whileTrue(coralSuperstructure.outtakeCoral());
 

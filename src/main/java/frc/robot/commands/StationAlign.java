@@ -24,7 +24,7 @@ import java.util.function.DoubleSupplier;
 
 public class StationAlign {
 
-  public static final Map<Integer, Pose2d> StationPoses = new HashMap<>();
+  public static final Map<Integer, Pose2d> stationPoses = new HashMap<>();
 
   private static final Distance kStationDistance = Inches.of(14);
   private static final Rotation2d kStationAlignmentRotation = Rotation2d.fromDegrees(0);
@@ -46,17 +46,10 @@ public class StationAlign {
    * only the station poses are loaded
    */
   public static void loadStationAlignmentPoses() {
-    System.out.println("Hi");
-    if (MyAlliance.isRed()) {
-      for (Integer id : redStationTagIDs) {
-        StationPoses.computeIfAbsent(id, StationAlign::getNearestCenterAlign);
-      }
-    } else {
-      for (Integer id : blueStationTagIDs) {
-        StationPoses.computeIfAbsent(id, StationAlign::getNearestCenterAlign);
-      }
-    }
-  }
+    List<Integer> stationTagIds = MyAlliance.isRed() ? redStationTagIDs : blueStationTagIDs;
+    for (Integer id : stationTagIds) {
+      stationPoses.computeIfAbsent(id, StationAlign::getNearestCenterAlign);
+  }}
 
   /**
    * Finds the pose of the nearest station tag
@@ -70,13 +63,11 @@ public class StationAlign {
 
     if (alliance.isEmpty()) return null;
 
-    if (alliance.get().equals(Alliance.Blue)) {
-      return robotPose.nearest(blueStationTags.stream().map(tag -> tag.pose.toPose2d()).toList());
-    } else if (alliance.get().equals(Alliance.Red)) {
-      return robotPose.nearest(redStationTags.stream().map(tag -> tag.pose.toPose2d()).toList());
-    }
+    List<AprilTag> stationTags = alliance.get().equals(Alliance.Red) ? redStationTags : blueStationTags;
 
-    return null;
+    return robotPose.nearest(stationTags.stream().map(tag -> tag.pose.toPose2d()).toList());
+
+  
   }
 
   /**
@@ -130,6 +121,7 @@ public class StationAlign {
   public static Command rotateToNearestStationTag(
       SwerveDrive swerveDrive, DoubleSupplier x, DoubleSupplier y) {
     return swerveDrive.driveFixedHeading(
-        x, y, () -> getNearestStationPose(swerveDrive.getPose()).getRotation());
+        x, y, () -> getNearestStationPose(swerveDrive.getPose()).getRotation().plus(kStationAlignmentRotation));
   }
 }
+
