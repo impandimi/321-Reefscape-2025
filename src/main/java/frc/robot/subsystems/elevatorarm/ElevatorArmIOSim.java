@@ -2,6 +2,7 @@
 package frc.robot.subsystems.elevatorarm;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -26,15 +27,15 @@ public class ElevatorArmIOSim implements ElevatorArmIO {
           ElevatorArmConstants.kElevatorArmGearing,
           ElevatorArmConstants.kElevatorArmMOI,
           ElevatorArmConstants.kElevatorArmLength.in(Meters),
-          ElevatorArmConstants.kMinAngle.in(Radians),
-          ElevatorArmConstants.kMaxAngle.in(Radians),
+          ElevatorArmConstants.kMinAngle.plus(ElevatorArmConstants.kCMOffset).in(Radians),
+          ElevatorArmConstants.kMaxAngle.plus(ElevatorArmConstants.kCMOffset).in(Radians),
           true,
-          ElevatorArmConstants.kMinAngle.in(Radians));
+          Degrees.of(0).in(Radians));
 
   // update inputs from the arm simulation
   public void updateInputs(ElevatorArmInputs inputs) {
     simMotor.update(0.02);
-    inputs.angle = Radians.of(simMotor.getAngleRads());
+    inputs.angle = Radians.of(simMotor.getAngleRads() - ElevatorArmConstants.kCMOffset.in(Radians));
     inputs.velocity = RadiansPerSecond.of(simMotor.getVelocityRadPerSec());
     inputs.current = Amps.of(simMotor.getCurrentDrawAmps());
   }
