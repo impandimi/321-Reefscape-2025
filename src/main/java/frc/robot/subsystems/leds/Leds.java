@@ -1,8 +1,9 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems;
+package frc.robot.subsystems.leds;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -25,16 +26,45 @@ public class Leds extends VirtualSubsystem {
   private static TreeSet<Signal> ledSignals;
   private LEDPattern currentPattern = LEDPattern.kOff;
 
+  // Constants
+  private final int length = 30;
+  private final Color algaeColor = new Color(133, 226, 203);
+
   // Patterns
-  public LEDPattern kRedAlliance = LEDPattern.solid(Color.kRed);
-  public LEDPattern kBlueAlliance = LEDPattern.solid(Color.kBlue);
-  public LEDPattern kRainbow = LEDPattern.rainbow(255, 255);
-  public LEDPattern kScrollingRainbow =
-      kRainbow.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), Meters.of(1 / 120.0));
+  // default mode - meteor yellow. TODO: add meteor pattern or something cool like that
+  public LEDPattern kDefault = LEDPattern.kOff;
+
+  // climb mode - solid blue
+  public LEDPattern kClimbing = LEDPattern.solid(Color.kBlue);
+
+  // aligning - solid red
+  public LEDPattern kAligning = LEDPattern.solid(Color.kRed);
+
+  // aligned - solid green
+  public LEDPattern kAligned = LEDPattern.solid(Color.kGreen);
+
+  // has coral - solid white
+  public LEDPattern kHasCoral = LEDPattern.solid(Color.kWhite);
+
+  // has algae - solid algaeColor
+  public LEDPattern kHasAlgae = LEDPattern.solid(algaeColor);
+
+  // has coral and algae - gradient of pink & light green (patrick star)
+  private LEDPattern hasCoralAndAlgaePattern =
+      LEDPattern.gradient(
+          LEDPattern.GradientType.kContinuous, Color.kHotPink, new Color(172, 220, 65));
+  public LEDPattern kHasCoralAndAlgae =
+      hasCoralAndAlgaePattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), Meters.of(0.2));
+
+  // Intaking - solid orange
+  public LEDPattern kIntaking = LEDPattern.solid(Color.kOrange);
+
+  // Outtaking - blinking orange
+  public LEDPattern kOuttaking = kIntaking.blink(Seconds.of(0.5));
 
   public Leds() {
     ledStrip = new AddressableLED(0);
-    ledBuffer = new AddressableLEDBuffer(30);
+    ledBuffer = new AddressableLEDBuffer(length);
     ledStrip.setLength(ledBuffer.getLength());
     ledStrip.setData(ledBuffer);
     ledStrip.start();

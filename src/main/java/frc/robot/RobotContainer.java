@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.Leds;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
@@ -14,6 +13,7 @@ import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
+import frc.robot.subsystems.leds.Leds;
 
 @Logged
 public class RobotContainer {
@@ -36,10 +36,6 @@ public class RobotContainer {
   private AddressableLEDSim ledSim = new AddressableLEDSim(leds.ledStrip);
 
   public RobotContainer() {
-    Leds.registerSignal(0, () -> true, () -> leds.kRedAlliance);
-    Leds.registerSignal(1, () -> driver.a().getAsBoolean(), () -> leds.kBlueAlliance);
-    Leds.registerSignal(2, () -> driver.b().getAsBoolean(), () -> leds.kScrollingRainbow);
-
     configureBindings();
   }
 
