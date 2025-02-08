@@ -110,7 +110,6 @@ public class RobotContainer {
 
     // climbing
     driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
-    driver.y().toggleOnFalse(algaeSuperstructure.goToSetpoint(AlgaeSetpoint.NEUTRAL));
     driver.a().onTrue(algaeSuperstructure.climb());
 
     // algae intake/outtake
@@ -130,22 +129,22 @@ public class RobotContainer {
      */
     new Trigger(() -> driver.getRightTriggerAxis() >= 0.8)
         .whileTrue(
-            Commands.either(
-                    Commands.select(
-                        Map.of(
-                            ReefPosition.ALGAE, ReefAlign.goToNearestCenterAlign(drivetrain),
-                            ReefPosition.LEFT, ReefAlign.goToNearestLeftAlign(drivetrain),
-                            ReefPosition.RIGHT, ReefAlign.goToNearestRightAlign(drivetrain),
-                            ReefPosition.NONE, Commands.none()),
-                        () -> queuedReefPosition),
-                    drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn),
-                    () -> true
-                    // Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble()) > 0.05
-                    )
+            // Commands.either(
+            Commands.select(
+                    Map.of(
+                        ReefPosition.ALGAE, ReefAlign.goToNearestCenterAlign(drivetrain),
+                        ReefPosition.LEFT, ReefAlign.goToNearestLeftAlign(drivetrain),
+                        ReefPosition.RIGHT, ReefAlign.goToNearestRightAlign(drivetrain),
+                        ReefPosition.NONE, Commands.none()),
+                    () -> queuedReefPosition)
+                // drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn)
+                // () -> true
+                // // Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble()) > 0.05
+                // )
                 .alongWith(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)));
 
     new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
-        .whileTrue(ReefAlign.rotateToNearest(drivetrain, driverStrafe, driverForward));
+        .whileTrue(ReefAlign.rotateToNearest(drivetrain, driverForward, driverStrafe));
 
     // manip controls
     // 1 to 4 - right side L1-L4

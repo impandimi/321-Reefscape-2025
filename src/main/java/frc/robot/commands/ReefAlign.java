@@ -29,7 +29,7 @@ public class ReefAlign {
   private static final Distance kLeftAlignDistance = Inches.of(-6.5);
   private static final Distance kReefDistance = Inches.of(14.5);
   private static final Distance kRightAlignDistance = Inches.of(6.5);
-  private static final Rotation2d kReefAlignmentRotation = Rotation2d.fromDegrees(180);
+  private static final Rotation2d kReefAlignmentRotation = Rotation2d.fromDegrees(270);
   private static final List<Integer> blueReefIDs = List.of(17, 18, 19, 20, 21, 22);
   private static final List<Integer> redReefIDs = List.of(6, 7, 8, 9, 10, 11);
   private static final List<AprilTag> blueReefTags =
@@ -132,6 +132,10 @@ public class ReefAlign {
     return swerveDrive.driveFixedHeading(
         x,
         y,
-        () -> (getClosestReefPose(swerveDrive.getPose()).getRotation().plus(Rotation2d.k180deg)));
+        () -> {
+          return getClosestReefPose(swerveDrive.getPose())
+              .getRotation()
+              .plus(kReefAlignmentRotation);
+        });
   }
 }

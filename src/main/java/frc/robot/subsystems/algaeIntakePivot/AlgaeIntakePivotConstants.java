@@ -43,6 +43,7 @@ public class AlgaeIntakePivotConstants {
   // pivot climbing
   // TODO: to be tuned
   public static final Angle kPivotClimbThreshold = Degrees.of(45);
+
   public static final Voltage kPivotClimbVoltage = Volts.of(-8);
 
   // motor configurations
