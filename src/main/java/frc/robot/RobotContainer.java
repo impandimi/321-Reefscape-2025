@@ -33,6 +33,7 @@ public class RobotContainer {
           () -> elevator.getHeight(), () -> elevatorArm.getAngle(), () -> algaePivot.getAngle());
 
   public RobotContainer() {
+
     configureBindings();
   }
 
