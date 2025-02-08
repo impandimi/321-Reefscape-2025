@@ -160,6 +160,10 @@ public class ElevatorArm extends SubsystemBase {
     io.updateInputs(this.inputs);
   }
 
+  public boolean atSetpoint() {
+    return pidController.atSetpoint();
+  }
+
   public Angle getAngle() {
     return inputs.angle;
   }

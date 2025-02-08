@@ -6,6 +6,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.ReefAlign;
 import frc.robot.util.VirtualSubsystem;
 
 @Logged
@@ -44,6 +45,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    // auto init is the first time that alliance is guaranteed to be resolved, according to memory
+    ReefAlign.loadReefAlignmentPoses();
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -59,6 +63,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    // alliance is also available here, for testing without needing to enable auto first
+    ReefAlign.loadReefAlignmentPoses();
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
