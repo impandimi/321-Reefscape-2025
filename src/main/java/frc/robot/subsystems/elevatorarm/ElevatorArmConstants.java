@@ -44,9 +44,9 @@ public class ElevatorArmConstants {
   // the fixed angle of the elbow (shoulder to elbow to wrist angle)
   public static final Angle kElbowAngle = Degrees.of(80);
   // the maximum angle the arm can go in simulation
-  public static final Angle kMaxAngle = Degrees.of(360);
+  public static final Angle kMaxAngle = Degrees.of(180);
   // the minimum angle the arm can go in simulation
-  public static final Angle kMinAngle = Degrees.of(0);
+  public static final Angle kMinAngle = Degrees.of(-180);
   // the starting angle of the arm
-  public static final Angle kStartAngle = Degrees.of(0);
+  public static final Angle kStartAngle = Degrees.of(-64.53);
 }

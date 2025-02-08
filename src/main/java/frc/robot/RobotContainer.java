@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
+import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivotConstants;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.drivetrain.DrivetrainConstants;
@@ -19,7 +20,6 @@ import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
-import frc.robot.subsystems.elevatorarm.ElevatorArmConstants;
 
 @Logged
 public class RobotContainer {
@@ -34,8 +34,9 @@ public class RobotContainer {
   private CommandXboxController driver = new CommandXboxController(0);
   private CommandXboxController manipulator = new CommandXboxController(1);
 
-  private SuperstructureVisualizer visualizer =
-      new SuperstructureVisualizer(() -> elevator.getHeight(), () -> elevatorArm.getAngle());
+  private SuperstructureVisualizer stateVisualizer =
+      new SuperstructureVisualizer(
+          () -> elevator.getHeight(), () -> elevatorArm.getAngle(), () -> algaePivot.getAngle());
 
   public RobotContainer() {
 
@@ -55,11 +56,18 @@ public class RobotContainer {
                         * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond),
                     DrivetrainConstants.kRotationDeadband)));
 
-    driver.y().onTrue(elevator.goToHeight(() -> ElevatorConstants.kElevatorMaximumHeight)); // v
-    driver.x().onTrue(elevator.goToHeight(() -> ElevatorConstants.kElevatorMinimumHeight)); // c
+    driver.y().onTrue(elevator.goToHeight(() -> ElevatorConstants.kElevatorMinimumHeight)); // v
+    driver.x().onTrue(elevator.goToHeight(() -> ElevatorConstants.kElevatorMaximumHeight)); // c
 
     driver.b().onTrue(elevatorArm.goToAngle(() -> Degrees.of(90))); // x
-    driver.a().onTrue(elevatorArm.goToAngle(() -> ElevatorArmConstants.kMinAngle)); // z
+    driver.a().onTrue(elevatorArm.goToAngle(() -> Degrees.of(0))); // z
+
+    driver
+        .rightBumper()
+        .onTrue(algaePivot.goToAngle(() -> AlgaeIntakePivotConstants.kPivotFloorAngle));
+    driver
+        .leftBumper()
+        .onTrue(algaePivot.goToAngle(() -> AlgaeIntakePivotConstants.kPivotIntakeAngle));
 
     configureBindings();
   }
