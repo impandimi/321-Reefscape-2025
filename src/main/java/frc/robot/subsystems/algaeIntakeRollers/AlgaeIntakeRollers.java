@@ -93,8 +93,8 @@ public class AlgaeIntakeRollers extends SubsystemBase {
     return run(() -> spinRollers(AlgaeIntakeRollersConstants.kRollerOuttakeVoltage));
   }
 
-  public Command setMechanismVoltage(Voltage volts) { // sets whole mechanism voltage
-    return run(() -> spinRollers(volts));
+  public Command setMechanismVoltage(Supplier<Voltage> volts) { // sets whole mechanism voltage
+    return run(() -> spinRollers(volts.get()));
   }
 
   // stall the algae motor if we see that we have an algae. Should be the default command

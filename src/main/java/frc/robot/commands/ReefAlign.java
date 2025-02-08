@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class ReefAlign {
   /*
@@ -163,6 +164,8 @@ public class ReefAlign {
 
     return resultPose;
   }
+
+  public static Command alignToReef(Supplier<ReefPosition> position) {}
 
   /**
    * Drives to align against the center of the nearest reef face (un;ess it's more than

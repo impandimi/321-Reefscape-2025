@@ -2,7 +2,6 @@
 package frc.robot.subsystems.elevatorarm;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 public class ElevatorArmIOSim implements ElevatorArmIO {
 
   // tuning config for the ElevatorArmIOSim
-  public static final ElevatorArmConfig config = new ElevatorArmConfig(1, 0, 0.05, 4.07, 0);
+  public static final ElevatorArmConfig config = new ElevatorArmConfig(0.13, 0, 0.004, 2.244, 0);
 
   // simulated instance of the elevator arm
   private SingleJointedArmSim simMotor =
@@ -27,10 +26,10 @@ public class ElevatorArmIOSim implements ElevatorArmIO {
           ElevatorArmConstants.kElevatorArmGearing,
           ElevatorArmConstants.kElevatorArmMOI,
           ElevatorArmConstants.kElevatorArmLength.in(Meters),
-          ElevatorArmConstants.kMinAngle.in(Degrees),
-          ElevatorArmConstants.kMaxAngle.in(Degrees),
+          ElevatorArmConstants.kMinAngle.in(Radians),
+          ElevatorArmConstants.kMaxAngle.in(Radians),
           true,
-          ElevatorArmConstants.kMinAngle.in(Degrees));
+          ElevatorArmConstants.kMinAngle.in(Radians));
 
   // update inputs from the arm simulation
   public void updateInputs(ElevatorArmInputs inputs) {

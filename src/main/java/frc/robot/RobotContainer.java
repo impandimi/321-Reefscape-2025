@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.HomingCommands;
+import frc.robot.commands.ReefAlign;
 import frc.robot.subsystems.AlgaeSuperstructure;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.subsystems.CoralSuperstructure;
@@ -25,6 +26,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import frc.robot.util.MathUtils;
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 @Logged
@@ -65,16 +67,15 @@ public class RobotContainer {
   private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
 
   public RobotContainer() {
-    drivetrain.setDefaultCommand(
-        drivetrain.teleopDrive(
-            () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
-
+    // home everything on robot start
     RobotModeTriggers.disabled()
         .negate()
         .onTrue(HomingCommands.homeEverything(elevator, algaePivot));
 
+    // drive
     drivetrain.setDefaultCommand(drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn));
 
+    // algae default commands (stalling rollers, default algae pivot setpoint)
     algaeRollers.setDefaultCommand(algaeRollers.stallIfHasAlgae());
     algaePivot.setDefaultCommand(algaePivot.goToAngle(() -> AlgaeSetpoint.NEUTRAL.getAlgaeAngle()));
 
@@ -99,31 +100,54 @@ public class RobotContainer {
 
   private void configureBindings() {
     // driver controls
-    driver.y().onTrue(algaeSuperstructure.prepareClimb());
-    driver.a().onTrue(algaeSuperstructure.climb());
-
+    // score coral / flip off algae
     driver.leftTrigger().whileTrue(coralSuperstructure.outtakeCoral());
 
-    // manip controls
-    // 0 to 3 - right side L1-L4
-    // 4 to 7 - left side L1-L4
-    // 8 to 9 - algae low / high
-    // 10 - intake
+    // climbing
+    driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
+    driver.y().toggleOnFalse(algaeSuperstructure.goToSetpoint(AlgaeSetpoint.NEUTRAL));
+    driver.a().onTrue(algaeSuperstructure.climb());
 
-    manipTrigger(0)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.RIGHT;
-                  queuedSetpoint = CoralScorerSetpoint.L1;
-                }));
+    // algae intake/outtake
+    driver.b().whileTrue(algaeSuperstructure.intakeAlgae());
+    driver.x().whileTrue(algaeSuperstructure.outtakeAlgae());
+
+    /**
+     * Pressing right trigger down all the way performs translation-align/to-setpoint, while
+     * pressing it slightly performs the rotation align
+     *
+     * <p>Driver has override over translation-align/to-setpoint
+     */
+    new Trigger(() -> driver.getRightTriggerAxis() >= 0.8)
+        .whileTrue(
+            Commands.either(
+                    Commands.select(
+                        Map.of(
+                            ReefPosition.ALGAE, ReefAlign.goToNearestCenterAlign(drivetrain),
+                            ReefPosition.LEFT, ReefAlign.goToNearestLeftAlign(drivetrain),
+                            ReefPosition.RIGHT, ReefAlign.goToNearestRightAlign(drivetrain),
+                            ReefPosition.NONE, Commands.none()),
+                        () -> queuedReefPosition),
+                    drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn),
+                    () -> true
+                    // Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble()) > 0.05
+                    )
+                .alongWith(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)));
+
+    new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
+        .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverStrafe, driverForward));
+
+    // manip controls
+    // 1 to 4 - right side L1-L4
+    // 5 to 8 - left side L1-L4
+    // 9 to 10 - algae low / high
 
     manipTrigger(1)
         .onTrue(
             Commands.runOnce(
                 () -> {
                   queuedReefPosition = ReefPosition.RIGHT;
-                  queuedSetpoint = CoralScorerSetpoint.L2;
+                  queuedSetpoint = CoralScorerSetpoint.L1;
                 }));
 
     manipTrigger(2)
@@ -131,7 +155,7 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> {
                   queuedReefPosition = ReefPosition.RIGHT;
-                  queuedSetpoint = CoralScorerSetpoint.L3;
+                  queuedSetpoint = CoralScorerSetpoint.L2;
                 }));
 
     manipTrigger(3)
@@ -139,15 +163,15 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> {
                   queuedReefPosition = ReefPosition.RIGHT;
-                  queuedSetpoint = CoralScorerSetpoint.L4;
+                  queuedSetpoint = CoralScorerSetpoint.L3;
                 }));
 
     manipTrigger(4)
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  queuedReefPosition = ReefPosition.LEFT;
-                  queuedSetpoint = CoralScorerSetpoint.L1;
+                  queuedReefPosition = ReefPosition.RIGHT;
+                  queuedSetpoint = CoralScorerSetpoint.L4;
                 }));
 
     manipTrigger(5)
@@ -155,7 +179,7 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> {
                   queuedReefPosition = ReefPosition.LEFT;
-                  queuedSetpoint = CoralScorerSetpoint.L2;
+                  queuedSetpoint = CoralScorerSetpoint.L1;
                 }));
 
     manipTrigger(6)
@@ -163,7 +187,7 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> {
                   queuedReefPosition = ReefPosition.LEFT;
-                  queuedSetpoint = CoralScorerSetpoint.L3;
+                  queuedSetpoint = CoralScorerSetpoint.L2;
                 }));
 
     manipTrigger(7)
@@ -171,10 +195,18 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> {
                   queuedReefPosition = ReefPosition.LEFT;
-                  queuedSetpoint = CoralScorerSetpoint.L4;
+                  queuedSetpoint = CoralScorerSetpoint.L3;
                 }));
 
     manipTrigger(8)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.LEFT;
+                  queuedSetpoint = CoralScorerSetpoint.L4;
+                }));
+
+    manipTrigger(9)
         .onTrue(
             Commands.runOnce(
                 () -> {
@@ -182,7 +214,7 @@ public class RobotContainer {
                   queuedSetpoint = CoralScorerSetpoint.ALGAE_LOW;
                 }));
 
-    manipTrigger(9)
+    manipTrigger(10)
         .onTrue(
             Commands.runOnce(
                 () -> {
