@@ -8,7 +8,7 @@ import edu.wpi.first.units.measure.Current;
 
 @Logged
 public class AlgaeIntakePivotInputs {
-  public Angle pivotAngle; // current pivot angle
+  public Angle pivotAngle = AlgaeIntakePivotConstants.kPivotStartingAngle; // current pivot angle
   public AngularVelocity pivotVelocity; // current pivot velocity
   public Current pivotCurrent; // current of ONE of the pivot motors
 }

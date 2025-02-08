@@ -17,6 +17,7 @@ import frc.robot.subsystems.AlgaeSuperstructure;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.subsystems.CoralSuperstructure;
 import frc.robot.subsystems.CoralSuperstructure.CoralScorerSetpoint;
+import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
@@ -66,6 +67,10 @@ public class RobotContainer {
   private ReefPosition queuedReefPosition = ReefPosition.NONE;
   private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
 
+  private SuperstructureVisualizer stateVisualizer =
+      new SuperstructureVisualizer(
+          () -> elevator.getHeight(), () -> elevatorArm.getAngle(), () -> algaePivot.getAngle());
+
   public RobotContainer() {
     // home everything on robot start
     RobotModeTriggers.disabled()
@@ -111,6 +116,11 @@ public class RobotContainer {
     // algae intake/outtake
     driver.b().whileTrue(algaeSuperstructure.intakeAlgae());
     driver.x().whileTrue(algaeSuperstructure.outtakeAlgae());
+
+    // TODO: preliminary coral scoring; needs the alignment part
+    driver
+        .rightBumper()
+        .whileTrue(coralSuperstructure.goToSetpoint(() -> CoralScorerSetpoint.FEED_CORAL));
 
     /**
      * Pressing right trigger down all the way performs translation-align/to-setpoint, while

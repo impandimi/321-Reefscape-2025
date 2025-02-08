@@ -55,7 +55,7 @@ public class CoralSuperstructure {
 
   public enum CoralScorerSetpoint {
     // TODO: determine angles empirically
-    NEUTRAL(Inches.of(30), Degrees.of(-35)), // TODO: make
+    NEUTRAL(Inches.of(30), Degrees.of(-60)), // TODO: make
     FEED_CORAL(Inches.of(40.058), Degrees.of(-77.64500)),
     L1(Inches.of(30), Degrees.of(30)), // TODO: actually tune
     L2(Inches.of(34.079), Degrees.of(50.13600)),

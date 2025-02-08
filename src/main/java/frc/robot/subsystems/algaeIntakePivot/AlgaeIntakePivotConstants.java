@@ -32,8 +32,8 @@ public class AlgaeIntakePivotConstants {
   public static final Angle kPivotZeroOffsetAngle = Degrees.of(0);
 
   // pivot thresholds
-  public static final Angle kMinBlockedAngle = Degrees.of(20); // TODO: find these
-  public static final Angle kMaxBlockedAngle = Degrees.of(40);
+  public static final Angle kMinBlockedAngle = Degrees.of(10); // TODO: find these
+  public static final Angle kMaxBlockedAngle = Degrees.of(50);
 
   // pivot homing
   public static final Voltage kHomingVoltage = Volts.of(-2);
