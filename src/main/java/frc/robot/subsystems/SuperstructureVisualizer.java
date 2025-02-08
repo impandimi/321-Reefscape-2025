@@ -70,7 +70,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
         elevator.append(
             new MechanismLigament2d(
                 "Arm",
-                ElevatorArmConstants.kArmLength.in(Meters),
+                ElevatorArmConstants.kElevatorArmLength.in(Meters),
                 0,
                 4.0,
                 new Color8Bit(Color.kFirstRed)));
@@ -111,7 +111,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
     this.elbowPose =
         shoulderPose.transformBy(
             new Transform3d(
-                new Translation3d(0, ElevatorArmConstants.kArmLength.in(Meters), 0),
+                new Translation3d(0, ElevatorArmConstants.kElevatorArmLength.in(Meters), 0),
                 new Rotation3d()));
 
     this.algaeIntakePose =
