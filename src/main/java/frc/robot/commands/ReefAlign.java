@@ -24,10 +24,11 @@ import java.util.function.DoubleSupplier;
 
 public class ReefAlign {
   /*
-    Maps reef AprilTag ("tag") ID to left and right alignment poses,
+    Maps reef AprilTag ("tag") ID to left, center, and right alignment poses,
     loads only the tags on alliance reef as determined at robot initialization
   */
   public static final Map<Integer, Pose2d> leftAlignPoses = new HashMap<>();
+  public static final Map<Integer, Pose2d> centerAlignPoses = new HashMap<>();
   public static final Map<Integer, Pose2d> rightAlignPoses = new HashMap<>();
 
   private static final Distance kLeftAlignDistance = Inches.of(-6.5);
@@ -52,15 +53,16 @@ public class ReefAlign {
    * only the poses on the alliance reef are loaded
    */
   public static void loadReefAlignmentPoses() {
-    System.out.println("Hi");
     if (MyAlliance.isRed()) {
       for (Integer id : redReefTagIDs) {
         leftAlignPoses.computeIfAbsent(id, ReefAlign::getNearestLeftAlign);
+        centerAlignPoses.computeIfAbsent(id, ReefAlign::getNearestCenterAlign);
         rightAlignPoses.computeIfAbsent(id, ReefAlign::getNearestRightAlign);
       }
     } else {
       for (Integer id : blueReefTagIDs) {
         leftAlignPoses.computeIfAbsent(id, ReefAlign::getNearestLeftAlign);
+        centerAlignPoses.computeIfAbsent(id, ReefAlign::getNearestCenterAlign);
         rightAlignPoses.computeIfAbsent(id, ReefAlign::getNearestRightAlign);
       }
     }
@@ -172,7 +174,7 @@ public class ReefAlign {
   /** Drives to align against the center of the nearest reef face, no manual driving */
   public static Command goToNearestCenterAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
-        () -> getNearestCenterAlign(getNearestReefID(swerveDrive.getPose())));
+        () -> centerAlignPoses.get(getNearestReefID(swerveDrive.getPose())));
   }
 
   /** Drives to align against the left side reef bars of the nearest reef face, no manual driving */
