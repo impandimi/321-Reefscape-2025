@@ -163,4 +163,8 @@ public class ElevatorArm extends SubsystemBase {
   public boolean atSetpoint() {
     return pidController.atSetpoint();
   }
+  
+  public Angle getAngle() {
+    return inputs.angle;
+  }
 }

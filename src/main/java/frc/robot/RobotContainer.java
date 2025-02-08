@@ -16,6 +16,7 @@ import frc.robot.subsystems.AlgaeSuperstructure;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.subsystems.CoralSuperstructure;
 import frc.robot.subsystems.CoralSuperstructure.CoralScorerSetpoint;
+import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
@@ -64,7 +65,12 @@ public class RobotContainer {
   private ReefPosition queuedReefPosition = ReefPosition.NONE;
   private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
 
+  private SuperstructureVisualizer stateVisualizer =
+      new SuperstructureVisualizer(
+          () -> elevator.getHeight(), () -> elevatorArm.getAngle(), () -> algaePivot.getAngle());
+
   public RobotContainer() {
+    
     drivetrain.setDefaultCommand(
         drivetrain.teleopDrive(
             () -> -driver.getLeftY(), () -> -driver.getLeftX(), () -> -driver.getRightX()));
@@ -93,7 +99,7 @@ public class RobotContainer {
                 .goToHeight(() -> ElevatorConstants.kElevatorDangerHeight.plus(Meters.of(0.1)))
                 // .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
                 .until(new Trigger(algaePivot::inCollisionZone).negate()));
-
+  
     configureBindings();
   }
 
