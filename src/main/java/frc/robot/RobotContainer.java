@@ -26,6 +26,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import frc.robot.util.MathUtils;
+import frc.robot.util.ReefPosition;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 
@@ -229,12 +230,5 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return Commands.none();
-  }
-
-  enum ReefPosition {
-    NONE,
-    LEFT,
-    ALGAE,
-    RIGHT;
   }
 }

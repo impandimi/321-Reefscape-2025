@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotConstants;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.util.MyAlliance;
+import frc.robot.util.ReefPosition;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,7 +166,7 @@ public class ReefAlign {
     return resultPose;
   }
 
-  public static Command alignToReef(Supplier<ReefPosition> position) {}
+  public static Command alignToReef(SwerveDrive swerveDrive, Supplier<ReefPosition> position) {}
 
   /**
    * Drives to align against the center of the nearest reef face (un;ess it's more than
