@@ -19,7 +19,8 @@ public class Robot extends TimedRobot {
   // public Pose2d robotPose = new Pose2d();
 
   // @Logged(name = "AssetsZeroComponentPoses")
-  // public Pose3d[] zeroComponentPoses = new Pose3d[] {new Pose3d()};
+  // public Pose3d[] zeroComponentPoses =
+  //     new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d()};
 
   public Robot() {
     m_robotContainer = new RobotContainer();
