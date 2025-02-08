@@ -26,11 +26,11 @@ public class ElevatorArmIOSim implements ElevatorArmIO {
           DCMotor.getNEO(1),
           ElevatorArmConstants.kElevatorArmGearing,
           ElevatorArmConstants.kElevatorArmMOI,
-          ElevatorArmConstants.kElevatorArmLength.in(Meters),
+          ElevatorArmConstants.kArmLength.in(Meters),
           ElevatorArmConstants.kMinAngle.in(Degrees),
           ElevatorArmConstants.kMaxAngle.in(Degrees),
           true,
-          ElevatorArmConstants.kMinAngle.in(Degrees));
+          ElevatorArmConstants.kStartAngle.in(Degrees));
 
   // update inputs from the arm simulation
   public void updateInputs(ElevatorArmInputs inputs) {

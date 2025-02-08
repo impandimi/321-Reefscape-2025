@@ -1,6 +1,8 @@
 /* (C) Robolancers 2025 */
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -34,7 +36,7 @@ public class RobotContainer {
     driver.y().onTrue(elevator.goToHeight(() -> ElevatorConstants.kElevatorMaximumHeight)); // v
     driver.x().onTrue(elevator.goToHeight(() -> ElevatorConstants.kElevatorMinimumHeight)); // c
 
-    driver.b().onTrue(elevatorArm.goToAngle(() -> ElevatorArmConstants.kMaxAngle)); // x
+    driver.b().onTrue(elevatorArm.goToAngle(() -> Degrees.of(90))); // x
     driver.a().onTrue(elevatorArm.goToAngle(() -> ElevatorArmConstants.kMinAngle)); // z
 
     configureBindings();

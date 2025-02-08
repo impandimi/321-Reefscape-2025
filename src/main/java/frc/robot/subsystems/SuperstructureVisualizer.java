@@ -30,12 +30,13 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
   MechanismLigament2d elevator;
   MechanismLigament2d arm;
 
-  Supplier<Distance> elevatorSetpoint;
-  Supplier<Angle> armSetpoint;
+  Supplier<Distance> elevatorSetpoint = () -> ElevatorConstants.kElevatorMinimumHeight;
+  Supplier<Angle> armSetpoint = () -> ElevatorArmConstants.kMinAngle;
 
   Pose3d elevatorFirstStagePose = new Pose3d();
   Pose3d elevatorSecondStagePose = new Pose3d();
-  Pose3d armPose = new Pose3d();
+  Pose3d shoulderPose = new Pose3d();
+  Pose3d elbowPose = new Pose3d();
   Pose3d wristPose = new Pose3d();
 
   public SuperstructureVisualizer(
@@ -43,12 +44,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
     this.elevatorSetpoint = elevatorSetpoint;
     this.armSetpoint = armSetpoint;
 
-    this.mechanism =
-        new Mechanism2d(
-            Inches.of(29).in(Meters),
-            ElevatorConstants.kElevatorMaximumHeight
-                .plus(ElevatorArmConstants.kElevatorArmLength)
-                .in(Meters));
+    this.mechanism = new Mechanism2d(Inches.of(29).in(Meters), Inches.of(80).in(Meters));
 
     MechanismRoot2d root =
         mechanism.getRoot(
@@ -69,7 +65,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
         elevator.append(
             new MechanismLigament2d(
                 "Arm",
-                ElevatorArmConstants.kElevatorArmLength.in(Meters),
+                ElevatorArmConstants.kArmLength.in(Meters),
                 0,
                 4.0,
                 new Color8Bit(Color.kFirstRed)));
@@ -81,10 +77,14 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
     elevator.setLength(elevatorSetpoint.get().in(Meters));
     SmartDashboard.putData("Mech2d", mechanism);
 
-    // TODO fix elevator pose math
-    double firstStageHeight =
+    double startHeightToSetpoint =
         elevatorSetpoint.get().in(Meters) - ElevatorConstants.kElevatorMinimumHeight.in(Meters);
-    double secondStageHeight = firstStageHeight / 2;
+
+    // second stage moves twice as much as the first stage
+    double firstStageHeight =
+        (startHeightToSetpoint * 2 / 3 / 2) + ElevatorConstants.kElevatorMinimumHeight.in(Meters);
+    double secondStageHeight =
+        (startHeightToSetpoint * 2 / 3) + ElevatorConstants.kElevatorMinimumHeight.in(Meters);
 
     this.elevatorFirstStagePose =
         new Pose3d(
@@ -96,24 +96,26 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
             VisualizerConstants.elevatorRoot3d.plus(new Translation3d(0, 0, secondStageHeight)),
             new Rotation3d());
 
-    // TODO this is a little greater than elevator height. check math
-    this.armPose =
+    this.shoulderPose =
         new Pose3d(
-            VisualizerConstants.armRoot3d.plus(
-                new Translation3d(
-                    0,
-                    0,
-                    elevator.getLength() - ElevatorConstants.kElevatorMinimumHeight.in(Meters))),
-            new Rotation3d());
+            VisualizerConstants.armRoot3d.plus(new Translation3d(0, 0, startHeightToSetpoint)),
+            new Rotation3d(Radians.convertFrom(arm.getAngle(), Degrees), 0, 0));
 
-    // TODO trig functions are switched b/c 0 is straight up. swap when converting to our angles
+    this.elbowPose =
+        shoulderPose.transformBy(
+            new Transform3d(
+                new Translation3d(0, ElevatorArmConstants.kArmLength.in(Meters), 0),
+                new Rotation3d()));
+
     this.wristPose =
-        armPose.transformBy(
+        elbowPose.transformBy(
             new Transform3d(
                 new Translation3d(
                     0,
-                    arm.getLength() * Math.sin(Radians.convertFrom(arm.getAngle(), Degrees)),
-                    arm.getLength() * Math.cos(Radians.convertFrom(arm.getAngle(), Degrees))),
+                    -ElevatorArmConstants.kElbowLength.in(Meters)
+                        * Math.cos(ElevatorArmConstants.kElbowAngle.in(Radians)),
+                    -ElevatorArmConstants.kElbowLength.in(Meters)
+                        * Math.sin(ElevatorArmConstants.kElbowAngle.in(Radians))),
                 new Rotation3d()));
   }
 
@@ -127,9 +129,14 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
     return elevatorSecondStagePose;
   }
 
-  @Logged(name = "ArmPose")
-  public Pose3d getArmPose() {
-    return armPose;
+  @Logged(name = "ShoulderPose")
+  public Pose3d getShoulderPose() {
+    return shoulderPose;
+  }
+
+  @Logged(name = "ElbowPose")
+  public Pose3d getElbowPose() {
+    return elbowPose;
   }
 
   @Logged(name = "WristPose")

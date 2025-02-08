@@ -3,6 +3,8 @@ package frc.robot;
 
 import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -14,6 +16,12 @@ public class Robot extends TimedRobot {
 
   @Logged(name = "RobotContainer")
   private final RobotContainer m_robotContainer;
+
+  @Logged(name = "AssetsRobotPose")
+  public Pose2d robotPose = new Pose2d();
+
+  @Logged(name = "AssetsZeroComponentPoses")
+  public Pose3d[] zeroComponentPoses = new Pose3d[] {new Pose3d()};
 
   public Robot() {
     m_robotContainer = new RobotContainer();
