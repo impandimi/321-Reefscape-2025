@@ -26,8 +26,8 @@ public class ElevatorConstants {
 
   public static final Mass kElevatorCarriageMass = Pound.of(20); // TODO: get carriage mass
   public static final Distance kElevatorDrumRadius = kElevatorConversion.div(2 * Math.PI);
-  public static final Distance kElevatorMinimumHeight = Inches.of(34);
-  public static final Distance kElevatorMaximumHeight = Inches.of(84.766);
+  public static final Distance kElevatorMinimumHeight = Inches.of(35);
+  public static final Distance kElevatorMaximumHeight = Inches.of(87.75);
   public static final Distance kElevatorStartingHeight = kElevatorMinimumHeight;
 
   // Elevator Motor Configs

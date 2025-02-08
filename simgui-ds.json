@@ -1,14 +1,13 @@
 {
-  "System Joysticks": {
+  "Keyboard 0 Settings": {
     "window": {
-      "enabled": false
+      "visible": true
     }
   },
   "keyboardJoysticks": [
     {
       "axisConfig": [
         {
-          "decKey": 65,
           "incKey": 68
         },
         {

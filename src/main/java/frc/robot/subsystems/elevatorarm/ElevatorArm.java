@@ -159,4 +159,8 @@ public class ElevatorArm extends SubsystemBase {
   public void periodic() {
     io.updateInputs(this.inputs);
   }
+
+  public Angle getAngle() {
+    return inputs.angle;
+  }
 }

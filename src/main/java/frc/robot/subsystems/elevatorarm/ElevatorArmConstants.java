@@ -40,4 +40,6 @@ public class ElevatorArmConstants {
   public static final Angle kMinAngle = Degrees.of(-180);
   // the angle from the encoder rotation axis to the center of mass
   public static final Angle kCMOffset = Degrees.of(-10); // TODO: find
+  // the starting angle of the arm
+  public static final Angle kStartAngle = Degrees.of(-64.53);
 }
