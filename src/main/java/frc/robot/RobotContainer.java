@@ -139,7 +139,7 @@ public class RobotContainer {
                 .alongWith(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)));
 
     new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
-        .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverStrafe, driverForward));
+        .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward, driverStrafe));
 
     // manip controls
     // 1 to 4 - right side L1-L4
