@@ -3,6 +3,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.XboxController;
@@ -109,6 +110,10 @@ public class RobotContainer {
     driver.a().onTrue(algaeSuperstructure.climb());
 
     driver.leftTrigger().whileTrue(coralSuperstructure.outtakeCoral());
+    
+    // artifact from merge
+    // driver.a().whileTrue(elevatorArm.goToAngle(() -> Degrees.of(35)));
+    // driver.b().whileTrue(elevatorArm.goToAngle(() -> Degrees.of(50)));
 
     // manip controls
     // 0 to 3 - right side L1-L4
