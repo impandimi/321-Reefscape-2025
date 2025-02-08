@@ -227,6 +227,6 @@ public class ReefAlign {
     return swerveDrive.driveFixedHeading(
         x,
         y,
-        () -> getNearestReefPose(swerveDrive.getPose()).getRotation().plus(Rotation2d.k180deg));
+        () -> getNearestReefPose(swerveDrive.getPose()).getRotation().plus(kReefAlignmentRotation));
   }
 }
