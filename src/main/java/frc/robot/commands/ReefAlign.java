@@ -178,7 +178,7 @@ public class ReefAlign {
   /** Drives to align against the left side reef bars of the nearest reef face, no manual driving */
   public static Command goToNearestLeftAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
-        () -> getNearestLeftAlign(getNearestReefID(swerveDrive.getPose())));
+        () -> leftAlignPoses.get(getNearestReefID(swerveDrive.getPose())));
   }
 
   /**
@@ -186,7 +186,7 @@ public class ReefAlign {
    */
   public static Command goToNearestRightAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
-        () -> getNearestRightAlign(getNearestReefID(swerveDrive.getPose())));
+        () -> rightAlignPoses.get(getNearestReefID(swerveDrive.getPose())));
   }
 
   /** Maintain translational driving while rotating toward the nearest reef tag */
