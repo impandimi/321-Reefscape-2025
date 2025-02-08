@@ -62,6 +62,7 @@ public class RobotContainer {
                   : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
   private DoubleSupplier driverTurn = () -> -MathUtils.deadband(driver.getRightX(), 0.05) * 5;
 
+  
   // robot queued states
   private ReefPosition queuedReefPosition = ReefPosition.NONE;
   private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
@@ -104,21 +105,29 @@ public class RobotContainer {
     driver.a().onTrue(algaeSuperstructure.climb());
 
     driver.leftTrigger().whileTrue(coralSuperstructure.outtakeCoral());
-    driver
-        .rightBumper()
-        .whileTrue(ReefAlign.rotateToNearest(drivetrain, driverForward, driverStrafe));
 
-    driver
-        .rightTrigger()
-        .whileTrue(
-            Commands.select(
-                    Map.of(
-                        ReefPosition.ALGAE, ReefAlign.goToNearestCenterAlign(drivetrain),
-                        ReefPosition.LEFT, ReefAlign.goToNearestLeftAlign(drivetrain),
-                        ReefPosition.RIGHT, ReefAlign.goToNearestRightAlign(drivetrain),
-                        ReefPosition.NONE, Commands.none()),
-                    () -> queuedReefPosition)
+    /**
+     * Pressing right trigger down all the way performs translation-align/to-setpoint,
+     * while pressing it slightly performs the rotation align
+     * 
+     * Driver has override over translation-align/to-setpoint
+     */
+          new Trigger(() -> driver.getRightTriggerAxis() >= 0.8).whileTrue(
+            Commands.either(Commands.select(
+              Map.of(
+                  ReefPosition.ALGAE, ReefAlign.goToNearestCenterAlign(drivetrain),
+                  ReefPosition.LEFT, ReefAlign.goToNearestLeftAlign(drivetrain),
+                  ReefPosition.RIGHT, ReefAlign.goToNearestRightAlign(drivetrain),
+                  ReefPosition.NONE, Commands.none()),
+              () -> queuedReefPosition), drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn), 
+              () -> true
+              // Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble()) > 0.05 
+              )  
                 .alongWith(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)));
+
+          new Trigger(
+            () -> driver.getRightTriggerAxis() > 0.05  && driver.getRightTriggerAxis() < 0.8)
+            .whileTrue(ReefAlign.rotateToNearest(drivetrain, driverStrafe, driverForward));
 
     // manip controls
     // 1 to 4 - right side L1-L4
