@@ -117,11 +117,15 @@ public class AlgaeIntakePivot extends SubsystemBase {
   }
 
   // sets voltage to the whole mechanism
-  public Command setMechanismVoltage(Voltage volts) {
+  public Command setMechanismVoltage(Supplier<Voltage> volts) {
     return run(
         () -> {
-          io.setPivotVoltage(volts);
+          io.setPivotVoltage(volts.get());
         });
+  }
+
+  public Angle getAngle() {
+    return inputs.pivotAngle;
   }
 
   @Override

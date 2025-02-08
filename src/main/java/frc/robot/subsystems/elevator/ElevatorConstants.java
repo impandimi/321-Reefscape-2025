@@ -17,17 +17,17 @@ import edu.wpi.first.units.measure.Voltage;
 public class ElevatorConstants {
 
   // Elevator IDs
-  public static final int kLeftMotorID = 12;
+  public static final int kLeftMotorID = 0;
   public static final int kRightMotorID = 0;
 
   // Elevator Physical Constants
   public static final double kElevatorGearing = 20;
   public static final Distance kElevatorConversion = Inches.of(0.375 * 2 * 13);
 
-  public static final Mass kElevatorCarriageMass = Pound.of(20);
+  public static final Mass kElevatorCarriageMass = Pound.of(20); // TODO: get carriage mass
   public static final Distance kElevatorDrumRadius = kElevatorConversion.div(2 * Math.PI);
-  public static final Distance kElevatorMinimumHeight = Inches.of(27);
-  public static final Distance kElevatorMaximumHeight = Inches.of(56);
+  public static final Distance kElevatorMinimumHeight = Inches.of(35);
+  public static final Distance kElevatorMaximumHeight = Inches.of(87.75);
   public static final Distance kElevatorStartingHeight = kElevatorMinimumHeight;
 
   // Elevator Motor Configs
