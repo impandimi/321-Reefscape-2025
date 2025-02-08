@@ -63,6 +63,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    // alliance is also available here, for testing without needing to enable auto first
+    ReefAlign.loadReefAlignmentPoses();
+
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

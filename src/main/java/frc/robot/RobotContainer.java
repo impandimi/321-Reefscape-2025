@@ -27,7 +27,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import frc.robot.util.MathUtils;
-import java.util.Map;
+import frc.robot.util.ReefPosition;
 import java.util.function.DoubleSupplier;
 
 @Logged
@@ -72,6 +72,7 @@ public class RobotContainer {
           () -> elevator.getHeight(), () -> elevatorArm.getAngle(), () -> algaePivot.getAngle());
 
   public RobotContainer() {
+
     // home everything on robot start
     RobotModeTriggers.disabled()
         .negate()
@@ -129,22 +130,16 @@ public class RobotContainer {
      */
     new Trigger(() -> driver.getRightTriggerAxis() >= 0.8)
         .whileTrue(
-            // Commands.either(
-            Commands.select(
-                    Map.of(
-                        ReefPosition.ALGAE, ReefAlign.goToNearestCenterAlign(drivetrain),
-                        ReefPosition.LEFT, ReefAlign.goToNearestLeftAlign(drivetrain),
-                        ReefPosition.RIGHT, ReefAlign.goToNearestRightAlign(drivetrain),
-                        ReefPosition.NONE, Commands.none()),
-                    () -> queuedReefPosition)
-                // drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn)
-                // () -> true
-                // // Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble()) > 0.05
-                // )
+            ReefAlign.alignToReef(drivetrain, () -> queuedReefPosition)
+                .onlyWhile(
+                    () ->
+                        Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble()) <= 0.05)
+                .asProxy()
+                .repeatedly()
                 .alongWith(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)));
 
     new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
-        .whileTrue(ReefAlign.rotateToNearest(drivetrain, driverForward, driverStrafe));
+        .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverStrafe, driverForward));
 
     // manip controls
     // 1 to 4 - right side L1-L4
@@ -238,12 +233,5 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return Commands.none();
-  }
-
-  enum ReefPosition {
-    NONE,
-    LEFT,
-    ALGAE,
-    RIGHT;
   }
 }
