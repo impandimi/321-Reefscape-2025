@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -42,8 +41,8 @@ public class RobotContainer {
   private AlgaeSuperstructure algaeSuperstructure =
       new AlgaeSuperstructure(algaePivot, algaeRollers);
 
-      
-  private AutomaticAutonomousMaker3000 automaker = new AutomaticAutonomousMaker3000(coralEndEffector, coralSuperstructure);
+  private AutomaticAutonomousMaker3000 automaker =
+      new AutomaticAutonomousMaker3000(coralEndEffector, coralSuperstructure);
 
   private CommandXboxController driver = new CommandXboxController(0);
   private CommandXboxController manipulator = new CommandXboxController(1);
