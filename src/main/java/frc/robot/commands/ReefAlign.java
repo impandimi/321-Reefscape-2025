@@ -36,7 +36,7 @@ public class ReefAlign {
 
   private static final Distance kMaxAlignDistance = Meter.of(2);
   private static final Distance kLeftAlignDistance = Inches.of(-6.5);
-  private static final Distance kReefDistance = Inches.of(14.5);
+  private static final Distance kReefDistance = Inches.of(14);
   private static final Distance kRightAlignDistance = Inches.of(6.5);
 
   private static final Rotation2d kReefAlignmentRotation = Rotation2d.fromDegrees(270);

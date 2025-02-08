@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.HomingCommands;
 import frc.robot.commands.ReefAlign;
+import frc.robot.commands.StationAlign;
 import frc.robot.subsystems.AlgaeSuperstructure;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.subsystems.CoralSuperstructure;
@@ -107,9 +108,6 @@ public class RobotContainer {
   private void configureBindings() {
     // driver controls
     // score coral / flip off algae
-    driver.leftTrigger().whileTrue(coralSuperstructure.outtakeCoral());
-
-    // climbing
     driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
     driver.a().onTrue(algaeSuperstructure.climb());
 
@@ -117,10 +115,12 @@ public class RobotContainer {
     driver.b().whileTrue(algaeSuperstructure.intakeAlgae());
     driver.x().whileTrue(algaeSuperstructure.outtakeAlgae());
 
-    // TODO: preliminary coral scoring; needs the alignment part
+    // coral feeding
     driver
         .rightBumper()
-        .whileTrue(coralSuperstructure.goToSetpoint(() -> CoralScorerSetpoint.FEED_CORAL));
+        .whileTrue(
+            StationAlign.rotateToNearestStationTag(drivetrain, driverForward, driverStrafe)
+                .alongWith(coralSuperstructure.feedCoral()));
 
     /**
      * Pressing right trigger down all the way performs translation-align/to-setpoint, while
