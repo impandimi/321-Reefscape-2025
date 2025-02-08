@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.HomingCommands;
+import frc.robot.commands.StationAlign;
 import frc.robot.subsystems.AlgaeSuperstructure;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.subsystems.CoralSuperstructure;
@@ -101,6 +102,9 @@ public class RobotContainer {
     // driver controls
     driver.y().onTrue(algaeSuperstructure.prepareClimb());
     driver.a().onTrue(algaeSuperstructure.climb());
+
+    driver.x().whileTrue(StationAlign.goToNearestCenterAlign(drivetrain));
+    driver.b().whileTrue(StationAlign.rotateToNearestStationTag(drivetrain, ()->-driver.getLeftY(), ()->-driver.getLeftX()));
 
     driver.leftTrigger().whileTrue(coralSuperstructure.outtakeCoral());
 
