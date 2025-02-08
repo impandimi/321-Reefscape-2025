@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 
 import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,8 +23,8 @@ import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 public class ReefAlign {
-  public static final Map<Integer, Pose2d> leftAlignPoses = null;
-  public static final Map<Integer, Pose2d> rightAlignPoses = null;
+  @NotLogged public static final Map<Integer, Pose2d> leftAlignPoses = null;
+  @NotLogged public static final Map<Integer, Pose2d> rightAlignPoses = null;
 
   private static final Distance kLeftAlignDistance = Inches.of(-6.5);
   private static final Distance kReefDistance = Inches.of(14.5);
@@ -80,7 +81,7 @@ public class ReefAlign {
         .ID;
   }
 
-  private static Pose2d getNearestLeftAlign(int reefTagID) {
+  public static Pose2d getNearestLeftAlign(int reefTagID) {
     Optional<Pose3d> tagPose = Constants.kAprilTagFieldLayout.getTagPose(reefTagID);
 
     if (tagPose.isEmpty()) return null;
@@ -90,13 +91,10 @@ public class ReefAlign {
     Pose2d resultPose =
         aprilTagPose.plus(
             new Transform2d(kReefDistance, kLeftAlignDistance, kReefAlignmentRotation));
-
-    // new Pose2d(kReefDistance, kLeftAlignDistance, kReefAlignmentRotation)
-    //         .relativeTo(aprilTagPose);
     return resultPose;
   }
 
-  private static Pose2d getNearestRightAlign(int reefTagID) {
+  public static Pose2d getNearestRightAlign(int reefTagID) {
     Optional<Pose3d> tagPose = Constants.kAprilTagFieldLayout.getTagPose(reefTagID);
 
     if (tagPose.isEmpty()) return null;
