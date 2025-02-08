@@ -17,6 +17,7 @@ import frc.robot.subsystems.AlgaeSuperstructure;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.subsystems.CoralSuperstructure;
 import frc.robot.subsystems.CoralSuperstructure.CoralScorerSetpoint;
+import frc.robot.subsystems.SuperstructureVisualizer;
 import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
@@ -27,7 +28,6 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import frc.robot.util.MathUtils;
 import frc.robot.util.ReefPosition;
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 @Logged
@@ -67,7 +67,12 @@ public class RobotContainer {
   private ReefPosition queuedReefPosition = ReefPosition.NONE;
   private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
 
+  private SuperstructureVisualizer stateVisualizer =
+      new SuperstructureVisualizer(
+          () -> elevator.getHeight(), () -> elevatorArm.getAngle(), () -> algaePivot.getAngle());
+
   public RobotContainer() {
+
     // home everything on robot start
     RobotModeTriggers.disabled()
         .negate()
@@ -121,22 +126,25 @@ public class RobotContainer {
      */
     new Trigger(() -> driver.getRightTriggerAxis() >= 0.8)
         .whileTrue(
-            Commands.either(
-                    Commands.select(
-                        Map.of(
-                            ReefPosition.ALGAE, ReefAlign.goToNearestCenterAlign(drivetrain),
-                            ReefPosition.LEFT, ReefAlign.goToNearestLeftAlign(drivetrain),
-                            ReefPosition.RIGHT, ReefAlign.goToNearestRightAlign(drivetrain),
-                            ReefPosition.NONE, Commands.none()),
-                        () -> queuedReefPosition),
-                    drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn),
-                    () -> true
-                    // Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble()) > 0.05
-                    )
+            ReefAlign.alignToReef(drivetrain, () -> queuedReefPosition)
+                .onlyWhile(
+                    () ->
+                        Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble()) <= 0.05)
+                .asProxy()
+                .repeatedly()
                 .alongWith(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)));
 
     new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
         .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverStrafe, driverForward));
+
+    // climbing
+    driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
+    driver.y().toggleOnFalse(algaeSuperstructure.goToSetpoint(AlgaeSetpoint.NEUTRAL));
+    driver.a().onTrue(algaeSuperstructure.climb());
+
+    // algae intake/outtake
+    driver.b().whileTrue(algaeSuperstructure.intakeAlgae());
+    driver.x().whileTrue(algaeSuperstructure.outtakeAlgae());
 
     // manip controls
     // 1 to 4 - right side L1-L4

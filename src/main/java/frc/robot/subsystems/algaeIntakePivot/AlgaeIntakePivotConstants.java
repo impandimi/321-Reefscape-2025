@@ -4,7 +4,7 @@ package frc.robot.subsystems.algaeIntakePivot;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
@@ -22,27 +22,31 @@ public class AlgaeIntakePivotConstants {
   public static final int kPivotMotorLeftId = 0;
   public static final int kPivotMotorRightId = 0;
 
-  // physical constants
-  public static final double kPivotGearing = 150;
-  public static final Distance kPivotLength = Meters.of(0.6);
-  public static final Angle kPivotMinAngle = Degrees.of(0);
-  public static final Angle kPivotMaxAngle = Degrees.of(200);
-  public static final Angle kPivotStartingAngle = Degrees.of(0);
-  public static final double kPivotMOI = 1; // TODO: find
-  public static final Angle kPivotZeroOffsetAngle = Degrees.of(0);
-
   // pivot thresholds
   public static final Angle kMinBlockedAngle = Degrees.of(20); // TODO: find these
   public static final Angle kMaxBlockedAngle = Degrees.of(40);
+  // setpoint constants
+  public static final Angle kPivotClimbThreshold = Degrees.of(45); // to be tuned
 
   // pivot homing
   public static final Voltage kHomingVoltage = Volts.of(-2);
   public static final Current kHomingCurrentThreshold = Amps.of(25);
   public static final AngularVelocity kHomingVelocityThreshold = DegreesPerSecond.of(2);
 
-  // pivot climbing
-  // TODO: to be tuned
-  public static final Angle kPivotClimbThreshold = Degrees.of(45);
+  // physical constants
+  public static final double kPivotGearing = 150; // this
+  public static final Distance kPivotLength = Inches.of(0.6); // this
+  public static final Angle kPivotMinAngle = Degrees.of(0);
+  public static final Angle kPivotMaxAngle = Degrees.of(180);
+  public static final Angle kPivotStartingAngle = Degrees.of(0);
+  public static final double kPivotMOI = 0.1; // this
+  public static final Angle kPivotIntakeAngle =
+      Degrees.of(80); // TODO: dummy angles; test these angles
+  public static final Angle kPivotOuttakeAngle = Degrees.of(90);
+  public static final Angle kPivotStoreAngle =
+      Degrees.of(70); // the angle the pivot will be at by default
+  public static final Angle kPivotClimbAngle = Degrees.of(45);
+  public static final Angle kPivotFloorAngle = Degrees.of(0);
   public static final Voltage kPivotClimbVoltage = Volts.of(-8);
 
   // motor configurations

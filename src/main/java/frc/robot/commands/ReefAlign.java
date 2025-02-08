@@ -166,13 +166,24 @@ public class ReefAlign {
     return resultPose;
   }
 
-  public static Command alignToReef(SwerveDrive swerveDrive, Supplier<ReefPosition> position) {}
+  public static Command alignToReef(
+      SwerveDrive swerveDrive, Supplier<ReefPosition> targetReefPosition) {
+    return swerveDrive.driveToFieldPose(
+        () ->
+            switch (targetReefPosition.get()) {
+              case ALGAE -> centerAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+              case LEFT -> leftAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+              case RIGHT -> rightAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+              default -> swerveDrive.getPose(); // more or less a no-op
+            });
+  }
 
   /**
    * Drives to align against the center of the nearest reef face (un;ess it's more than
    * kMaxAlignDistance away), no manual driving
    */
   public static Command goToNearestCenterAlign(SwerveDrive swerveDrive) {
+    System.out.println(swerveDrive.getPose());
     final Pose2d targetAlignPose = centerAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
     return swerveDrive
         .driveToFieldPose(() -> targetAlignPose)
@@ -201,6 +212,7 @@ public class ReefAlign {
    * than kMaxAlignDistance away), no manual driving
    */
   public static Command goToNearestRightAlign(SwerveDrive swerveDrive) {
+    System.out.println(swerveDrive.getPose());
     final Pose2d targetAlignPose = rightAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
     return swerveDrive
         .driveToFieldPose(() -> targetAlignPose)
