@@ -49,7 +49,8 @@ public class StationAlign {
     List<Integer> stationTagIds = MyAlliance.isRed() ? redStationTagIDs : blueStationTagIDs;
     for (Integer id : stationTagIds) {
       stationPoses.computeIfAbsent(id, StationAlign::getNearestCenterAlign);
-  }}
+    }
+  }
 
   /**
    * Finds the pose of the nearest station tag
@@ -63,11 +64,10 @@ public class StationAlign {
 
     if (alliance.isEmpty()) return null;
 
-    List<AprilTag> stationTags = alliance.get().equals(Alliance.Red) ? redStationTags : blueStationTags;
+    List<AprilTag> stationTags =
+        alliance.get().equals(Alliance.Red) ? redStationTags : blueStationTags;
 
     return robotPose.nearest(stationTags.stream().map(tag -> tag.pose.toPose2d()).toList());
-
-  
   }
 
   /**
@@ -121,7 +121,11 @@ public class StationAlign {
   public static Command rotateToNearestStationTag(
       SwerveDrive swerveDrive, DoubleSupplier x, DoubleSupplier y) {
     return swerveDrive.driveFixedHeading(
-        x, y, () -> getNearestStationPose(swerveDrive.getPose()).getRotation().plus(kStationAlignmentRotation));
+        x,
+        y,
+        () ->
+            getNearestStationPose(swerveDrive.getPose())
+                .getRotation()
+                .plus(kStationAlignmentRotation));
   }
 }
-

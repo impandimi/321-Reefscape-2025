@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.ReefAlign;
+import frc.robot.util.VirtualSubsystem;
 
 @Logged
 public class Robot extends TimedRobot {
@@ -14,6 +15,13 @@ public class Robot extends TimedRobot {
 
   @Logged(name = "RobotContainer")
   private final RobotContainer m_robotContainer;
+
+  // @Logged(name = "AssetsRobotPose")
+  // public Pose2d robotPose = new Pose2d();
+
+  // @Logged(name = "AssetsZeroComponentPoses")
+  // public Pose3d[] zeroComponentPoses =
+  //     new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d()};
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -23,6 +31,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    VirtualSubsystem.periodicAll();
   }
 
   @Override

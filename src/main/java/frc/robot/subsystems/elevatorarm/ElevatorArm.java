@@ -92,7 +92,7 @@ public class ElevatorArm extends SubsystemBase {
   public void goToAngle(Angle angle) {
     double volts =
         pidController.calculate(inputs.angle.in(Degrees), angle.in(Degrees))
-            + feedforward.calculate(angle.in(Radians), 0)
+            + feedforward.calculate(angle.plus(ElevatorArmConstants.kCMOffset).in(Radians), 0)
             + calculateGamepieceFeedforward(angle);
     io.setVoltage(Volts.of(volts));
   }
@@ -162,5 +162,9 @@ public class ElevatorArm extends SubsystemBase {
 
   public boolean atSetpoint() {
     return pidController.atSetpoint();
+  }
+
+  public Angle getAngle() {
+    return inputs.angle;
   }
 }

@@ -31,12 +31,10 @@ public class AlgaeSuperstructure {
     return goToSetpoint(AlgaeSetpoint.INTAKE).alongWith(this.rollers.intake());
   }
 
-  public Command outtakeAlgaePosition() {
-    return goToSetpoint(AlgaeSetpoint.OUTTAKE);
-  }
-
   public Command outtakeAlgae() {
-    return this.rollers.outtake();
+    return goToSetpoint(AlgaeSetpoint.OUTTAKE)
+        .until(pivot::atSetpoint)
+        .andThen(this.rollers.outtake());
   }
 
   public Command prepareClimb() {

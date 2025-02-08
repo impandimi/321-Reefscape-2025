@@ -22,11 +22,11 @@ public class AlgaeIntakePivotConstants {
   public static final int kPivotMotorLeftId = 0;
   public static final int kPivotMotorRightId = 0;
 
+  // pivot thresholds
+  public static final Angle kMinBlockedAngle = Degrees.of(20); // TODO: find these
+  public static final Angle kMaxBlockedAngle = Degrees.of(40);
   // setpoint constants
   public static final Angle kPivotClimbThreshold = Degrees.of(45); // to be tuned
-  public static final Voltage kPivotClimbVoltage = Volts.of(-8);
-  public static final Angle kMinBlockedAngle = Degrees.of(20); // this
-  public static final Angle kMaxBlockedAngle = Degrees.of(40); // this
 
   // pivot homing
   public static final Voltage kHomingVoltage = Volts.of(-2);
@@ -40,6 +40,14 @@ public class AlgaeIntakePivotConstants {
   public static final Angle kPivotMaxAngle = Degrees.of(180);
   public static final Angle kPivotStartingAngle = Degrees.of(0);
   public static final double kPivotMOI = 0.1; // this
+  public static final Angle kPivotIntakeAngle =
+      Degrees.of(80); // TODO: dummy angles; test these angles
+  public static final Angle kPivotOuttakeAngle = Degrees.of(90);
+  public static final Angle kPivotStoreAngle =
+      Degrees.of(70); // the angle the pivot will be at by default
+  public static final Angle kPivotClimbAngle = Degrees.of(45);
+  public static final Angle kPivotFloorAngle = Degrees.of(0);
+  public static final Voltage kPivotClimbVoltage = Volts.of(-8);
 
   // motor configurations
   public static final boolean kLeftInverted = false;

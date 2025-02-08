@@ -71,6 +71,7 @@ public class Elevator extends SubsystemBase {
 
   // Goes to height
   public void goToHeight(Distance targetHeight) {
+
     double motorOutput = pidController.calculate(inputs.height.in(Meters), targetHeight.in(Meters));
 
     double ff = feedForward.calculate(motorOutput);

@@ -3,6 +3,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,20 +17,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotConstants;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.util.MyAlliance;
+import frc.robot.util.ReefPosition;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class ReefAlign {
   /*
-    Maps reef AprilTag ("tag") ID to left and right alignment poses,
+    Maps reef AprilTag ("tag") ID to left, center, and right alignment poses,
     loads only the tags on alliance reef as determined at robot initialization
   */
   public static final Map<Integer, Pose2d> leftAlignPoses = new HashMap<>();
+  public static final Map<Integer, Pose2d> centerAlignPoses = new HashMap<>();
   public static final Map<Integer, Pose2d> rightAlignPoses = new HashMap<>();
 
+  private static final Distance kMaxAlignDistance = Meter.of(2);
   private static final Distance kLeftAlignDistance = Inches.of(-6.5);
   private static final Distance kReefDistance = Inches.of(14);
   private static final Distance kRightAlignDistance = Inches.of(6.5);
@@ -52,16 +57,12 @@ public class ReefAlign {
    * only the poses on the alliance reef are loaded
    */
   public static void loadReefAlignmentPoses() {
-    if (MyAlliance.isRed()) {
-      for (Integer id : redReefTagIDs) {
-        leftAlignPoses.computeIfAbsent(id, ReefAlign::getNearestLeftAlign);
-        rightAlignPoses.computeIfAbsent(id, ReefAlign::getNearestRightAlign);
-      }
-    } else {
-      for (Integer id : blueReefTagIDs) {
-        leftAlignPoses.computeIfAbsent(id, ReefAlign::getNearestLeftAlign);
-        rightAlignPoses.computeIfAbsent(id, ReefAlign::getNearestRightAlign);
-      }
+    final List<Integer> tagIDsToLoad = MyAlliance.isRed() ? redReefTagIDs : blueReefTagIDs;
+
+    for (Integer id : tagIDsToLoad) {
+      leftAlignPoses.computeIfAbsent(id, ReefAlign::getNearestLeftAlign);
+      centerAlignPoses.computeIfAbsent(id, ReefAlign::getNearestCenterAlign);
+      rightAlignPoses.computeIfAbsent(id, ReefAlign::getNearestRightAlign);
     }
   }
 
@@ -73,17 +74,14 @@ public class ReefAlign {
    */
   public static Pose2d getNearestReefPose(Pose2d robotPose) {
     // `Optional` means the Alliance may not exist yet, which must be handled to proceed
-    Optional<Alliance> alliance = DriverStation.getAlliance();
+    final Optional<Alliance> alliance = DriverStation.getAlliance();
 
     if (alliance.isEmpty()) return null;
 
-    if (alliance.get().equals(Alliance.Blue)) {
-      return robotPose.nearest(blueReefTags.stream().map(tag -> tag.pose.toPose2d()).toList());
-    } else if (alliance.get().equals(Alliance.Red)) {
-      return robotPose.nearest(redReefTags.stream().map(tag -> tag.pose.toPose2d()).toList());
-    }
+    final List<AprilTag> tagsToCheck =
+        alliance.get().equals(Alliance.Red) ? redReefTags : blueReefTags;
 
-    return null;
+    return robotPose.nearest(tagsToCheck.stream().map(tag -> tag.pose.toPose2d()).toList());
   }
 
   /**
@@ -168,24 +166,60 @@ public class ReefAlign {
     return resultPose;
   }
 
-  /** Drives to align against the center of the nearest reef face, no manual driving */
-  public static Command goToNearestCenterAlign(SwerveDrive swerveDrive) {
+  public static Command alignToReef(
+      SwerveDrive swerveDrive, Supplier<ReefPosition> targetReefPosition) {
     return swerveDrive.driveToFieldPose(
-        () -> getNearestCenterAlign(getNearestReefID(swerveDrive.getPose())));
-  }
-
-  /** Drives to align against the left side reef bars of the nearest reef face, no manual driving */
-  public static Command goToNearestLeftAlign(SwerveDrive swerveDrive) {
-    return swerveDrive.driveToFieldPose(
-        () -> getNearestLeftAlign(getNearestReefID(swerveDrive.getPose())));
+        () ->
+            switch (targetReefPosition.get()) {
+              case ALGAE -> centerAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+              case LEFT -> leftAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+              case RIGHT -> rightAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+              default -> swerveDrive.getPose(); // more or less a no-op
+            });
   }
 
   /**
-   * Drives to align against the right side reef bars of the nearest reef face, no manual driving
+   * Drives to align against the center of the nearest reef face (un;ess it's more than
+   * kMaxAlignDistance away), no manual driving
+   */
+  public static Command goToNearestCenterAlign(SwerveDrive swerveDrive) {
+    System.out.println(swerveDrive.getPose());
+    final Pose2d targetAlignPose = centerAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+    return swerveDrive
+        .driveToFieldPose(() -> targetAlignPose)
+        .unless(
+            () ->
+                swerveDrive.getPose().getTranslation().getDistance(targetAlignPose.getTranslation())
+                    > kMaxAlignDistance.in(Meters));
+  }
+
+  /**
+   * Drives to align against the left side reef bars of the nearest reef face (un;ess it's more than
+   * kMaxAlignDistance away), no manual driving
+   */
+  public static Command goToNearestLeftAlign(SwerveDrive swerveDrive) {
+    final Pose2d targetAlignPose = leftAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+    return swerveDrive
+        .driveToFieldPose(() -> targetAlignPose)
+        .unless(
+            () ->
+                swerveDrive.getPose().getTranslation().getDistance(targetAlignPose.getTranslation())
+                    > kMaxAlignDistance.in(Meters));
+  }
+
+  /**
+   * Drives to align against the right side reef bars of the nearest reef face (un;ess it's more
+   * than kMaxAlignDistance away), no manual driving
    */
   public static Command goToNearestRightAlign(SwerveDrive swerveDrive) {
-    return swerveDrive.driveToFieldPose(
-        () -> getNearestRightAlign(getNearestReefID(swerveDrive.getPose())));
+    System.out.println(swerveDrive.getPose());
+    final Pose2d targetAlignPose = rightAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+    return swerveDrive
+        .driveToFieldPose(() -> targetAlignPose)
+        .unless(
+            () ->
+                swerveDrive.getPose().getTranslation().getDistance(targetAlignPose.getTranslation())
+                    > kMaxAlignDistance.in(Meters));
   }
 
   /** Maintain translational driving while rotating toward the nearest reef tag */
