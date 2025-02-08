@@ -3,8 +3,14 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.TimedRobot;
 
 public class RobotConstants {
-  public static final Time kPeriod = Seconds.of(0.02);
+  public static final Time kPeriod = Seconds.of(TimedRobot.kDefaultPeriod);
+
+  public static final AprilTagFieldLayout kAprilTagFieldLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 }

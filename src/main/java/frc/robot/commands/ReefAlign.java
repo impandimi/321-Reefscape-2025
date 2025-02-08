@@ -13,48 +13,67 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants;
+import frc.robot.RobotConstants;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.util.MyAlliance;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 public class ReefAlign {
-  public static final Map<Integer, Pose2d> leftAlignPoses = null;
-  public static final Map<Integer, Pose2d> rightAlignPoses = null;
+  /*
+    Maps reef AprilTag ("tag") ID to left and right alignment poses,
+    loads only the tags on alliance reef as determined at robot initialization
+  */
+  public static final Map<Integer, Pose2d> leftAlignPoses = new HashMap<>();
+  public static final Map<Integer, Pose2d> rightAlignPoses = new HashMap<>();
 
   private static final Distance kLeftAlignDistance = Inches.of(-6.5);
   private static final Distance kReefDistance = Inches.of(14.5);
   private static final Distance kRightAlignDistance = Inches.of(6.5);
   private static final Rotation2d kReefAlignmentRotation = Rotation2d.fromDegrees(180);
-  private static final List<Integer> blueReefIDs = List.of(17, 18, 19, 20, 21, 22);
-  private static final List<Integer> redReefIDs = List.of(6, 7, 8, 9, 10, 11);
+
+  private static final List<Integer> blueReefTagIDs = List.of(17, 18, 19, 20, 21, 22);
+  private static final List<Integer> redReefTagIDs = List.of(6, 7, 8, 9, 10, 11);
+
   private static final List<AprilTag> blueReefTags =
-      Constants.kAprilTagFieldLayout.getTags().stream()
-          .filter(tag -> blueReefIDs.contains(tag.ID))
+      RobotConstants.kAprilTagFieldLayout.getTags().stream()
+          .filter(tag -> blueReefTagIDs.contains(tag.ID))
           .toList();
   private static final List<AprilTag> redReefTags =
-      Constants.kAprilTagFieldLayout.getTags().stream()
-          .filter(tag -> redReefIDs.contains(tag.ID))
+      RobotConstants.kAprilTagFieldLayout.getTags().stream()
+          .filter(tag -> redReefTagIDs.contains(tag.ID))
           .toList();
 
+  /**
+   * This method is run during Robot#autonomousInit() and Robot#teleopInit() to save computations,
+   * only the poses on the alliance reef are loaded
+   */
   public static void loadReefAlignmentPoses() {
+    System.out.println("Hi");
     if (MyAlliance.isRed()) {
-      for (Integer i : redReefIDs) {
-        leftAlignPoses.computeIfAbsent(i, ReefAlign::getNearestLeftAlign);
-        rightAlignPoses.computeIfAbsent(i, ReefAlign::getNearestRightAlign);
+      for (Integer id : redReefTagIDs) {
+        leftAlignPoses.computeIfAbsent(id, ReefAlign::getNearestLeftAlign);
+        rightAlignPoses.computeIfAbsent(id, ReefAlign::getNearestRightAlign);
       }
     } else {
-      for (Integer i : blueReefIDs) {
-        leftAlignPoses.computeIfAbsent(i, ReefAlign::getNearestLeftAlign);
-        rightAlignPoses.computeIfAbsent(i, ReefAlign::getNearestRightAlign);
+      for (Integer id : blueReefTagIDs) {
+        leftAlignPoses.computeIfAbsent(id, ReefAlign::getNearestLeftAlign);
+        rightAlignPoses.computeIfAbsent(id, ReefAlign::getNearestRightAlign);
       }
     }
   }
 
-  public static Pose2d getClosestReefPose(Pose2d robotPose) {
+  /**
+   * Finds the pose of the nearest reef tag on the alliance reef
+   *
+   * @param robotPose the pose of the robot to find the nearest reef tag pose for
+   * @return null if robot alliance is unknown, otherwise a valid reef tag pose
+   */
+  public static Pose2d getNearestReefPose(Pose2d robotPose) {
+    // `Optional` means the Alliance may not exist yet, which must be handled to proceed
     Optional<Alliance> alliance = DriverStation.getAlliance();
 
     if (alliance.isEmpty()) return null;
@@ -68,20 +87,55 @@ public class ReefAlign {
     return null;
   }
 
-  public static int getClosestReefID(Pose2d robotPose) {
-    Pose2d closest = getClosestReefPose(robotPose);
+  /**
+   * Finds the ID of the nearest reef tag on the alliance reef
+   *
+   * @param robotPose the pose of the robot to find the nearest reef tag ID for
+   * @return -1 if robot alliance is unknown, otherwise a valid reef tag ID
+   */
+  public static int getNearestReefID(Pose2d robotPose) {
+    Pose2d nearest = getNearestReefPose(robotPose);
 
-    if (closest == null) return -1;
+    // handle the null that getNearestReefPose() may return when robot alliance is unknown
+    if (nearest == null) return -1;
 
-    return Constants.kAprilTagFieldLayout.getTags().stream()
-        .filter(tag -> tag.pose.toPose2d().equals(closest))
+    return RobotConstants.kAprilTagFieldLayout.getTags().stream()
+        .filter(tag -> tag.pose.toPose2d().equals(nearest))
         .toList()
         .get(0)
         .ID;
   }
 
+  /**
+   * Intended for aligning to the reef for removing algae
+   *
+   * @param reefTagID a valid reef tag ID
+   * @return null if no reef tag of the ID specified is found, otherwise a valid robot pose aligned
+   *     with the center of the nearest reef tag
+   */
+  private static Pose2d getNearestCenterAlign(int reefTagID) {
+    // `Optional` here means there may not be a tag with the specified ID, again must be handled
+    Optional<Pose3d> tagPose = RobotConstants.kAprilTagFieldLayout.getTagPose(reefTagID);
+
+    if (tagPose.isEmpty()) return null;
+
+    Pose2d aprilTagPose = tagPose.get().toPose2d();
+
+    Pose2d resultPose =
+        aprilTagPose.plus(new Transform2d(kReefDistance, Meter.zero(), kReefAlignmentRotation));
+
+    return resultPose;
+  }
+
+  /**
+   * Intended for aligning to the left side reef bars for scoring coral
+   *
+   * @param reefTagID a valid reef tag ID
+   * @return null if no reef tag of the ID specified is found, otherwise a valid robot pose aligned
+   *     with the center of the nearest reef tag
+   */
   private static Pose2d getNearestLeftAlign(int reefTagID) {
-    Optional<Pose3d> tagPose = Constants.kAprilTagFieldLayout.getTagPose(reefTagID);
+    Optional<Pose3d> tagPose = RobotConstants.kAprilTagFieldLayout.getTagPose(reefTagID);
 
     if (tagPose.isEmpty()) return null;
 
@@ -91,13 +145,18 @@ public class ReefAlign {
         aprilTagPose.plus(
             new Transform2d(kReefDistance, kLeftAlignDistance, kReefAlignmentRotation));
 
-    // new Pose2d(kReefDistance, kLeftAlignDistance, kReefAlignmentRotation)
-    //         .relativeTo(aprilTagPose);
     return resultPose;
   }
 
+  /**
+   * Intended for aligning to the right side reef bars for scoring coral
+   *
+   * @param reefTagID a valid reef tag ID
+   * @return null if no reef tag of the ID specified is found, otherwise a valid robot pose aligned
+   *     with the center of the nearest reef tag
+   */
   private static Pose2d getNearestRightAlign(int reefTagID) {
-    Optional<Pose3d> tagPose = Constants.kAprilTagFieldLayout.getTagPose(reefTagID);
+    Optional<Pose3d> tagPose = RobotConstants.kAprilTagFieldLayout.getTagPose(reefTagID);
 
     if (tagPose.isEmpty()) return null;
 
@@ -107,33 +166,35 @@ public class ReefAlign {
         aprilTagPose.plus(
             new Transform2d(kReefDistance, kRightAlignDistance, kReefAlignmentRotation));
 
-    // new Pose2d(kReefDistance, kRightAlignDistance, kReefAlignmentRotation)
-    //         .relativeTo(aprilTagPose);
     return resultPose;
   }
 
+  /** Drives to align against the center of the nearest reef face, no manual driving */
   public static Command goToNearestCenterAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
-        () ->
-            getClosestReefPose(swerveDrive.getPose())
-                .plus(new Transform2d(kReefDistance, Meter.zero(), kReefAlignmentRotation)));
+        () -> getNearestCenterAlign(getNearestReefID(swerveDrive.getPose())));
   }
 
+  /** Drives to align against the left side reef bars of the nearest reef face, no manual driving */
   public static Command goToNearestLeftAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
-        () -> getNearestLeftAlign(getClosestReefID(getClosestReefPose(swerveDrive.getPose()))));
+        () -> getNearestLeftAlign(getNearestReefID(swerveDrive.getPose())));
   }
 
+  /**
+   * Drives to align against the right side reef bars of the nearest reef face, no manual driving
+   */
   public static Command goToNearestRightAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
-        () -> getNearestRightAlign(getClosestReefID(getClosestReefPose(swerveDrive.getPose()))));
+        () -> getNearestRightAlign(getNearestReefID(swerveDrive.getPose())));
   }
 
-  public static Command rotateToNearest(
+  /** Maintain translational driving while rotating toward the nearest reef tag */
+  public static Command rotateToNearestReefTag(
       SwerveDrive swerveDrive, DoubleSupplier x, DoubleSupplier y) {
     return swerveDrive.driveFixedHeading(
         x,
         y,
-        () -> (getClosestReefPose(swerveDrive.getPose()).getRotation().plus(Rotation2d.k180deg)));
+        () -> getNearestReefPose(swerveDrive.getPose()).getRotation().plus(Rotation2d.k180deg));
   }
 }
