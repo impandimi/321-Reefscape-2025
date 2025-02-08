@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.HomingCommands;
 import frc.robot.commands.ReefAlign;
+import frc.robot.commands.StationAlign;
 import frc.robot.subsystems.AlgaeSuperstructure;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.subsystems.CoralSuperstructure;
@@ -107,11 +108,7 @@ public class RobotContainer {
   private void configureBindings() {
     // driver controls
     // score coral / flip off algae
-    driver.leftTrigger().whileTrue(coralSuperstructure.outtakeCoral());
-
-    // climbing
     driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
-    driver.y().toggleOnFalse(algaeSuperstructure.goToSetpoint(AlgaeSetpoint.NEUTRAL));
     driver.a().onTrue(algaeSuperstructure.climb());
 
     // algae intake/outtake
@@ -135,16 +132,13 @@ public class RobotContainer {
                 .alongWith(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)));
 
     new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
-        .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverStrafe, driverForward));
+        .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward, driverStrafe));
 
-    // climbing
-    driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
-    driver.y().toggleOnFalse(algaeSuperstructure.goToSetpoint(AlgaeSetpoint.NEUTRAL));
-    driver.a().onTrue(algaeSuperstructure.climb());
-
-    // algae intake/outtake
-    driver.b().whileTrue(algaeSuperstructure.intakeAlgae());
-    driver.x().whileTrue(algaeSuperstructure.outtakeAlgae());
+    driver
+        .rightBumper()
+        .whileTrue(
+            StationAlign.rotateToNearestStationTag(drivetrain, driverForward, driverStrafe)
+                .alongWith(coralSuperstructure.feedCoral()));
 
     // manip controls
     // 1 to 4 - right side L1-L4
