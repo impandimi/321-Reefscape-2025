@@ -174,7 +174,7 @@ public class AlgaeIntakePivot extends SubsystemBase {
     Angle effectiveAngle =
         inputs.pivotAngle.plus(
             inputs.pivotVelocity.times(
-                RobotConstants.kPeriod.times(
+                RobotConstants.kRobotLoopPeriod.times(
                     2))); // angle after looking forward in time n loops based on current arm
     // velocity
 
