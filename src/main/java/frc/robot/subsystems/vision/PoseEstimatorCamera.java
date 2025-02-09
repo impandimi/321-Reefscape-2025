@@ -2,29 +2,46 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose3d;
 import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.VisionTargetSim;
 
-// abstraction for future multicamera setups
+// abstraction for multicamera setup
 @Logged
 public class PoseEstimatorCamera {
-  private final String name;
+  private final String name; // solely for logging
 
-  private final PhotonCamera camera;
+  private final CameraIO io;
+  private final CameraInputs inputs;
+
   private final PhotonPoseEstimator poseEstimator;
 
-  private EstimatedRobotPose latestEstimate;
+  private PoseEstimate latestEstimate;
 
-  public PoseEstimatorCamera(CameraConfig config) {
+  public static PoseEstimatorCamera createSim(
+      CameraConfig config,
+      PhotonCameraSim sim,
+      Supplier<Pose3d> cameraPoseSupplier,
+      Set<VisionTargetSim> targets) {
+    return new PoseEstimatorCamera(new CameraIOSim(sim, cameraPoseSupplier, targets), config);
+  }
+
+  public static PoseEstimatorCamera createReal(CameraConfig config) {
+    return new PoseEstimatorCamera(new CameraIOReal(config), config);
+  }
+
+  private PoseEstimatorCamera(CameraIO io, CameraConfig config) {
     this.name = config.cameraName();
 
-    this.camera = new PhotonCamera(config.cameraName());
+    this.io = io;
+    this.inputs = new CameraInputs();
 
     this.poseEstimator =
         new PhotonPoseEstimator(
@@ -34,20 +51,15 @@ public class PoseEstimatorCamera {
   }
 
   public void update() {
-    final List<PhotonPipelineResult> results = camera.getAllUnreadResults();
+    io.updateInputs(inputs);
 
-    final Optional<EstimatedRobotPose> optionalEstimate =
-        poseEstimator.update(results.get(results.size() - 1));
+    final Optional<EstimatedRobotPose> optionalEstimate = poseEstimator.update(inputs.latestResult);
 
-    optionalEstimate.ifPresent(
-        est -> {
-          poseEstimator.setReferencePose(est.estimatedPose);
-          latestEstimate = est;
-        });
+    optionalEstimate.ifPresent(est -> latestEstimate = new PoseEstimate(est, inputs.latestResult));
   }
 
   // for use by drivetrain pose estimator, may consolidate into a robot-wide pose estimator
-  public EstimatedRobotPose getLatestEstimate() {
+  public PoseEstimate getLatestEstimate() {
     return latestEstimate;
   }
 }

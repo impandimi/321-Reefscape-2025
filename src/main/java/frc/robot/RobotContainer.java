@@ -15,18 +15,22 @@ import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
 
 @Logged
 public class RobotContainer {
-  private Vision vision;
-
   private SwerveDrive drivetrain = SwerveDrive.create();
   private AlgaeIntakePivot algaePivot = AlgaeIntakePivot.create();
   private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.create();
   private CoralEndEffector coralEndEffector = CoralEndEffector.create();
   private ElevatorArm elevatorArm = ElevatorArm.create();
   private Elevator elevator = Elevator.create();
+
+  private Vision vision =
+      Vision.create(
+          drivetrain::getPose,
+          (estimate, stdDevs) ->
+              drivetrain.addVisionMeasurement(
+                  estimate.estimatedPose.toPose2d(), estimate.timestampSeconds, stdDevs));
 
   private CommandXboxController driver = new CommandXboxController(0);
   private CommandXboxController manipulator = new CommandXboxController(1);
@@ -36,8 +40,6 @@ public class RobotContainer {
           () -> elevator.getHeight(), () -> elevatorArm.getAngle(), () -> algaePivot.getAngle());
 
   public RobotContainer() {
-    vision = new Vision(VisionConstants.k427CameraConfig);
-
     configureBindings();
   }
 
