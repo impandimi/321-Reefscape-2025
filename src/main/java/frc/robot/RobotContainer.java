@@ -129,48 +129,28 @@ public class RobotContainer {
      * <p>Pressing right trigger all the way down will either align the robot automatically or just
      * point the robot to the reef, based on how far we are away from the reef
      */
-    // driver.rightTrigger()
-    //     .whileTrue(
-    //         Commands.either(
-    //                     Commands.runOnce(() -> ReefAlign.alignToReef(drivetrain,
-    // queuedReefPosition), drivetrain),
-    //                     Commands.runOnce(() -> ReefAlign.rotateToNearestReefTag(drivetrain,
-    // driverForward.getAsDouble(),
-    // driverStrafe.getAsDouble()), drivetrain),
-    //                 () ->
-    //                     ReefAlign.isWithinReefRange(drivetrain,
-    // RobotConstants.kMechanismDeadbandThreshold) // use mechanism threshold cuz we wanna be
-    // close before aligning in this case
-    //                         && Math.hypot(driverForward.getAsDouble(),
-    // driverStrafe.getAsDouble())
-    //                             <= 0.05)
-    //             .repeatedly()
-    //             .alongWith(
-    //                 coralSuperstructure
-    //                     .goToSetpoint(() -> queuedSetpoint)
-    //                     .onlyWhile(() -> ReefAlign.isWithinReefRange(drivetrain,
-    // RobotConstants.kMechanismDeadbandThreshold))
-    //                     .asProxy()
-    //                     .repeatedly()));
-
-    /**
-     * Preference 2:
-     *
-     * <p>Pressing right trigger down all the way performs translation-align/to-setpoint, while
-     * pressing it slightly performs the rotation align
-     *
-     * <p>Driver has override over translation-align/to-setpoint
-     */
-    new Trigger(() -> driver.getRightTriggerAxis() >= 0.8)
+    driver
+        .rightTrigger()
         .whileTrue(
-            ReefAlign.alignToReef(drivetrain, () -> queuedReefPosition)
-                .onlyWhile(
+            Commands.either(
+                    Commands.runOnce(
+                        () -> ReefAlign.alignToReef(drivetrain, queuedReefPosition), drivetrain),
+                    Commands.runOnce(
+                        () ->
+                            ReefAlign.rotateToNearestReefTag(
+                                drivetrain,
+                                driverForward.getAsDouble(),
+                                driverStrafe.getAsDouble()),
+                        drivetrain),
                     () ->
                         ReefAlign.isWithinReefRange(
-                                drivetrain, ReefAlign.kMaxAlignmentDeadbandThreshold)
+                                drivetrain,
+                                ReefAlign
+                                    .kMechanismDeadbandThreshold) // use mechanism threshold cuz we
+                            // wanna be close before aligning
+                            // in this case
                             && Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble())
                                 <= 0.05)
-                .asProxy()
                 .repeatedly()
                 .alongWith(
                     coralSuperstructure
@@ -182,8 +162,38 @@ public class RobotContainer {
                         .asProxy()
                         .repeatedly()));
 
-    new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
-        .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward, driverStrafe));
+    /**
+     * Preference 2:
+     *
+     * <p>Pressing right trigger down all the way performs translation-align/to-setpoint, while
+     * pressing it slightly performs the rotation align
+     *
+     * <p>Driver has override over translation-align/to-setpoint
+     */
+    // new Trigger(() -> driver.getRightTriggerAxis() >= 0.8)
+    //     .whileTrue(
+    //         ReefAlign.alignToReef(drivetrain, () -> queuedReefPosition)
+    //             .onlyWhile(
+    //                 () ->
+    //                     ReefAlign.isWithinReefRange(
+    //                             drivetrain, ReefAlign.kMaxAlignmentDeadbandThreshold)
+    //                         && Math.hypot(driverForward.getAsDouble(),
+    // driverStrafe.getAsDouble())
+    //                             <= 0.05)
+    //             .asProxy()
+    //             .repeatedly()
+    //             .alongWith(
+    //                 coralSuperstructure
+    //                     .goToSetpoint(() -> queuedSetpoint)
+    //                     .onlyWhile(
+    //                         () ->
+    //                             ReefAlign.isWithinReefRange(
+    //                                 drivetrain, ReefAlign.kMechanismDeadbandThreshold))
+    //                     .asProxy()
+    //                     .repeatedly()));
+
+    // new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
+    //     .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward, driverStrafe));
 
     // manip controls
     // 1 to 4 - right side L1-L4

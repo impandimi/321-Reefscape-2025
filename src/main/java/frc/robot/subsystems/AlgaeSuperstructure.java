@@ -33,8 +33,7 @@ public class AlgaeSuperstructure {
 
   public Command outtakeAlgae() {
     return goToSetpoint(AlgaeSetpoint.OUTTAKE)
-        .until(pivot::atSetpoint)
-        .andThen(this.rollers.outtake());
+        .alongWith(Commands.waitUntil(pivot::atSetpoint).andThen(this.rollers.outtake()));
   }
 
   public Command prepareClimb() {
