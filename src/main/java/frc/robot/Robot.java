@@ -32,7 +32,6 @@ public class Robot extends TimedRobot {
     VirtualSubsystem.periodicAll();
 
     CommandScheduler.getInstance().run();
-    VirtualSubsystem.periodicAll();
   }
 
   @Override
