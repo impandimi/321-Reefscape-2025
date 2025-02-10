@@ -129,19 +129,19 @@ public class RobotContainer {
      *
      * <p>Pressing right trigger all the way down will either align the robot automatically or just
      * point the robot to the reef, based on how far we are away from the reef
-     *
-     * <p>NOTE: currently broken :(
      */
     // driver.rightTrigger()
     //     .whileTrue(
     //         Commands.either(
-    //                     ReefAlign.alignToReef(drivetrain, () -> queuedReefPosition),
-    //                     ReefAlign.rotateToNearestReefTag(drivetrain, driverForward,
-    // driverStrafe),
+    //                     Commands.runOnce(() -> ReefAlign.alignToReef(drivetrain,
+    // queuedReefPosition), drivetrain),
+    //                     Commands.runOnce(() -> ReefAlign.rotateToNearestReefTag(drivetrain,
+    // driverForward.getAsDouble(),
+    // driverStrafe.getAsDouble()), drivetrain),
     //                 () ->
     //                     ReefAlign.isWithinReefRange(drivetrain,
-    // RobotConstants.kMechanismDeadbandThreshold) // use mechanism threshold cuz we wanna be close
-    // before aligning in this case
+    // RobotConstants.kMechanismDeadbandThreshold) // use mechanism threshold cuz we wanna be
+    // close before aligning in this case
     //                         && Math.hypot(driverForward.getAsDouble(),
     // driverStrafe.getAsDouble())
     //                             <= 0.05)
