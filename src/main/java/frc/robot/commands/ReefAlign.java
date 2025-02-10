@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotConstants;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.util.MyAlliance;
@@ -167,14 +168,16 @@ public class ReefAlign {
 
   public static Command alignToReef(
       SwerveDrive swerveDrive, Supplier<ReefPosition> targetReefPosition) {
-    return swerveDrive.driveToFieldPose(
-        () ->
-            switch (targetReefPosition.get()) {
-              case ALGAE -> centerAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
-              case LEFT -> leftAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
-              case RIGHT -> rightAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
-              default -> swerveDrive.getPose(); // more or less a no-op
-            });
+    return swerveDrive
+        .driveToFieldPose(
+            () ->
+                switch (targetReefPosition.get()) {
+                  case ALGAE -> centerAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+                  case LEFT -> leftAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+                  case RIGHT -> rightAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+                  default -> swerveDrive.getPose(); // more or less a no-op
+                })
+        .deadlineFor(Commands.run(() -> System.out.println("Aligning...")));
   }
 
   /**
@@ -228,5 +231,16 @@ public class ReefAlign {
         x,
         y,
         () -> getNearestReefPose(swerveDrive.getPose()).getRotation().plus(kReefAlignmentRotation));
+  }
+
+  // if robot is within 2 meters of either red or blue reef, auto-align will NOT work
+  public static boolean isWithinReefRange(SwerveDrive drive, Distance deadband) {
+    Pose2d centerPos =
+        MyAlliance.isRed() ? RobotConstants.kRedCenterAlignPos : RobotConstants.kBlueCenterAlignPos;
+    double deadbandDistance =
+        Math.hypot(
+            drive.getPose().getX() - centerPos.getX(), drive.getPose().getY() - centerPos.getY());
+
+    return deadbandDistance < deadband.in(Meters);
   }
 }

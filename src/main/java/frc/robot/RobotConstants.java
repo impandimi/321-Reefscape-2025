@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.commands.ReefAlign;
 
 public class RobotConstants {
   public static final Time kRobotLoopPeriod = Seconds.of(TimedRobot.kDefaultPeriod);
@@ -19,9 +18,11 @@ public class RobotConstants {
   public static final AprilTagFieldLayout kAprilTagFieldLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
-  public static final Pose2d kRedCenterAlignPos = new Pose2d(4.457, 4, new Rotation2d());
-  public static final Pose2d kBlueCenterAlignPos = new Pose2d(0.493, 4.794, new Rotation2d());
+  public static final Pose2d kRedCenterAlignPos = new Pose2d(13, 4, new Rotation2d());
+  public static final Pose2d kBlueCenterAlignPos = new Pose2d(4.457, 4, new Rotation2d());
 
-  public static final Distance kDeadbandThreshold = Meters.of(2);
-
+  public static final Distance kMechanismDeadbandThreshold =
+      Meters.of(2); // distance to trigger mechanism
+  public static final Distance kMaxAlignmentDeadbandThreshold =
+      Meters.of(5); // distance to trigger alignment
 }
