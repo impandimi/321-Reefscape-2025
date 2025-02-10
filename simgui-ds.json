@@ -1,12 +1,7 @@
 {
   "System Joysticks": {
     "window": {
-      "enabled": false
-    }
-  },
-  "System Joysticks": {
-    "window": {
-      "enabled": false
+      "enabled": true
     }
   },
   "keyboardJoysticks": [
