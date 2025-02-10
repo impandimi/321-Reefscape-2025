@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -27,6 +29,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import frc.robot.util.MathUtils;
+import frc.robot.util.MyAlliance;
 import frc.robot.util.ReefPosition;
 import java.util.function.DoubleSupplier;
 
@@ -103,6 +106,16 @@ public class RobotContainer {
 
     configureBindings();
   }
+  double redDeadbandDistance = Math.hypot(drivetrain.getPose().getX() - RobotConstants.kRedCenterAlignPos.getX(), drivetrain.getPose().getY() - RobotConstants.kRedCenterAlignPos.getY());
+  double blueDeadbandDistance = Math.hypot(drivetrain.getPose().getX() - RobotConstants.kBlueCenterAlignPos.getX(), drivetrain.getPose().getY() - RobotConstants.kBlueCenterAlignPos.getY());
+
+  // if robot is within 2 meters of either red or blue reef, auto-align will NOT work
+    private boolean isWithinReefRange() {
+        Pose2d centerPos = MyAlliance.isRed() ? RobotConstants.kRedCenterAlignPos : RobotConstants.kBlueCenterAlignPos; 
+        double deadbandDistance = Math.hypot(drivetrain.getPose().getX() - centerPos.getX(), drivetrain.getPose().getY() - centerPos.getY());
+
+            return deadbandDistance < RobotConstants.kDeadbandThreshold.in(Meters); 
+    }
 
   private void configureBindings() {
     // driver controls
@@ -128,18 +141,22 @@ public class RobotContainer {
      *
      * <p>Driver has override over translation-align/to-setpoint
      */
+
     new Trigger(() -> driver.getRightTriggerAxis() >= 0.8)
         .whileTrue(
             ReefAlign.alignToReef(drivetrain, () -> queuedReefPosition)
                 .onlyWhile(
                     () ->
+                        isWithinReefRange() &&
                         Math.hypot(driverForward.getAsDouble(), driverStrafe.getAsDouble()) <= 0.05)
                 .asProxy()
                 .repeatedly()
-                .alongWith(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)));
+                .alongWith(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)
+                ));
 
     new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
-        .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverStrafe, driverForward));
+        .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverStrafe, driverForward)
+        );
 
     // manip controls
     // 1 to 4 - right side L1-L4
