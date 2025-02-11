@@ -37,10 +37,19 @@ public class Leds extends VirtualSubsystem {
   // climb mode - solid blue
   public LEDPattern kClimbing = LEDPattern.solid(Color.kBlue);
 
-  // aligning - solid red
-  public LEDPattern kAligning = LEDPattern.solid(Color.kRed);
+  // when we are far away and only aligning rotationally - solid red
+  public LEDPattern kAligningRotation = LEDPattern.solid(Color.kRed);
 
-  // aligned - solid green
+  // when the robot has a pose to align to - solid yellow
+  public LEDPattern kReadyToAlign = LEDPattern.solid(Color.kYellow);
+
+  // when the robot is aligning to a pose - strobe yellow
+  public LEDPattern kAligningPose = kReadyToAlign.blink(Seconds.of(0.3));
+
+  // when the driver interrupts the aligning process
+  public LEDPattern kAlignOverride = LEDPattern.solid(Color.kPurple);
+
+  // aligned and ready to score - solid green
   public LEDPattern kAligned = LEDPattern.solid(Color.kGreen);
 
   // has coral - solid white
