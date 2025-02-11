@@ -109,6 +109,16 @@ public interface SwerveDrive extends Subsystem {
     return MyAlliance.isRed() ? rotation.plus(Rotation2d.k180deg) : rotation;
   }
 
+  default boolean atPoseSetpoint() {
+    /*
+    * TODO: should there be additional SwerveDrive state to store
+      the alignment setpoint so that atPoseSetpoint() checks against that setpoint instead?
+    */
+    return xPoseController.atSetpoint()
+        && yPoseController.atSetpoint()
+        && thetaController.atSetpoint();
+  }
+
   Command teleopDrive(
       DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation);
 
