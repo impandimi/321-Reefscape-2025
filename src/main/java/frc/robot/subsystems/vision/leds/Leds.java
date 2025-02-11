@@ -1,5 +1,5 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems;
+package frc.robot.subsystems.vision.leds;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -71,4 +71,6 @@ public class Leds extends VirtualSubsystem {
     currentPattern.applyTo(ledBuffer);
     ledStrip.setData(ledBuffer);
   }
+
+  
 }
