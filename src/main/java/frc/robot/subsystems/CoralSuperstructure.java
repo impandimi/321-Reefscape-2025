@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import java.util.function.Supplier;
 
@@ -32,9 +33,21 @@ public class CoralSuperstructure {
   public Command goToSetpoint(Supplier<CoralScorerSetpoint> setpoint) {
     return Commands.runOnce(() -> targetState = setpoint.get())
         .andThen(
-            elevator
-                .goToHeight(() -> setpoint.get().getElevatorHeight())
-                .alongWith(arm.goToAngle(() -> setpoint.get().getArmAngle())));
+            goToSetpoint(
+                () -> setpoint.get().getElevatorHeight(), () -> setpoint.get().getArmAngle()));
+  }
+
+  public Command goToSetpoint(Supplier<Distance> height, Supplier<Angle> angle) {
+    return elevator.goToHeight(() -> height.get()).alongWith(arm.goToAngle(() -> angle.get()));
+  }
+
+  public void goToSetpoint(CoralScorerSetpoint setpoint) {
+    goToSetpoint(setpoint.getElevatorHeight(), setpoint.getArmAngle());
+  }
+
+  public void goToSetpoint(Distance height, Angle ang) {
+    elevator.goToHeight(height);
+    arm.goToAngle(ang);
   }
 
   public boolean atTargetState() {
@@ -53,9 +66,13 @@ public class CoralSuperstructure {
     return targetState;
   }
 
+  public boolean hasCoral() {
+    return endEffector.hasCoral();
+  }
+
   public enum CoralScorerSetpoint {
     // TODO: determine angles empirically
-    NEUTRAL(Inches.of(30), Degrees.of(-60)), // TODO: make
+    NEUTRAL(ElevatorConstants.kElevatorStartingHeight, Degrees.of(-60)), // TODO: make
     FEED_CORAL(Inches.of(40.058), Degrees.of(-77.64500)),
     L1(Inches.of(30), Degrees.of(30)), // TODO: actually tune
     L2(Inches.of(34.079), Degrees.of(50.13600)),

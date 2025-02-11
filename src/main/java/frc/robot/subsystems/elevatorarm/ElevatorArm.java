@@ -67,6 +67,8 @@ public class ElevatorArm extends SubsystemBase {
     this.inputs = new ElevatorArmInputs();
     this.pidController = new PIDController(config.kP(), config.kI(), config.kD());
     this.feedforward = new ArmFeedforward(0, config.kG(), 0);
+
+    this.pidController.setTolerance(ElevatorArmConstants.kAngleTolerance.in(Degrees));
   }
 
   /**

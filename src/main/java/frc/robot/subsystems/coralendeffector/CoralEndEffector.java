@@ -87,6 +87,10 @@ public class CoralEndEffector extends SubsystemBase {
     return run(() -> io.setVoltage(voltage.get()));
   }
 
+  public boolean hasCoral() {
+    return inputs.hasCoral;
+  }
+
   // stalls coral if we have a coral; this should be the default command
   public Command stallCoralIfDetected() {
     return run(

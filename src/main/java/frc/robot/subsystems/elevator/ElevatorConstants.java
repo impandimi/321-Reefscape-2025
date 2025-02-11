@@ -33,6 +33,9 @@ public class ElevatorConstants {
   public static final Distance kElevatorDangerHeight =
       Meters.of(0.9); // TODO: get this danger height
 
+  // controller config
+  public static final Distance kHeightTolerance = Meters.of(0.1);
+
   // Elevator Motor Configs
   public static final boolean kLeftInverted = false;
   public static final boolean kRightInverted = false;
