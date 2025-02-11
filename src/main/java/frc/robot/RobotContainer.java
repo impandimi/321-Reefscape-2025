@@ -137,19 +137,10 @@ public class RobotContainer {
         .whileTrue( // while right trigger is pressed:
             Commands.runOnce(() -> isDriverOverride = false)
                 .andThen(
-                    Commands
-                        .either( // either align to reef or rotate to reef based on how close we are
-                            // to reef
-                            Commands.runOnce(
-                                () -> ReefAlign.alignToReef(drivetrain, queuedReefPosition),
-                                drivetrain),
-                            Commands.runOnce(
-                                () ->
-                                    ReefAlign.rotateToNearestReefTag(
-                                        drivetrain,
-                                        driverForward.getAsDouble(),
-                                        driverStrafe.getAsDouble()),
-                                drivetrain),
+                    // either align to reef or coral based on how far we are away
+                    // rotate to reef until we're close enough
+                    ReefAlign.rotateToNearestReefTag(drivetrain, driverForward, driverStrafe)
+                        .until(
                             () ->
                                 ReefAlign.isWithinReefRange(
                                         drivetrain,
@@ -161,6 +152,19 @@ public class RobotContainer {
                                     && Math.hypot(
                                             driverForward.getAsDouble(), driverStrafe.getAsDouble())
                                         <= 0.05)
+                        .andThen(
+                            // when we get close enough, align to reef, but only while we're close
+                            // enough
+                            ReefAlign.alignToReef(drivetrain, () -> queuedReefPosition)
+                                .onlyWhile(
+                                    () ->
+                                        ReefAlign.isWithinReefRange(
+                                                drivetrain, ReefAlign.kMechanismDeadbandThreshold)
+                                            && Math.hypot(
+                                                    driverForward.getAsDouble(),
+                                                    driverStrafe.getAsDouble())
+                                                <= 0.05))
+                        // when we get far away, repeat the command
                         .repeatedly()
                         // allow driver control to be taken back when driverOverride becomes true
                         .onlyWhile(() -> !isDriverOverride)
