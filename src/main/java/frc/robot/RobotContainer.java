@@ -13,11 +13,7 @@ import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
-<<<<<<< HEAD
 import frc.robot.subsystems.vision.leds.Leds;
-=======
-import frc.robot.subsystems.leds.Leds;
->>>>>>> d97284cec42ed898829e77e33d67d5d9784ab119
 
 @Logged
 public class RobotContainer {
