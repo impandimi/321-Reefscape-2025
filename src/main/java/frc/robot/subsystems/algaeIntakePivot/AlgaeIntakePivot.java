@@ -1,7 +1,9 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.algaeIntakePivot;
 
+import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -13,6 +15,8 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotConstants;
+import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.util.TunableConstant;
 import java.util.function.Supplier;
 
@@ -27,6 +31,8 @@ public class AlgaeIntakePivot extends SubsystemBase {
   private ArmFeedforward feedForward; // feed forward for pivot
 
   private AlgaeIntakePivotConfig config;
+
+  private boolean isHomed = false;
 
   public AlgaeIntakePivot(AlgaeIntakePivotIO io, AlgaeIntakePivotConfig config) {
     this.io = io;
@@ -75,7 +81,7 @@ public class AlgaeIntakePivot extends SubsystemBase {
   public void goToAngle(Angle desiredAngle) {
     Voltage desiredVoltage =
         Volts.of(
-            feedForward.calculate(desiredAngle.in(Radians), 0, 0)
+            feedForward.calculate(desiredAngle.in(Radians), 0)
                 + algaeIntakeClimbController.calculate(
                     inputs.pivotAngle.in(Degrees), desiredAngle.in(Degrees)));
 
@@ -89,18 +95,22 @@ public class AlgaeIntakePivot extends SubsystemBase {
         });
   }
 
+  public Command goToAngle(AlgaeSetpoint setpoint) {
+    return goToAngle(() -> setpoint.getAlgaeAngle());
+  }
+
   public Command outtakePosition() {
-    return run(() -> goToAngle(AlgaeIntakePivotConstants.kPivotOuttakeAngle));
+    return goToAngle(AlgaeSetpoint.OUTTAKE);
   }
 
   public Command intakePosition() {
-    return run(() -> goToAngle(AlgaeIntakePivotConstants.kPivotIntakeAngle));
+    return goToAngle(AlgaeSetpoint.INTAKE);
   }
 
   // flips intake to the floor in preparation for climb, which consists
   // of the mechanism pivoting back and clamping onto the cage
   public Command climbFloorPosition() {
-    return run(() -> goToAngle(AlgaeIntakePivotConstants.kPivotFloorAngle));
+    return goToAngle(AlgaeSetpoint.CLIMB_PREP);
   }
 
   // mechanism clamps onto cage by rotating via pivot
@@ -108,12 +118,28 @@ public class AlgaeIntakePivot extends SubsystemBase {
     return run(
         () -> {
           if (inputs.pivotAngle.in(Degrees)
-              > AlgaeIntakePivotConstants.kPivotClimbAngle.in(Degrees)) {
+              > AlgaeIntakePivotConstants.kPivotClimbThreshold.in(Degrees)) {
             io.setPivotVoltage(AlgaeIntakePivotConstants.kPivotClimbVoltage);
           } else {
             io.setPivotVoltage(Volts.of(0));
           }
         });
+  }
+
+  public Command homeMechanism() {
+    return setMechanismVoltage(() -> AlgaeIntakePivotConstants.kHomingVoltage)
+        .until(
+            () ->
+                (inputs.pivotCurrent.in(Amp)
+                        > AlgaeIntakePivotConstants.kHomingCurrentThreshold.in(Amp)
+                    && Math.abs(inputs.pivotVelocity.in(DegreesPerSecond))
+                        < AlgaeIntakePivotConstants.kHomingVelocityThreshold.in(DegreesPerSecond)))
+        .andThen(
+            runOnce(
+                () -> {
+                  io.resetEncoder(AlgaeIntakePivotConstants.kPivotStartingAngle);
+                  isHomed = true;
+                }));
   }
 
   // sets voltage to the whole mechanism
@@ -124,12 +150,33 @@ public class AlgaeIntakePivot extends SubsystemBase {
         });
   }
 
+  @Override
+  public void periodic() { // updating inputs
+    io.updateInputs(inputs);
+  }
+
   public Angle getAngle() {
     return inputs.pivotAngle;
   }
 
-  @Override
-  public void periodic() { // updating inputs
-    io.updateInputs(inputs);
+  public boolean atSetpoint() {
+    return algaeIntakeClimbController.atSetpoint();
+  }
+
+  public boolean pivotIsHomed() {
+    return isHomed;
+  }
+
+  public boolean inCollisionZone() {
+    if (inputs.pivotAngle == null || inputs.pivotVelocity == null) return false;
+    Angle effectiveAngle =
+        inputs.pivotAngle.plus(
+            inputs.pivotVelocity.times(
+                RobotConstants.kRobotLoopPeriod.times(
+                    2))); // angle after looking forward in time n loops based on current arm
+    // velocity
+
+    return effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMinBlockedAngle) >= 0
+        && effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMaxBlockedAngle) <= 0;
   }
 }
