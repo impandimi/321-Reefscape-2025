@@ -163,12 +163,13 @@ public class RobotContainer {
                                             && Math.hypot(
                                                     driverForward.getAsDouble(),
                                                     driverStrafe.getAsDouble())
-                                                <= 0.05))
+                                                <= 0.05
+                                            &&
+                                            // allow driver control to be taken back when
+                                            // driverOverride becomes true
+                                            !isDriverOverride))
                         // when we get far away, repeat the command
                         .repeatedly()
-                        // allow driver control to be taken back when driverOverride becomes true
-                        .onlyWhile(() -> !isDriverOverride)
-                        .asProxy()
                         .alongWith( // and run the mechanism to where we need to go
                             coralSuperstructure
                                 .goToSetpoint(
@@ -215,7 +216,7 @@ public class RobotContainer {
                 .onlyIf(() -> coralSuperstructure.atTargetState()));
 
     // toggle driver override
-    driver.povUp().onTrue(Commands.runOnce(() -> isDriverOverride = !isDriverOverride));
+    driver.a().onTrue(Commands.runOnce(() -> isDriverOverride = !isDriverOverride));
 
     /**
      * Preference 2:
