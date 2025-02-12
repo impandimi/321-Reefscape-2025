@@ -41,6 +41,9 @@ public class AlgaeIntakePivot extends SubsystemBase {
 
     algaeIntakeClimbController = new PIDController(config.kP(), config.kI(), config.kD());
     feedForward = new ArmFeedforward(0, config.kG(), 0); // creates pid controller and feed forward
+
+    algaeIntakeClimbController.setTolerance(
+        AlgaeIntakePivotConstants.kControllerTolerance.in(Degrees));
   }
 
   // Tune PID and feed forward constants(kP, kI, kD, kG) live on smart dashboard / ascope
