@@ -1,6 +1,7 @@
 /* (C) Robolancers 2025 */
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.HomingCommands;
+import frc.robot.commands.ProcessorAlign;
 import frc.robot.commands.ReefAlign;
 import frc.robot.commands.StationAlign;
 import frc.robot.subsystems.AlgaeSuperstructure;
@@ -215,6 +217,33 @@ public class RobotContainer {
                         .until(coralSuperstructure::atTargetState))
                 .onlyIf(() -> coralSuperstructure.atTargetState()));
 
+        driver
+            .leftTrigger()
+            .whileTrue(
+                Commands.runOnce(() -> isDriverOverride = false)
+                .andThen(
+                    ProcessorAlign.rotateToNearestProcessor(drivetrain, driverForward, driverStrafe)
+                )
+                .until (
+                    () -> ProcessorAlign.isWithinProcessorRange(drivetrain, RobotConstants.kdeadbandRange)
+                )
+                .andThen(
+                    ProcessorAlign.goToNearestAlign(drivetrain)
+                    .onlyWhile(
+                        () -> !isDriverOverride && ProcessorAlign.isWithinProcessorRange(drivetrain, RobotConstants.kdeadbandRange)
+                    )
+                )
+                .repeatedly()
+                .alongWith(
+                    algaeSuperstructure.goToSetpoint(AlgaeSetpoint.OUTTAKE)
+                )
+            );
+        
+        driver.
+            leftTrigger().
+            onFalse(algaeSuperstructure.outtakeAlgae());            
+
+    
     // toggle driver override
     driver.a().onTrue(Commands.runOnce(() -> isDriverOverride = !isDriverOverride));
 

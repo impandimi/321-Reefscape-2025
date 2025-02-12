@@ -3,6 +3,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,6 +32,9 @@ public class ProcessorAlign {
 
   private static final List<Integer> blueProcessorTagIDs = List.of(16);
   private static final List<Integer> redProcessorTagIDs = List.of(3);
+
+  public static final Pose2d kRedProcessorPose = new Pose2d(5.983, 0.395, new Rotation2d());
+  public static final Pose2d kBlueProcessorPose = new Pose2d(11.437, 7.675, new Rotation2d());
 
   private static final List<AprilTag> blueProcessorTags =
       RobotConstants.kAprilTagFieldLayout.getTags().stream()
@@ -128,4 +132,14 @@ public class ProcessorAlign {
                 .getRotation()
                 .plus(kProcessorAlignmentRotation));
   }
-}
+
+    // if robot is within 2 meters of either red or blue processor, auto-align will NOT work
+    public static boolean isWithinProcessorRange(SwerveDrive drive, Distance deadband) {
+      Pose2d centerPos = MyAlliance.isRed() ? kRedProcessorPose : kBlueProcessorPose;
+      double deadbandDistance =
+          Math.hypot(
+              drive.getPose().getX() - centerPos.getX(), drive.getPose().getY() - centerPos.getY());
+  
+      return deadbandDistance < deadband.in(Meters);
+    }
+  }

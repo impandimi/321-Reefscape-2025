@@ -48,6 +48,10 @@ public class AlgaeSuperstructure {
     return targetState;
   }
 
+  public boolean atTargetState() {
+    return pivot.atSetpoint(); 
+  }
+
   public enum AlgaeSetpoint {
     NEUTRAL(Degrees.of(0)),
     INTAKE(Degrees.of(135)),
