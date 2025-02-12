@@ -31,12 +31,10 @@ public class AlgaeSuperstructure {
     return goToSetpoint(AlgaeSetpoint.INTAKE).alongWith(this.rollers.intake());
   }
 
-  public Command outtakeAlgaePosition() {
-    return goToSetpoint(AlgaeSetpoint.OUTTAKE);
-  }
-
   public Command outtakeAlgae() {
-    return this.rollers.outtake();
+    return goToSetpoint(AlgaeSetpoint.OUTTAKE)
+        .until(pivot::atSetpoint)
+        .andThen(this.rollers.outtake());
   }
 
   public Command prepareClimb() {
@@ -52,7 +50,7 @@ public class AlgaeSuperstructure {
   }
 
   public enum AlgaeSetpoint {
-    NEUTRAL(Degrees.of(-16)),
+    NEUTRAL(Degrees.of(0)),
     INTAKE(Degrees.of(135)),
     OUTTAKE(Degrees.of(100)),
     CLIMB_PREP(Degrees.of(180));

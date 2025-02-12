@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
+import java.util.function.Supplier;
 
 public class CoralSuperstructure {
 
@@ -28,12 +29,12 @@ public class CoralSuperstructure {
 
   // moves the entire elevator+arm superstructure to a desired state; this should be the go-to way
   // of moving the superstructure, aside from the default subsystem commands
-  public Command goToSetpoint(CoralScorerSetpoint setpoint) {
-    return Commands.runOnce(() -> targetState = setpoint)
+  public Command goToSetpoint(Supplier<CoralScorerSetpoint> setpoint) {
+    return Commands.runOnce(() -> targetState = setpoint.get())
         .andThen(
             elevator
-                .goToHeight(() -> setpoint.getElevatorHeight())
-                .alongWith(arm.goToAngle(() -> setpoint.getArmAngle())));
+                .goToHeight(() -> setpoint.get().getElevatorHeight())
+                .alongWith(arm.goToAngle(() -> setpoint.get().getArmAngle())));
   }
 
   public boolean atTargetState() {
@@ -41,7 +42,7 @@ public class CoralSuperstructure {
   }
 
   public Command feedCoral() {
-    return goToSetpoint(CoralScorerSetpoint.FEED_CORAL).alongWith(endEffector.intakeCoral());
+    return goToSetpoint(() -> CoralScorerSetpoint.FEED_CORAL).alongWith(endEffector.intakeCoral());
   }
 
   public Command outtakeCoral() {
@@ -54,14 +55,14 @@ public class CoralSuperstructure {
 
   public enum CoralScorerSetpoint {
     // TODO: determine angles empirically
-    NEUTRAL(Inches.of(0), Degrees.of(-35)),
-    FEED_CORAL(Inches.of(0), Degrees.of(0)),
-    L1(Inches.of(0), Degrees.of(0)),
-    L2(Inches.of(0), Degrees.of(0)),
-    L3(Inches.of(0), Degrees.of(0)),
-    L4(Inches.of(0), Degrees.of(0)),
-    ALGAE_LOW(Inches.of(0), Degrees.of(0)),
-    ALGAE_HIGH(Inches.of(0), Degrees.of(0));
+    NEUTRAL(Inches.of(30), Degrees.of(-35)), // TODO: make
+    FEED_CORAL(Inches.of(40.058), Degrees.of(-77.64500)),
+    L1(Inches.of(30), Degrees.of(30)), // TODO: actually tune
+    L2(Inches.of(34.079), Degrees.of(50.13600)),
+    L3(Inches.of(46.166), Degrees.of(57.56300)),
+    L4(Inches.of(71.524), Degrees.of(56.57500)),
+    ALGAE_LOW(Inches.of(50), Degrees.of(20)), // TODO: actually tune
+    ALGAE_HIGH(Inches.of(60), Degrees.of(20)); // TODO: actually tune
 
     private Distance elevatorHeight; // the height of the elevator to got
     private Angle armAngle; // the angle the arm should go to
