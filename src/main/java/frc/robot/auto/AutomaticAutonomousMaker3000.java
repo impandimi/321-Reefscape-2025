@@ -2,6 +2,7 @@ package frc.robot.auto;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.json.simple.parser.ParseException;
@@ -27,6 +28,7 @@ public class AutomaticAutonomousMaker3000 {
     
     private SendableChooser<StartingPosition> startingPosition = new SendableChooser<>();
     private SendableChooser<ReefSide> reefSide = new SendableChooser<>();
+    private SendableChooser<FeedLocation> feedLocation = new SendableChooser<>();
 
     private ArrayList<ScoringGroupChooser> scoringGroupChoosers = new ArrayList<>(); 
 
@@ -56,30 +58,28 @@ public class AutomaticAutonomousMaker3000 {
         }
     } 
 
-    // public Command buildAuto(CoralEndEffector coralEndEffector, CoralSuperstructure coralSuperstructure) {
-    //     Command auto = Commands.none();
+    public Command buildAuto(CycleAutoConfig autoConfig, CoralEndEffector coralEndEffector, CoralSuperstructure coralSuperstructure) {
+        Command auto = Commands.none();
 
-    //     auto = auto.andThen(withScoring(getAutonomousCommand(startingPosition.getSelected().pathID 
-    //     + " to " 
-    //     + reefSide.getSelected().pathID), coralSuperstructure))
-    //     .andThen(withIntaking(getAutonomousCommand(reefSide.getSelected().pathID
-    //     + " to "
-    //     + scoringGroups.get(0).FeedLocation.getSelected().pathID), coralEndEffector));
+        auto = auto.andThen(getAutonomousCommand(autoConfig.startingPosition 
+        + " to " 
+        + autoConfig.reefSide))
+        .andThen(getAutonomousCommand(autoConfig.reefSide
+        + " to "
+        + feedLocation.getSelected().pathID))
+        .andThen(getAutonomousCommand(autoConfig.scoringGroup.get(0).getPath()));
         
-    //     for (int i = 0; i < scoringGroups.size() - 1; i++) {
+        if (autoConfig.get(i).feedLocation.getSelected() == FeedLocation.NOCHOICE) break; 
 
-    //         if (scoringGroups.get(i).feedLocation.getSelected() == FeedLocation.NOCHOICE) break; 
+        auto = auto.andThen(withScoring(getAutonomousCommand(autoConfig.feedLocation
+        + " to "
+        + autoConfig.get(i).reefSide.getSelected().pathID), coralSuperstructure))
+        .andThen(withIntaking(getAutonomousCommand(autoConfig.get(i).reefSide.getSelected().pathID
+        + " to "
+        + autoConfig.get(i + 1).feedLocation.getSelected().pathID), coralEndEffector));
 
-    //         auto = auto.andThen(withScoring(getAutonomousCommand(scoringGroups.get(i).feedLocation.getSelected().pathID
-    //         + " to "
-    //         + scoringGroups.get(i).reefSide.getSelected().pathID), coralSuperstructure))
-    //         .andThen(withIntaking(getAutonomousCommand(scoringGroups.get(i).reefSide.getSelected().pathID
-    //         + " to "
-    //         + scoringGroups.get(i + 1).feedLocation.getSelected().pathID), coralEndEffector));
-    //     }
-
-    //     return auto;
-    // }
+        return auto;
+    }
 
     public Command withIntaking(Command path, CoralEndEffector coralendeffector) {
         return path; 
@@ -202,6 +202,10 @@ public class AutomaticAutonomousMaker3000 {
         SmartDashboard.putData("Pole" + index, pole);
         SmartDashboard.putData("FeedLocation" + index, feedLocation);
         }
+
+        public ScoringGroup build() {
+            return new ScoringGroup(feedLocation.getSelected(), pole.getSelected(), reefSide.getSelected(), level.getSelected());
+        }
     }
 
     public class ScoringGroup {
@@ -217,24 +221,41 @@ public class AutomaticAutonomousMaker3000 {
             this.level = level;
         }
 
-        private String getPath() {
-            return feedLocation.pathID + " to " + reefSide.pathID;
+        private String[] getPath() {
+            String[] answer = new String[2];
+            answer[0] = feedLocation + " to " + reefSide;
+            answer[1] = reefSide + " to " + feedLocation;
+            answer[2] = startingPosition + " to " + reefSide;
+            return answer;
         }
 
         public Trajectory getTrajectory(){
             try {
                 PathPlannerPath path = PathPlannerPath.fromPathFile(getPath());
 
-                ArrayList<Pose2d> poses = null;
+                List<Pose2d> poses = path.getPathPoses();
                 //TODO: Translate path to pose2D
 
                 return TrajectoryGenerator.generateTrajectory(poses, 
-                new TrajectoryConfig(path.getGlobalConstraints().maxVelocityMPS(), path.getGlobalConstraints().maxAccelerationMPSSq()));
+                new TrajectoryConfig(path.getGlobalConstraints().maxVelocityMPS(),
+                path.getGlobalConstraints().maxAccelerationMPSSq()));
             } 
             catch (Exception e) {
                 DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
                 return null;
             }
+        }
+    }
+
+    public class CycleAutoConfig {
+        private ArrayList<ScoringGroup> scoringGroup = new ArrayList<>();
+        private StartingPosition startingPosition;
+        private ReefSide reefSide;
+
+        public CycleAutoConfig(ArrayList<ScoringGroup> scoringGroup, StartingPosition startingPosition, ReefSide reefSide) {
+            this.scoringGroup = scoringGroup;
+            this.startingPosition = startingPosition;
+            this.reefSide = reefSide;
         }
     }
 }
