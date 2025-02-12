@@ -49,6 +49,8 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
           .withDriveRequestType(DriveRequestType.Velocity)
           .withDesaturateWheelSpeeds(true);
 
+  private Pose2d alignmentSetpoint = Pose2d.kZero;
+
   public DrivetrainReal(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
     // create CTRE Swervedrivetrain
@@ -250,6 +252,16 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                   .withTargetDirection(rotation.get())
                   .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
         });
+  }
+
+  @Override
+  public void setAlignmentSetpoint(Pose2d setpoint) {
+    alignmentSetpoint = setpoint;
+  }
+
+  @Override
+  public boolean atPoseSetpoint() {
+    return getPose().equals(alignmentSetpoint);
   }
 
   @Override

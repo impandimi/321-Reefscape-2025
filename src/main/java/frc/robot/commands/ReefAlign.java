@@ -169,13 +169,17 @@ public class ReefAlign {
   public static Command alignToReef(
       SwerveDrive swerveDrive, Supplier<ReefPosition> targetReefPosition) {
     return swerveDrive.driveToFieldPose(
-        () ->
-            switch (targetReefPosition.get()) {
-              case ALGAE -> centerAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
-              case LEFT -> leftAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
-              case RIGHT -> rightAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
-              default -> swerveDrive.getPose(); // more or less a no-op
-            });
+        () -> {
+          final var target =
+              switch (targetReefPosition.get()) {
+                case ALGAE -> centerAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+                case LEFT -> leftAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+                case RIGHT -> rightAlignPoses.get(getNearestReefID(swerveDrive.getPose()));
+                default -> swerveDrive.getPose(); // more or less a no-op
+              };
+          swerveDrive.setAlignmentSetpoint(target);
+          return target;
+        });
   }
 
   /**
