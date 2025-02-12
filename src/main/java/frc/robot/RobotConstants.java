@@ -1,12 +1,10 @@
 /* (C) Robolancers 2025 */
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -15,6 +13,4 @@ public class RobotConstants {
 
   public static final AprilTagFieldLayout kAprilTagFieldLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-
-  public static final Distance kdeadbandRange = Meters.of(2);
 }

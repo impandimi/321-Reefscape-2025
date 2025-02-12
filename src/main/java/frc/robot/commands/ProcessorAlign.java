@@ -28,13 +28,13 @@ public class ProcessorAlign {
   public static final Map<Integer, Pose2d> processorPoses = new HashMap<>();
 
   private static final Distance kProcessorDistance = Inches.of(14);
-  private static final Rotation2d kProcessorAlignmentRotation = Rotation2d.fromDegrees(90);
+  private static final Rotation2d kProcessorAlignmentRotation = Rotation2d.fromDegrees(180);
 
   private static final List<Integer> blueProcessorTagIDs = List.of(16);
   private static final List<Integer> redProcessorTagIDs = List.of(3);
 
-  public static final Pose2d kRedProcessorPose = new Pose2d(5.983, 0.395, new Rotation2d());
-  public static final Pose2d kBlueProcessorPose = new Pose2d(11.437, 7.675, new Rotation2d());
+  public static final Pose2d kBlueProcessorPose = new Pose2d(5.983, 0.395, new Rotation2d());
+  public static final Pose2d kRedProcessorPose = new Pose2d(11.437, 7.675, new Rotation2d());
 
   private static final List<AprilTag> blueProcessorTags =
       RobotConstants.kAprilTagFieldLayout.getTags().stream()
@@ -44,6 +44,8 @@ public class ProcessorAlign {
       RobotConstants.kAprilTagFieldLayout.getTags().stream()
           .filter(tag -> redProcessorTagIDs.contains(tag.ID))
           .toList();
+
+  public static final Distance kAlignmentDeadbandRange = Meters.of(0.75);
 
   /**
    * This method is run during Robot#autonomousInit() and Robot#teleopInit() to save computations,
@@ -133,13 +135,13 @@ public class ProcessorAlign {
                 .plus(kProcessorAlignmentRotation));
   }
 
-    // if robot is within 2 meters of either red or blue processor, auto-align will NOT work
-    public static boolean isWithinProcessorRange(SwerveDrive drive, Distance deadband) {
-      Pose2d centerPos = MyAlliance.isRed() ? kRedProcessorPose : kBlueProcessorPose;
-      double deadbandDistance =
-          Math.hypot(
-              drive.getPose().getX() - centerPos.getX(), drive.getPose().getY() - centerPos.getY());
-  
-      return deadbandDistance < deadband.in(Meters);
-    }
+  // if robot is within 2 meters of either red or blue processor, auto-align will NOT work
+  public static boolean isWithinProcessorRange(SwerveDrive drive, Distance deadband) {
+    Pose2d centerPos = MyAlliance.isRed() ? kRedProcessorPose : kBlueProcessorPose;
+    double deadbandDistance =
+        Math.hypot(
+            drive.getPose().getX() - centerPos.getX(), drive.getPose().getY() - centerPos.getY());
+
+    return deadbandDistance < deadband.in(Meters);
   }
+}
