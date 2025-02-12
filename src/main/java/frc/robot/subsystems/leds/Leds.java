@@ -1,10 +1,11 @@
 /* (C) Robolancers 2025 */
-package frc.robot.subsystems.vision.leds;
+package frc.robot.subsystems.leds;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -28,6 +29,7 @@ public class Leds extends VirtualSubsystem {
 
   // Constants
   private final int length = 30;
+  private final Time blinkSpeed = Seconds.of(0.5);
   private final Color algaeColor = new Color(133, 226, 203);
 
   // Patterns
@@ -44,7 +46,7 @@ public class Leds extends VirtualSubsystem {
   public LEDPattern kReadyToAlign = LEDPattern.solid(Color.kYellow);
 
   // when the robot is aligning to a pose - strobe yellow
-  public LEDPattern kAligningPose = kReadyToAlign.blink(Seconds.of(0.3));
+  public LEDPattern kAligningPose = kReadyToAlign.blink(blinkSpeed);
 
   // when the driver interrupts the aligning process
   public LEDPattern kAlignOverride = LEDPattern.solid(Color.kPurple);
@@ -63,13 +65,13 @@ public class Leds extends VirtualSubsystem {
       LEDPattern.gradient(
           LEDPattern.GradientType.kContinuous, Color.kHotPink, new Color(172, 220, 65));
   public LEDPattern kHasCoralAndAlgae =
-      hasCoralAndAlgaePattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), Meters.of(0.2));
+      hasCoralAndAlgaePattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(1), Meters.of(1));
 
   // Intaking - solid orange
   public LEDPattern kIntaking = LEDPattern.solid(Color.kOrange);
 
   // Outtaking - blinking orange
-  public LEDPattern kOuttaking = kIntaking.blink(Seconds.of(0.5));
+  public LEDPattern kOuttaking = kIntaking.blink(blinkSpeed);
 
   public Leds() {
     ledStrip = new AddressableLED(0);
