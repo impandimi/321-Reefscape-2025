@@ -189,7 +189,8 @@ public class RobotContainer {
                                 .onlyWhile(
                                     () ->
                                         ReefAlign.isWithinReefRange(
-                                            drivetrain, ReefAlign.kMechanismDeadbandThreshold))
+                                                drivetrain, ReefAlign.kMechanismDeadbandThreshold)
+                                            && queuedSetpoint != CoralScorerSetpoint.NEUTRAL)
                                 .repeatedly())));
 
     driver
@@ -201,7 +202,8 @@ public class RobotContainer {
                 .until(() -> !coralSuperstructure.hasCoral()) // until we don't have coral
                 .withTimeout(1) // timeout at 1 second
                 .andThen(
-                    // move arm up and go back down
+                    // move arm up and go back down (only if we're already at the scoring setpoint
+                    // state)
                     coralSuperstructure
                         .goToSetpoint(
                             () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
@@ -210,8 +212,12 @@ public class RobotContainer {
                             coralSuperstructure::atTargetState)) // and then resume default command
                 .onlyIf(
                     () ->
-                        coralSuperstructure
-                            .atTargetState())); // only if we're at the target state and are ready
+                        coralSuperstructure.atTargetState()
+                            && queuedSetpoint != CoralScorerSetpoint.NEUTRAL
+                            && !driver
+                                .povLeft()
+                                .getAsBoolean())); // only if we're at the target state and are
+    // ready
     // to score
 
     // --- ALGAE AUTOMATED CONTROLS ---
@@ -266,8 +272,10 @@ public class RobotContainer {
                 .withTimeout(1)
                 .onlyIf(
                     () ->
-                        algaeSuperstructure
-                            .atTargetState())); // only if algae intake is at outtake position
+                        algaeSuperstructure.atTargetState()
+                            && !driver
+                                .povLeft()
+                                .getAsBoolean())); // only if algae intake is at outtake position
 
     // toggle driver override
     driver.povUp().onTrue(Commands.runOnce(() -> isDriverOverride = !isDriverOverride));
