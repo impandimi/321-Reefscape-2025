@@ -109,6 +109,10 @@ public class AlgaeIntakeRollers extends SubsystemBase {
         });
   }
 
+  public boolean hasAlgae() {
+    return inputs.hasAlgae;
+  }
+
   @Override // updates inputs constatly
   public void periodic() {
     io.updateInputs(inputs);

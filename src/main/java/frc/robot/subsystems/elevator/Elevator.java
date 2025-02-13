@@ -49,6 +49,8 @@ public class Elevator extends SubsystemBase {
     this.pidController = new PIDController(config.kP(), config.kI(), config.kD());
     this.feedForward = new ElevatorFeedforward(config.kS(), config.kG(), 0);
 
+    this.pidController.setTolerance(ElevatorConstants.kHeightTolerance.in(Meters));
+
     // set position to starting position
     io.setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
   }

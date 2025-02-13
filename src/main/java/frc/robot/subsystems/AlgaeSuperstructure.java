@@ -32,9 +32,7 @@ public class AlgaeSuperstructure {
   }
 
   public Command outtakeAlgae() {
-    return goToSetpoint(AlgaeSetpoint.OUTTAKE)
-        .until(pivot::atSetpoint)
-        .andThen(this.rollers.outtake());
+    return this.rollers.outtake();
   }
 
   public Command prepareClimb() {
@@ -47,6 +45,14 @@ public class AlgaeSuperstructure {
 
   public AlgaeSetpoint getTargetState() {
     return targetState;
+  }
+
+  public boolean atTargetState() {
+    return pivot.atSetpoint();
+  }
+
+  public boolean hasAlgae() {
+    return rollers.hasAlgae();
   }
 
   public enum AlgaeSetpoint {
