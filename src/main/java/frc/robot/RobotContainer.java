@@ -1,13 +1,18 @@
 /* (C) Robolancers 2025 */
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.drivetrain.DrivetrainConstants;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
+import frc.robot.util.MathUtils;
+import java.util.function.DoubleSupplier;
 
 @Logged
 public class RobotContainer {
@@ -26,21 +31,21 @@ public class RobotContainer {
   private CommandXboxController driver = new CommandXboxController(0);
   private XboxController manipulator = new XboxController(1);
 
-  // private Trigger isSlowMode = driver.leftBumper();
+  private Trigger isSlowMode = driver.leftBumper();
 
-  // private DoubleSupplier driverForward =
-  //     () ->
-  //         -MathUtils.deadband(driver.getLeftY(), 0.05)
-  //             * (isSlowMode.getAsBoolean()
-  //                 ? 2
-  //                 : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
-  // private DoubleSupplier driverStrafe =
-  //     () ->
-  //         -MathUtils.deadband(driver.getLeftX(), 0.05)
-  //             * (isSlowMode.getAsBoolean()
-  //                 ? 2
-  //                 : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
-  // private DoubleSupplier driverTurn = () -> -MathUtils.deadband(driver.getRightX(), 0.05) * 5;
+  private DoubleSupplier driverForward =
+      () ->
+          -MathUtils.deadband(driver.getLeftY(), 0.05)
+              * (isSlowMode.getAsBoolean()
+                  ? 2
+                  : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
+  private DoubleSupplier driverStrafe =
+      () ->
+          -MathUtils.deadband(driver.getLeftX(), 0.05)
+              * (isSlowMode.getAsBoolean()
+                  ? 2
+                  : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
+  private DoubleSupplier driverTurn = () -> -MathUtils.deadband(driver.getRightX(), 0.05) * 5;
 
   // // robot queued states
   // private ReefPosition queuedReefPosition = ReefPosition.NONE;
@@ -58,8 +63,7 @@ public class RobotContainer {
     //     .onTrue(HomingCommands.homeEverything(elevator, algaePivot));
 
     // // drive
-    // drivetrain.setDefaultCommand(drivetrain.teleopDrive(driverForward, driverStrafe,
-    // driverTurn));
+    drivetrain.setDefaultCommand(drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn));
 
     // algae default commands (stalling rollers, default algae pivot setpoint)
     // algaeRollers.setDefaultCommand(algaeRollers.stallIfHasAlgae());
