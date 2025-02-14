@@ -40,14 +40,10 @@ public class AlgaeIntakePivotConstants {
   public static final Angle kPivotMaxAngle = Degrees.of(180);
   public static final Angle kPivotStartingAngle = Degrees.of(0);
   public static final double kPivotMOI = 0.1; // this
-  public static final Angle kPivotIntakeAngle =
-      Degrees.of(80); // TODO: dummy angles; test these angles
-  public static final Angle kPivotOuttakeAngle = Degrees.of(90);
-  public static final Angle kPivotStoreAngle =
-      Degrees.of(70); // the angle the pivot will be at by default
-  public static final Angle kPivotClimbAngle = Degrees.of(45);
-  public static final Angle kPivotFloorAngle = Degrees.of(0);
   public static final Voltage kPivotClimbVoltage = Volts.of(-8);
+
+  // controller constants
+  public static final Angle kControllerTolerance = Degrees.of(1);
 
   // motor configurations
   public static final boolean kLeftInverted = false;
