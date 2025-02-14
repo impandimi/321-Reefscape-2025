@@ -39,7 +39,7 @@ public class ReefAlign {
   private static final Distance kReefDistance = Inches.of(14);
   private static final Distance kRightAlignDistance = Inches.of(6.5);
 
-  private static final Rotation2d kReefAlignmentRotation = Rotation2d.fromDegrees(270);
+  private static final Rotation2d kReefAlignmentRotation = Rotation2d.kCW_90deg;
   private static final List<Integer> blueReefTagIDs = List.of(17, 18, 19, 20, 21, 22);
   private static final List<Integer> redReefTagIDs = List.of(6, 7, 8, 9, 10, 11);
   private static final List<AprilTag> blueReefTags =
@@ -51,8 +51,8 @@ public class ReefAlign {
           .filter(tag -> redReefTagIDs.contains(tag.ID))
           .toList();
 
-  public static final Pose2d kRedCenterAlignPos = new Pose2d(13, 4, new Rotation2d());
-  public static final Pose2d kBlueCenterAlignPos = new Pose2d(4.457, 4, new Rotation2d());
+  public static final Pose2d kRedCenterAlignPos = new Pose2d(13, 4, Rotation2d.kZero);
+  public static final Pose2d kBlueCenterAlignPos = new Pose2d(4.457, 4, Rotation2d.kZero);
 
   public static final Distance kMechanismDeadbandThreshold =
       Meters.of(2); // distance to trigger mechanism
@@ -60,8 +60,8 @@ public class ReefAlign {
       Meters.of(5); // distance to trigger alignment
 
   /**
-   * This method is run during Robot#autonomousInit() and Robot#teleopInit() to save computations,
-   * only the poses on the alliance reef are loaded
+   * This method is run when DriverStation connects to save computations mid-match, only the poses
+   * on the alliance reef are loaded
    */
   public static void loadReefAlignmentPoses() {
     final List<Integer> tagIDsToLoad = MyAlliance.isRed() ? redReefTagIDs : blueReefTagIDs;
@@ -189,6 +189,7 @@ public class ReefAlign {
         });
   }
 
+  // TODO: what is this used for?
   public static void alignToReef(SwerveDrive drive, ReefPosition position) {
     drive.driveToFieldPose(
         switch (position) {
@@ -250,6 +251,7 @@ public class ReefAlign {
         () -> getNearestReefPose(swerveDrive.getPose()).getRotation().plus(kReefAlignmentRotation));
   }
 
+  // TODO: what is this used for?
   public static void rotateToNearestReefTag(SwerveDrive swerveDrive, double x, double y) {
     swerveDrive.driveFixedHeading(
         x, y, getNearestReefPose(swerveDrive.getPose()).getRotation().plus(kReefAlignmentRotation));

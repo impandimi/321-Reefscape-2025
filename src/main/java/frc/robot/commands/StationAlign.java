@@ -27,7 +27,7 @@ public class StationAlign {
   public static final Map<Integer, Pose2d> stationPoses = new HashMap<>();
 
   private static final Distance kStationDistance = Inches.of(14);
-  private static final Rotation2d kStationAlignmentRotation = Rotation2d.fromDegrees(90);
+  private static final Rotation2d kStationAlignmentRotation = Rotation2d.kCCW_90deg;
 
   private static final List<Integer> blueStationTagIDs = List.of(12, 13);
   private static final List<Integer> redStationTagIDs = List.of(1, 2);
@@ -114,7 +114,11 @@ public class StationAlign {
   /** Drives to align against the center of the nearest station, no manual driving */
   public static Command goToNearestCenterAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
-        () -> getNearestCenterAlign(getNearestStationID(swerveDrive.getPose())));
+        () -> {
+          final var target = stationPoses.get(getNearestStationID(swerveDrive.getPose()));
+          swerveDrive.setAlignmentSetpoint(target);
+          return target;
+        });
   }
 
   /** Maintain translational driving while rotating toward the nearest station tag */

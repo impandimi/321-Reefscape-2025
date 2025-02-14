@@ -28,13 +28,13 @@ public class ProcessorAlign {
   public static final Map<Integer, Pose2d> processorPoses = new HashMap<>();
 
   private static final Distance kProcessorDistance = Inches.of(14);
-  private static final Rotation2d kProcessorAlignmentRotation = Rotation2d.fromDegrees(180);
+  private static final Rotation2d kProcessorAlignmentRotation = Rotation2d.k180deg;
 
   private static final List<Integer> blueProcessorTagIDs = List.of(16);
   private static final List<Integer> redProcessorTagIDs = List.of(3);
 
-  public static final Pose2d kBlueProcessorPose = new Pose2d(5.983, 0.395, new Rotation2d());
-  public static final Pose2d kRedProcessorPose = new Pose2d(11.437, 7.675, new Rotation2d());
+  public static final Pose2d kBlueProcessorPose = new Pose2d(5.983, 0.395, Rotation2d.kZero);
+  public static final Pose2d kRedProcessorPose = new Pose2d(11.437, 7.675, Rotation2d.kZero);
 
   private static final List<AprilTag> blueProcessorTags =
       RobotConstants.kAprilTagFieldLayout.getTags().stream()
@@ -48,8 +48,8 @@ public class ProcessorAlign {
   public static final Distance kAlignmentDeadbandRange = Meters.of(0.75);
 
   /**
-   * This method is run during Robot#autonomousInit() and Robot#teleopInit() to save computations,
-   * only the processor poses are loaded
+   * This method is run when DriverStation connects to save computations mid-match, only the
+   * processor poses are loaded
    */
   public static void loadProcessorAlignmentPoses() {
     List<Integer> processorTagIds = MyAlliance.isRed() ? redProcessorTagIDs : blueProcessorTagIDs;
@@ -120,7 +120,11 @@ public class ProcessorAlign {
   /** Drives to align against the center of the nearest processor, no manual driving */
   public static Command goToNearestAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
-        () -> getNearestAlign(getNearestProcessorID(swerveDrive.getPose())));
+        () -> {
+          final var target = processorPoses.get(getNearestProcessorID(swerveDrive.getPose()));
+          swerveDrive.setAlignmentSetpoint(target);
+          return target;
+        });
   }
 
   /** Maintain translational driving while rotating toward the nearest processor tag */
