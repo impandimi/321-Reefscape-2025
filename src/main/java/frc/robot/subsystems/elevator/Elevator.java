@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Distance;
@@ -53,6 +54,8 @@ public class Elevator extends SubsystemBase {
 
     // set position to starting position
     io.setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
+
+    io.setOnboardPID(config);
   }
 
   // Below are methods & their commands for simple robot operations
@@ -74,17 +77,30 @@ public class Elevator extends SubsystemBase {
   // Goes to height
   public void goToHeight(Distance targetHeight) {
 
-    double motorOutput = pidController.calculate(inputs.height.in(Meters), targetHeight.in(Meters));
+    if (io instanceof ElevatorIOSim) {
+      double motorOutput =
+          pidController.calculate(inputs.height.in(Meters), targetHeight.in(Meters));
 
-    double ff = feedForward.calculate(motorOutput);
-    setVoltage(Volts.of(motorOutput + ff));
+      double ff = feedForward.calculate(motorOutput);
+
+      double total = motorOutput + ff;
+
+      setVoltage(Volts.of(total));
+    } else {
+      io.setPosition(targetHeight);
+    }
   }
 
   // returns a Command to go to height
   public Command goToHeight(Supplier<Distance> targetHeight) {
     return run(
         () -> {
-          goToHeight(targetHeight.get());
+          double setpoint =
+              MathUtil.clamp(
+                  targetHeight.get().in(Meters),
+                  ElevatorConstants.kElevatorMinimumHeight.in(Meters),
+                  ElevatorConstants.kElevatorMaximumHeight.in(Meters));
+          goToHeight(Meters.of(setpoint));
         });
   }
 
@@ -117,14 +133,21 @@ public class Elevator extends SubsystemBase {
     TunableConstant kD = new TunableConstant("/Elevator/kD", config.kD());
     TunableConstant kG = new TunableConstant("/Elevator/kG", config.kG());
     TunableConstant kS = new TunableConstant("/Elevator/kS", config.kS());
+    TunableConstant kV = new TunableConstant("/Elevator/kV", config.kV());
+    TunableConstant kA = new TunableConstant("/Elevator/kA", config.kA());
     TunableConstant targetHeight = new TunableConstant("/Elevator/targetHeight", 0);
 
-    return run(
-        () -> {
-          this.pidController.setPID(kP.get(), kI.get(), kD.get());
-          this.feedForward = new ElevatorFeedforward(kS.get(), kG.get(), 0);
-          goToHeight(Meters.of(targetHeight.get()));
-        });
+    return runOnce(
+            () -> {
+              io.setOnboardPID(
+                  new ElevatorConfig(
+                      kP.get(), kI.get(), kD.get(), kG.get(), kS.get(), kV.get(), kA.get()));
+            })
+        .andThen(
+            run(
+                () -> {
+                  goToHeight(Meters.of(targetHeight.get()));
+                }));
   }
 
   // Loops repeatedly

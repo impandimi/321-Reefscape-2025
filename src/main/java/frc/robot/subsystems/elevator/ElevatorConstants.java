@@ -46,6 +46,6 @@ public class ElevatorConstants {
 
   // Constants for homing elevator
   public static final Voltage kHomingVoltage = Volts.of(-2);
-  public static final Current kHomingCurrentThreshold = Amps.of(25);
+  public static final Current kHomingCurrentThreshold = Amps.of(20);
   public static final LinearVelocity kHomingVelocityThreshold = MetersPerSecond.of(0.5);
 }

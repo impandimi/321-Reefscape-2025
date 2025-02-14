@@ -4,16 +4,23 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Volt;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
@@ -22,7 +29,7 @@ import edu.wpi.first.units.measure.Voltage;
 // For when Elevator is real
 public class ElevatorIOTalon implements ElevatorIO {
   // Creates config record w/ values
-  public static final ElevatorConfig config = new ElevatorConfig(50, 0, 0, 0.3, 0.1);
+  public static final ElevatorConfig config = new ElevatorConfig(50, 0, 0, 0, 0, 0.25, 0.01);
 
   // Creates motor objects
 
@@ -41,13 +48,13 @@ public class ElevatorIOTalon implements ElevatorIO {
   public void updateInputs(ElevatorInputs inputs) {
     inputs.height =
         Meters.of(
-            elevatorMotorLeft.getPosition().getValueAsDouble()
+            elevatorMotorRight.getPosition().getValueAsDouble()
                 * ElevatorConstants.kElevatorConversion.in(Meters));
     inputs.velocity =
         MetersPerSecond.of(
-            elevatorMotorLeft.getVelocity().getValueAsDouble()
+            elevatorMotorRight.getVelocity().getValueAsDouble()
                 * ElevatorConstants.kElevatorConversion.in(Meters));
-    inputs.current = Amps.of(elevatorMotorLeft.getStatorCurrent().getValueAsDouble());
+    inputs.current = Amps.of(elevatorMotorRight.getStatorCurrent().getValueAsDouble());
   }
 
   // Method to setup L & R motor & encoders
@@ -64,7 +71,8 @@ public class ElevatorIOTalon implements ElevatorIO {
                     .withInverted(
                         ElevatorConstants.kLeftInverted
                             ? InvertedValue.Clockwise_Positive
-                            : InvertedValue.CounterClockwise_Positive))
+                            : InvertedValue.CounterClockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Brake))
             .withFeedback(
                 new FeedbackConfigs()
                     .withSensorToMechanismRatio(ElevatorConstants.kElevatorGearing)
@@ -81,11 +89,24 @@ public class ElevatorIOTalon implements ElevatorIO {
                     .withInverted(
                         ElevatorConstants.kRightInverted
                             ? InvertedValue.Clockwise_Positive
-                            : InvertedValue.CounterClockwise_Positive))
+                            : InvertedValue.CounterClockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Brake))
             .withFeedback(
                 new FeedbackConfigs()
                     .withSensorToMechanismRatio(ElevatorConstants.kElevatorGearing)
-                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor));
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor))
+            .withMotionMagic(
+                new MotionMagicConfigs()
+                    .withMotionMagicCruiseVelocity(
+                        MetersPerSecond.of(0).in(MetersPerSecond)
+                            / ElevatorConstants.kElevatorConversion.in(Meters))
+                    .withMotionMagicAcceleration(
+                        MetersPerSecondPerSecond.of(120).in(MetersPerSecondPerSecond)
+                            / ElevatorConstants.kElevatorConversion.in(Meters)))
+            .withSlot0(
+                new Slot0Configs()
+                    .withGravityType(GravityTypeValue.Elevator_Static)
+                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign));
 
     elevatorMotorLeft.getConfigurator().apply(configurationLeft);
     elevatorMotorRight.getConfigurator().apply(configurationRight);
@@ -93,9 +114,17 @@ public class ElevatorIOTalon implements ElevatorIO {
 
   // Sets power of motors w/voltage
   public void setVoltage(Voltage Volts) {
-    elevatorMotorLeft.setVoltage(Volts.in(Volt));
+    elevatorMotorRight.setVoltage(Volts.in(Volt));
+    elevatorMotorLeft.setControl(new Follower(elevatorMotorRight.getDeviceID(), true));
+  }
+
+  @Override
+  public void setPosition(Distance position) {
+    System.out.println(position.in(Meters) / ElevatorConstants.kElevatorConversion.in(Meters));
     elevatorMotorRight.setControl(
-        new Follower(elevatorMotorLeft.getDeviceID(), ElevatorConstants.kRightInverted));
+        new MotionMagicExpoVoltage(
+            position.in(Meters) / ElevatorConstants.kElevatorConversion.in(Meters)));
+    elevatorMotorLeft.setControl(new Follower(elevatorMotorRight.getDeviceID(), true));
   }
 
   // Sets encoder pos
@@ -109,5 +138,22 @@ public class ElevatorIOTalon implements ElevatorIO {
   // Special case where encoder pos is reset to the initial/starting height
   public void resetEncoderPosition() {
     setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
+  }
+
+  @Override
+  public void setOnboardPID(ElevatorConfig conf) {
+    elevatorMotorRight
+        .getConfigurator()
+        .apply(
+            new Slot0Configs()
+                .withGravityType(GravityTypeValue.Elevator_Static)
+                .withKP(conf.kP())
+                .withKI(conf.kI())
+                .withKD(conf.kD())
+                .withKS(conf.kS())
+                .withKG(conf.kG())
+                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
+                .withKV(conf.kV())
+                .withKA(conf.kA()));
   }
 }

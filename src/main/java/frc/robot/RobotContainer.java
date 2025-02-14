@@ -1,8 +1,8 @@
 /* (C) Robolancers 2025 */
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.CoralSuperstructure.CoralScorerSetpoint;
 import frc.robot.subsystems.drivetrain.DrivetrainConstants;
@@ -62,13 +63,22 @@ public class RobotContainer {
   private boolean isDriverOverride = false;
 
   public RobotContainer() {
-    elevator.setDefaultCommand(elevator.setVoltage(() -> Volts.zero()));
+    // elevator.setDefaultCommand(elevator.setVoltage(() -> Volts.of(0)));
+    elevator.setDefaultCommand(
+        elevator.goToHeight(
+            () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight().plus(Meters.of(0.2))));
 
-    driver.a().whileTrue(elevator.tune());
+    // driver.a().whileTrue(elevator.tune());
+    // driver.b().whileTrue(elevator.setVoltage(() -> Volts.of(1)));
+    // driver.y().whileTrue(elevator.homeEncoder());
+    driver.b().whileTrue(elevator.goToHeight(() -> CoralScorerSetpoint.L2.getElevatorHeight()));
+    driver.x().whileTrue(elevator.goToHeight(() -> CoralScorerSetpoint.L3.getElevatorHeight()));
+    driver.y().whileTrue(elevator.goToHeight(() -> CoralScorerSetpoint.L4.getElevatorHeight()));
 
     // home everything on robot start
-    // RobotModeTriggers.disabled()
-    //     .negate()
+    RobotModeTriggers.disabled()
+        .negate()
+        .onTrue(elevator.homeEncoder().onlyIf(() -> !elevator.elevatorIsHomed()));
     //     .onTrue(HomingCommands.homeEverything(elevator, algaePivot));
 
     // drive

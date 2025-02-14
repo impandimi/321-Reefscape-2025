@@ -13,7 +13,7 @@ import edu.wpi.first.units.measure.Voltage;
 // Ideal case for use when Elevator is disabled, doesn't actually control anything
 public class ElevatorIOIdeal implements ElevatorIO {
 
-  public static ElevatorConfig config = new ElevatorConfig(0, 0, 0, 0, 0);
+  public static ElevatorConfig config = new ElevatorConfig(0, 0, 0, 0, 0, 0, 0);
 
   // updateInputs method updates the Inputs with the actual values from motors;
   // Called repeatedly in periodic method in Elevator

@@ -19,7 +19,7 @@ import edu.wpi.first.units.measure.Voltage;
 // For when Elevator is real
 public class ElevatorIOSpark implements ElevatorIO {
   // Creates config record w/ values
-  public static final ElevatorConfig config = new ElevatorConfig(150, 0, 0.3, 0.43, 0.64);
+  public static final ElevatorConfig config = new ElevatorConfig(150, 0, 0.3, 0.43, 0.64, 0, 0);
   // Creates motor objects
   public SparkMax elevatorMotorLeft =
       new SparkMax(ElevatorConstants.kLeftMotorID, MotorType.kBrushless);

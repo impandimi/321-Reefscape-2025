@@ -23,4 +23,8 @@ public interface ElevatorIO {
   default void setVoltage(Voltage volts) {}
 
   default void setEncoderPosition(Distance position) {}
+
+  default void setPosition(Distance position) {}
+
+  default void setOnboardPID(ElevatorConfig config) {}
 }
