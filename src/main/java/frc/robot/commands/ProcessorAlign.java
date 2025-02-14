@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,20 +29,20 @@ public class ProcessorAlign {
   private static final Distance kProcessorDistance = Inches.of(14);
   private static final Rotation2d kProcessorAlignmentRotation = Rotation2d.k180deg;
 
-  private static final List<Integer> blueProcessorTagIDs = List.of(16);
-  private static final List<Integer> redProcessorTagIDs = List.of(3);
+  private static final Transform2d kProcessorAlignTransform =
+      new Transform2d(kProcessorDistance, Meter.zero(), kProcessorAlignmentRotation);
 
+  private static final int blueProcessorTagID = 16;
+  private static final int redProcessorTagID = 3;
+
+  // TODO: use units
   public static final Pose2d kBlueProcessorPose = new Pose2d(5.983, 0.395, Rotation2d.kZero);
   public static final Pose2d kRedProcessorPose = new Pose2d(11.437, 7.675, Rotation2d.kZero);
 
-  private static final List<AprilTag> blueProcessorTags =
-      RobotConstants.kAprilTagFieldLayout.getTags().stream()
-          .filter(tag -> blueProcessorTagIDs.contains(tag.ID))
-          .toList();
-  private static final List<AprilTag> redProcessorTags =
-      RobotConstants.kAprilTagFieldLayout.getTags().stream()
-          .filter(tag -> redProcessorTagIDs.contains(tag.ID))
-          .toList();
+  private static final Pose2d blueProcessorTag =
+      RobotConstants.kAprilTagFieldLayout.getTagPose(blueProcessorTagID).get().toPose2d();
+  private static final Pose2d redProcessorTag =
+      RobotConstants.kAprilTagFieldLayout.getTagPose(redProcessorTagID).get().toPose2d();
 
   public static final Distance kAlignmentDeadbandRange = Meters.of(0.75);
 
@@ -52,10 +51,8 @@ public class ProcessorAlign {
    * processor poses are loaded
    */
   public static void loadProcessorAlignmentPoses() {
-    List<Integer> processorTagIds = MyAlliance.isRed() ? redProcessorTagIDs : blueProcessorTagIDs;
-    for (Integer id : processorTagIds) {
-      processorPoses.computeIfAbsent(id, ProcessorAlign::getNearestAlign);
-    }
+    int processorTagId = MyAlliance.isRed() ? redProcessorTagID : blueProcessorTagID;
+    processorPoses.computeIfAbsent(processorTagId, ProcessorAlign::getNearestAlign);
   }
 
   /**
@@ -70,10 +67,10 @@ public class ProcessorAlign {
 
     if (alliance.isEmpty()) return null;
 
-    List<AprilTag> processorTags =
-        alliance.get().equals(Alliance.Red) ? redProcessorTags : blueProcessorTags;
+    List<Pose2d> processorTag =
+        List.of(alliance.get().equals(Alliance.Red) ? redProcessorTag : blueProcessorTag);
 
-    return robotPose.nearest(processorTags.stream().map(tag -> tag.pose.toPose2d()).toList());
+    return robotPose.nearest(processorTag);
   }
 
   /**
@@ -110,9 +107,7 @@ public class ProcessorAlign {
 
     Pose2d aprilTagPose = tagPose.get().toPose2d();
 
-    Pose2d resultPose =
-        aprilTagPose.plus(
-            new Transform2d(kProcessorDistance, Meter.zero(), kProcessorAlignmentRotation));
+    Pose2d resultPose = aprilTagPose.plus(kProcessorAlignTransform);
 
     return resultPose;
   }
