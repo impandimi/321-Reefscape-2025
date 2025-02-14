@@ -53,6 +53,7 @@ public class TunerConstants {
   // This needs to be tuned to your individual robot
   private static final Current kSlipCurrent = Amps.of(60.0);
   private static final Current kSupplyCurrent = Amps.of(40.0);
+  private static final double kClosedLoopRampRate = 0.02;
 
   // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
   // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
@@ -63,7 +64,9 @@ public class TunerConstants {
                   .withStatorCurrentLimit(kSlipCurrent)
                   .withStatorCurrentLimitEnable(true)
                   .withSupplyCurrentLimit(kSupplyCurrent)
-                  .withSupplyCurrentLimitEnable(true));
+                  .withSupplyCurrentLimitEnable(true))
+          .withClosedLoopRamps(
+              new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(kClosedLoopRampRate));
   private static final TalonFXConfiguration steerInitialConfigs =
       new TalonFXConfiguration()
           .withCurrentLimits(
@@ -71,10 +74,12 @@ public class TunerConstants {
                   // Swerve azimuth does not require much torque output, so we can set a relatively
                   // low
                   // stator current limit to help avoid brownouts without impacting performance.
-                  .withStatorCurrentLimit(Amps.of(60))
+                  .withStatorCurrentLimit(kSlipCurrent)
                   .withStatorCurrentLimitEnable(true)
                   .withSupplyCurrentLimit(kSupplyCurrent)
-                  .withSupplyCurrentLimitEnable(true));
+                  .withSupplyCurrentLimitEnable(true))
+          .withClosedLoopRamps(
+              new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(kClosedLoopRampRate));
   private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
   // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
   private static final Pigeon2Configuration pigeonConfigs = null;
