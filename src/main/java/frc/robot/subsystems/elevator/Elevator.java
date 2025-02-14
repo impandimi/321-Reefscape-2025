@@ -4,12 +4,9 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -23,9 +20,8 @@ public class Elevator extends SubsystemBase {
   // Initialize all parts of Elevator Subsystem, as well as pid controller
   private ElevatorIO io;
   private ElevatorInputs inputs;
-  private PIDController pidController;
-  private ElevatorFeedforward feedForward;
-  private ElevatorConfig config;
+
+  private Distance targetHeight = ElevatorConstants.kElevatorStartingHeight;
 
   private boolean isHomed = false;
 
@@ -33,29 +29,22 @@ public class Elevator extends SubsystemBase {
   // or not
   public static Elevator create() {
     return RobotBase.isReal()
-        ? new Elevator(new ElevatorIOTalon(), ElevatorIOTalon.config)
-        : new Elevator(new ElevatorIOSim(), ElevatorIOSim.config);
+        ? new Elevator(new ElevatorIOTalon())
+        : new Elevator(new ElevatorIOSim());
   }
 
   public static Elevator disable() {
-    return new Elevator(new ElevatorIOIdeal(), ElevatorIOIdeal.config);
+    return new Elevator(new ElevatorIOIdeal());
   }
 
   // Eleavtor Constructor
   // Creates Elevator, sets initialized variables to the real/sim values from create() method above
-  public Elevator(ElevatorIO io, ElevatorConfig config) {
+  public Elevator(ElevatorIO io) {
     this.io = io;
     this.inputs = new ElevatorInputs();
-    this.config = config;
-    this.pidController = new PIDController(config.kP(), config.kI(), config.kD());
-    this.feedForward = new ElevatorFeedforward(config.kS(), config.kG(), 0);
-
-    this.pidController.setTolerance(ElevatorConstants.kHeightTolerance.in(Meters));
 
     // set position to starting position
     io.setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
-
-    io.setOnboardPID(config);
   }
 
   // Below are methods & their commands for simple robot operations
@@ -76,19 +65,8 @@ public class Elevator extends SubsystemBase {
 
   // Goes to height
   public void goToHeight(Distance targetHeight) {
-
-    if (io instanceof ElevatorIOSim) {
-      double motorOutput =
-          pidController.calculate(inputs.height.in(Meters), targetHeight.in(Meters));
-
-      double ff = feedForward.calculate(motorOutput);
-
-      double total = motorOutput + ff;
-
-      setVoltage(Volts.of(total));
-    } else {
-      io.setPosition(targetHeight);
-    }
+    this.targetHeight = targetHeight;
+    io.setPosition(targetHeight);
   }
 
   // returns a Command to go to height
@@ -128,13 +106,13 @@ public class Elevator extends SubsystemBase {
   // When command is run, tunable constants are created & PID controller values & target height are
   // set to said tunable values
   public Command tune() {
-    TunableConstant kP = new TunableConstant("/Elevator/kP", config.kP());
-    TunableConstant kI = new TunableConstant("/Elevator/kI", config.kI());
-    TunableConstant kD = new TunableConstant("/Elevator/kD", config.kD());
-    TunableConstant kG = new TunableConstant("/Elevator/kG", config.kG());
-    TunableConstant kS = new TunableConstant("/Elevator/kS", config.kS());
-    TunableConstant kV = new TunableConstant("/Elevator/kV", config.kV());
-    TunableConstant kA = new TunableConstant("/Elevator/kA", config.kA());
+    TunableConstant kP = new TunableConstant("/Elevator/kP", 0);
+    TunableConstant kI = new TunableConstant("/Elevator/kI", 0);
+    TunableConstant kD = new TunableConstant("/Elevator/kD", 0);
+    TunableConstant kG = new TunableConstant("/Elevator/kG", 0);
+    TunableConstant kS = new TunableConstant("/Elevator/kS", 0);
+    TunableConstant kV = new TunableConstant("/Elevator/kV", 0);
+    TunableConstant kA = new TunableConstant("/Elevator/kA", 0);
     TunableConstant targetHeight = new TunableConstant("/Elevator/targetHeight", 0);
 
     return runOnce(
@@ -170,6 +148,10 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean atSetpoint() {
-    return pidController.atSetpoint();
+    return io.atSetpoint();
+  }
+
+  public Distance getTargetHeight() {
+    return targetHeight;
   }
 }

@@ -42,6 +42,7 @@ public class ElevatorIOTalon implements ElevatorIO {
   // Constructor: Sets up motors
   public ElevatorIOTalon() {
     setupMotors();
+    setOnboardPID(config);
   }
 
   // Updates inputs with values from encoder (Called periodically in periodic function later)
@@ -155,5 +156,12 @@ public class ElevatorIOTalon implements ElevatorIO {
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
                 .withKV(conf.kV())
                 .withKA(conf.kA()));
+  }
+
+  @Override
+  public boolean atSetpoint() {
+    return elevatorMotorRight.getClosedLoopError().getValueAsDouble()
+            * ElevatorConstants.kElevatorConversion.in(Meters)
+        < ElevatorConstants.kHeightTolerance.in(Meters);
   }
 }

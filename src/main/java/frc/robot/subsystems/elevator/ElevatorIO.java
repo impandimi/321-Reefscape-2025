@@ -18,13 +18,22 @@ setEncoderPosition
 */
 public interface ElevatorIO {
 
+  // update inputs from sensors
   default void updateInputs(ElevatorInputs inputs) {}
 
+  // run the motor at a specific voltage
   default void setVoltage(Voltage volts) {}
 
+  // set encoder position; doesn't run the motor
   default void setEncoderPosition(Distance position) {}
 
+  // run elevator to position using onboard pid controller
   default void setPosition(Distance position) {}
 
+  // set pid values of onboard pid controller
   default void setOnboardPID(ElevatorConfig config) {}
+
+  default boolean atSetpoint() {
+    return false;
+  }
 }

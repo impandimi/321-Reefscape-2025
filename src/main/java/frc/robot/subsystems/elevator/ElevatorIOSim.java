@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
@@ -18,6 +20,10 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 public class ElevatorIOSim implements ElevatorIO {
   // Constant values for the simulation of the elevator
   public static final ElevatorConfig config = new ElevatorConfig(50, 0, 0, 0.404, 0, 0, 0);
+
+  // controllers
+  private PIDController pidController = new PIDController(0, 0, 0);
+  private ElevatorFeedforward feedforward = new ElevatorFeedforward(0, 0, 0);
 
   // elevator sim object w/ appropriate paramaters
   // Creates the motor simulation of the elevator
@@ -31,6 +37,10 @@ public class ElevatorIOSim implements ElevatorIO {
           ElevatorConstants.kElevatorMaximumHeight.in(Meters),
           true,
           ElevatorConstants.kElevatorStartingHeight.in(Meters));
+
+  public ElevatorIOSim() {
+    setOnboardPID(config);
+  }
 
   // Updates Inputs w/ values from sim (Also tells sim how often to update itself)
   public void updateInputs(ElevatorInputs inputs) {
@@ -48,5 +58,21 @@ public class ElevatorIOSim implements ElevatorIO {
   // Sets encoder position to a position & velocity to whatever the current velocity is
   public void setEncoderPosition(Distance height) {
     simMotor.setState(height.in(Meters), simMotor.getVelocityMetersPerSecond());
+  }
+
+  @Override
+  public void setPosition(Distance dist) {
+    // TODO: referencing motor position specifically here is iffy, find a way to refactor
+    double motorOutput = pidController.calculate(simMotor.getPositionMeters(), dist.in(Meters));
+
+    double ff = feedforward.calculate(motorOutput);
+
+    setVoltage(Volts.of(motorOutput + ff));
+  }
+
+  @Override
+  public void setOnboardPID(ElevatorConfig config) {
+    this.pidController.setPID(config.kP(), config.kI(), config.kD());
+    this.feedforward = new ElevatorFeedforward(config.kS(), config.kG(), config.kV(), config.kA());
   }
 }

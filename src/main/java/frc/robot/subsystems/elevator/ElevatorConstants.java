@@ -48,4 +48,6 @@ public class ElevatorConstants {
   public static final Voltage kHomingVoltage = Volts.of(-2);
   public static final Current kHomingCurrentThreshold = Amps.of(20);
   public static final LinearVelocity kHomingVelocityThreshold = MetersPerSecond.of(0.5);
+
+  public static final Voltage kNominalVoltage = Volts.of(12);
 }

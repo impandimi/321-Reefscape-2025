@@ -2,7 +2,6 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.epilogue.Logged;
@@ -19,7 +18,7 @@ public class ElevatorIOIdeal implements ElevatorIO {
   // Called repeatedly in periodic method in Elevator
   // doesn't do anything here
   public void updateInputs(ElevatorInputs inputs) {
-    inputs.height = Meters.of(0);
+    inputs.height = ElevatorConstants.kElevatorStartingHeight;
     inputs.velocity = MetersPerSecond.of(0);
     inputs.current = Amps.of(0);
   }
