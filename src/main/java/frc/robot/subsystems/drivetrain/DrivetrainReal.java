@@ -269,6 +269,11 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     return super.getState().ModuleTargets;
   }
 
+  @Logged(name = "ReefVisionEstimatedPose")
+  public Pose2d getReefVisionPose() {
+    return reefPoseEstimator.getEstimatedPosition();
+  }
+
   @Logged(name = "MeasuredRobotPose")
   @Override
   public Pose2d getPose() {

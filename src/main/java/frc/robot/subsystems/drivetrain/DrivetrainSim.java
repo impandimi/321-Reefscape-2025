@@ -251,6 +251,11 @@ public class DrivetrainSim implements SwerveDrive {
     return simulatedDrive.getSetPointsOptimized();
   }
 
+  @Logged(name = "ReefVisionEstimatedPose")
+  public Pose2d getReefVisionPose() {
+    return reefPoseEstimator.getEstimatedPosition();
+  }
+
   @Logged(name = "MeasuredRobotPose")
   @Override
   public Pose2d getPose() {
