@@ -56,6 +56,10 @@ public class ElevatorIOTalon implements ElevatorIO {
             elevatorMotorRight.getVelocity().getValueAsDouble()
                 * ElevatorConstants.kElevatorConversion.in(Meters));
     inputs.current = Amps.of(elevatorMotorRight.getStatorCurrent().getValueAsDouble());
+    inputs.atSetpoint =
+        elevatorMotorRight.getClosedLoopError().getValueAsDouble()
+                * ElevatorConstants.kElevatorConversion.in(Meters)
+            < ElevatorConstants.kHeightTolerance.in(Meters);
   }
 
   // Method to setup L & R motor & encoders
@@ -124,22 +128,20 @@ public class ElevatorIOTalon implements ElevatorIO {
   }
 
   @Override
-  public void setPosition(Distance position) {
+  public void goToPosition(Distance position) {
     elevatorMotorRight.setControl(
         new MotionMagicExpoVoltage(convertMetersToRot(position.in(Meters))));
     elevatorMotorLeft.setControl(
         new Follower(elevatorMotorRight.getDeviceID(), ElevatorConstants.kFollowerInverted));
   }
 
-  // Sets encoder pos
-  public void setEncoderPosition(Distance position) {
-    elevatorMotorLeft.setPosition(convertMetersToRot(position.in(Meters)));
-    elevatorMotorRight.setPosition(convertMetersToRot(position.in(Meters)));
-  }
-
-  // Special case where encoder pos is reset to the initial/starting height
+  // resets encoder pos
+  @Override
   public void resetEncoderPosition() {
-    setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
+    elevatorMotorLeft.setPosition(
+        convertMetersToRot(ElevatorConstants.kElevatorStartingHeight.in(Meters)));
+    elevatorMotorRight.setPosition(
+        convertMetersToRot(ElevatorConstants.kElevatorStartingHeight.in(Meters)));
   }
 
   @Override
@@ -157,13 +159,6 @@ public class ElevatorIOTalon implements ElevatorIO {
                 .withKV(conf.kV())
                 .withKA(conf.kA())
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign));
-  }
-
-  @Override
-  public boolean atSetpoint() {
-    return elevatorMotorRight.getClosedLoopError().getValueAsDouble()
-            * ElevatorConstants.kElevatorConversion.in(Meters)
-        < ElevatorConstants.kHeightTolerance.in(Meters);
   }
 
   public double convertMetersToRot(double meters) {

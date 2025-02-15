@@ -44,7 +44,7 @@ public class Elevator extends SubsystemBase {
     this.inputs = new ElevatorInputs();
 
     // set position to starting position
-    io.setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
+    io.resetEncoderPosition();
   }
 
   // Below are methods & their commands for simple robot operations
@@ -66,7 +66,7 @@ public class Elevator extends SubsystemBase {
   // Goes to height
   public void goToHeight(Distance targetHeight) {
     this.targetHeight = targetHeight;
-    io.setPosition(targetHeight);
+    io.goToPosition(targetHeight);
   }
 
   // returns a Command to go to height
@@ -97,8 +97,7 @@ public class Elevator extends SubsystemBase {
         .andThen(
             runOnce(
                 () -> {
-                  io.setEncoderPosition(
-                      Meters.of(ElevatorConstants.kElevatorStartingHeight.in(Meters)));
+                  io.resetEncoderPosition();
                   isHomed = true;
                 }));
   }
@@ -148,7 +147,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean atSetpoint() {
-    return io.atSetpoint();
+    return inputs.atSetpoint;
   }
 
   public Distance getTargetHeight() {

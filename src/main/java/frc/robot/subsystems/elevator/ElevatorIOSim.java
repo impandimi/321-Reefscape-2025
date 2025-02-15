@@ -48,6 +48,7 @@ public class ElevatorIOSim implements ElevatorIO {
     inputs.height = Meters.of(simMotor.getPositionMeters());
     inputs.velocity = MetersPerSecond.of(simMotor.getVelocityMetersPerSecond());
     inputs.current = Amp.of(simMotor.getCurrentDrawAmps());
+    inputs.atSetpoint = pidController.atSetpoint();
   }
 
   // Method that sets power of the motors w/volts
@@ -55,13 +56,16 @@ public class ElevatorIOSim implements ElevatorIO {
     simMotor.setInputVoltage(volts.in(Volts));
   }
 
-  // Sets encoder position to a position & velocity to whatever the current velocity is
-  public void setEncoderPosition(Distance height) {
-    simMotor.setState(height.in(Meters), simMotor.getVelocityMetersPerSecond());
+  // resets encoder position to its starting height
+  @Override
+  public void resetEncoderPosition() {
+    simMotor.setState(
+        ElevatorConstants.kElevatorStartingHeight.in(Meters),
+        simMotor.getVelocityMetersPerSecond());
   }
 
   @Override
-  public void setPosition(Distance dist) {
+  public void goToPosition(Distance dist) {
     // TODO: referencing motor position specifically here is iffy, find a way to refactor
     double motorOutput = pidController.calculate(simMotor.getPositionMeters(), dist.in(Meters));
 

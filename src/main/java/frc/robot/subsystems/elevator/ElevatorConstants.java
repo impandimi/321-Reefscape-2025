@@ -42,8 +42,8 @@ public class ElevatorConstants {
   public static final boolean kLeftInverted = false;
   public static final boolean kRightInverted = true;
   public static final boolean kFollowerInverted = true;
-  public static final int kStatorLimit = 40;
-  public static final int kSupplyLimit = 40;
+  public static final Current kStatorLimit = Amps.of(40);
+  public static final Current kSupplyLimit = Amps.of(40);
   public static final double kPositionConversionFactor =
       kElevatorConversion.in(Meters) / kElevatorGearing;
   public static final double kVelocityConversionFactor = kPositionConversionFactor / 60;

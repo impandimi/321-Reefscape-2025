@@ -25,15 +25,11 @@ public interface ElevatorIO {
   default void setVoltage(Voltage volts) {}
 
   // set encoder position; doesn't run the motor
-  default void setEncoderPosition(Distance position) {}
+  default void resetEncoderPosition() {}
 
   // run elevator to position using onboard pid controller
-  default void setPosition(Distance position) {}
+  default void goToPosition(Distance position) {}
 
   // set pid values of onboard pid controller
   default void setOnboardPID(ElevatorConfig config) {}
-
-  default boolean atSetpoint() {
-    return false;
-  }
 }

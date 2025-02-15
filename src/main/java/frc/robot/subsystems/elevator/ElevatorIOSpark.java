@@ -51,6 +51,10 @@ public class ElevatorIOSpark implements ElevatorIO {
     inputs.height = Meters.of(elevatorMotorLeft.getEncoder().getPosition());
     inputs.velocity = MetersPerSecond.of(elevatorMotorLeft.getEncoder().getVelocity());
     inputs.current = Amps.of(elevatorMotorLeft.getOutputCurrent());
+    inputs.atSetpoint =
+        Math.abs(elevatorMotorLeft.getEncoder().getPosition() - lastReference.in(Meters))
+            < ElevatorConstants.kHeightTolerance.in(Meters);
+    ;
   }
 
   // Method to setup L & R motor & encoders
@@ -58,7 +62,7 @@ public class ElevatorIOSpark implements ElevatorIO {
   private void setupMotors() {
     elevatorMotorRight.configure(
         new SparkMaxConfig()
-            .smartCurrentLimit(ElevatorConstants.kStatorLimit)
+            .smartCurrentLimit((int) ElevatorConstants.kStatorLimit.in(Amps))
             .voltageCompensation(ElevatorConstants.kNominalVoltage.in(Volts))
             .idleMode(IdleMode.kBrake)
             .inverted(ElevatorConstants.kRightInverted)
@@ -70,7 +74,7 @@ public class ElevatorIOSpark implements ElevatorIO {
         PersistMode.kPersistParameters);
     elevatorMotorLeft.configure(
         new SparkMaxConfig()
-            .smartCurrentLimit(ElevatorConstants.kStatorLimit)
+            .smartCurrentLimit((int) ElevatorConstants.kStatorLimit.in(Amps))
             .voltageCompensation(ElevatorConstants.kNominalVoltage.in(Volts))
             .idleMode(IdleMode.kBrake)
             .apply(
@@ -87,19 +91,19 @@ public class ElevatorIOSpark implements ElevatorIO {
     elevatorMotorRight.setVoltage(Volts);
   }
 
-  // Sets encoder pos
-  public void setEncoderPosition(Distance position) {
-    elevatorMotorLeft.getEncoder().setPosition(position.in(Meters));
-    elevatorMotorRight.getEncoder().setPosition(position.in(Meters));
-  }
-
-  // Special case where encoder pos is reset to the initial/starting height
+  // resets encoder pos
+  @Override
   public void resetEncoderPosition() {
-    setEncoderPosition(ElevatorConstants.kElevatorStartingHeight);
+    elevatorMotorLeft
+        .getEncoder()
+        .setPosition(ElevatorConstants.kElevatorStartingHeight.in(Meters));
+    elevatorMotorRight
+        .getEncoder()
+        .setPosition(ElevatorConstants.kElevatorStartingHeight.in(Meters));
   }
 
   @Override
-  public void setPosition(Distance position) {
+  public void goToPosition(Distance position) {
     double ffOutput = feedforward.calculate(0);
     lastReference = position;
     pidController.setReference(
@@ -114,11 +118,5 @@ public class ElevatorIOSpark implements ElevatorIO {
         ResetMode.kNoResetSafeParameters,
         PersistMode.kPersistParameters);
     feedforward = new ElevatorFeedforward(config.kS(), config.kG(), config.kV(), config.kA());
-  }
-
-  @Override
-  public boolean atSetpoint() {
-    return Math.abs(elevatorMotorRight.getEncoder().getPosition() - lastReference.in(Meters))
-        < ElevatorConstants.kHeightTolerance.in(Meters);
   }
 }
