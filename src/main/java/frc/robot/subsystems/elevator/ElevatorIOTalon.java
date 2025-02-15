@@ -65,8 +65,10 @@ public class ElevatorIOTalon implements ElevatorIO {
         new TalonFXConfiguration()
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(ElevatorConstants.kCurrentLimit)
-                    .withStatorCurrentLimitEnable(true))
+                    .withStatorCurrentLimit(ElevatorConstants.kStatorLimit)
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(ElevatorConstants.kSupplyLimit)
+                    .withSupplyCurrentLimitEnable(true))
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withInverted(
@@ -83,8 +85,10 @@ public class ElevatorIOTalon implements ElevatorIO {
         new TalonFXConfiguration()
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(ElevatorConstants.kCurrentLimit)
-                    .withStatorCurrentLimitEnable(true))
+                    .withStatorCurrentLimit(ElevatorConstants.kStatorLimit)
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(ElevatorConstants.kStatorLimit)
+                    .withSupplyCurrentLimitEnable(true))
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withInverted(
@@ -99,11 +103,10 @@ public class ElevatorIOTalon implements ElevatorIO {
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(
-                        MetersPerSecond.of(0).in(MetersPerSecond)
-                            / ElevatorConstants.kElevatorConversion.in(Meters))
+                        convertMetersToRot(ElevatorConstants.kMaxVelocity.in(MetersPerSecond)))
                     .withMotionMagicAcceleration(
-                        MetersPerSecondPerSecond.of(120).in(MetersPerSecondPerSecond)
-                            / ElevatorConstants.kElevatorConversion.in(Meters)))
+                        convertMetersToRot(
+                            ElevatorConstants.kMaxAcceleration.in(MetersPerSecondPerSecond))))
             .withSlot0(
                 new Slot0Configs()
                     .withGravityType(GravityTypeValue.Elevator_Static)
@@ -116,24 +119,22 @@ public class ElevatorIOTalon implements ElevatorIO {
   // Sets power of motors w/voltage
   public void setVoltage(Voltage Volts) {
     elevatorMotorRight.setVoltage(Volts.in(Volt));
-    elevatorMotorLeft.setControl(new Follower(elevatorMotorRight.getDeviceID(), true));
+    elevatorMotorLeft.setControl(
+        new Follower(elevatorMotorRight.getDeviceID(), ElevatorConstants.kFollowerInverted));
   }
 
   @Override
   public void setPosition(Distance position) {
-    System.out.println(position.in(Meters) / ElevatorConstants.kElevatorConversion.in(Meters));
     elevatorMotorRight.setControl(
-        new MotionMagicExpoVoltage(
-            position.in(Meters) / ElevatorConstants.kElevatorConversion.in(Meters)));
-    elevatorMotorLeft.setControl(new Follower(elevatorMotorRight.getDeviceID(), true));
+        new MotionMagicExpoVoltage(convertMetersToRot(position.in(Meters))));
+    elevatorMotorLeft.setControl(
+        new Follower(elevatorMotorRight.getDeviceID(), ElevatorConstants.kFollowerInverted));
   }
 
   // Sets encoder pos
   public void setEncoderPosition(Distance position) {
-    elevatorMotorLeft.setPosition(
-        position.in(Meters) / ElevatorConstants.kElevatorConversion.in(Meters));
-    elevatorMotorRight.setPosition(
-        position.in(Meters) / ElevatorConstants.kElevatorConversion.in(Meters));
+    elevatorMotorLeft.setPosition(convertMetersToRot(position.in(Meters)));
+    elevatorMotorRight.setPosition(convertMetersToRot(position.in(Meters)));
   }
 
   // Special case where encoder pos is reset to the initial/starting height
@@ -153,9 +154,9 @@ public class ElevatorIOTalon implements ElevatorIO {
                 .withKD(conf.kD())
                 .withKS(conf.kS())
                 .withKG(conf.kG())
-                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
                 .withKV(conf.kV())
-                .withKA(conf.kA()));
+                .withKA(conf.kA())
+                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign));
   }
 
   @Override
@@ -163,5 +164,9 @@ public class ElevatorIOTalon implements ElevatorIO {
     return elevatorMotorRight.getClosedLoopError().getValueAsDouble()
             * ElevatorConstants.kElevatorConversion.in(Meters)
         < ElevatorConstants.kHeightTolerance.in(Meters);
+  }
+
+  public double convertMetersToRot(double meters) {
+    return meters / ElevatorConstants.kElevatorConversion.in(Meters);
   }
 }

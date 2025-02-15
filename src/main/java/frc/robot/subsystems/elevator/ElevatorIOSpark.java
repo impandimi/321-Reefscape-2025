@@ -58,7 +58,7 @@ public class ElevatorIOSpark implements ElevatorIO {
   private void setupMotors() {
     elevatorMotorRight.configure(
         new SparkMaxConfig()
-            .smartCurrentLimit(ElevatorConstants.kCurrentLimit)
+            .smartCurrentLimit(ElevatorConstants.kStatorLimit)
             .voltageCompensation(ElevatorConstants.kNominalVoltage.in(Volts))
             .idleMode(IdleMode.kBrake)
             .inverted(ElevatorConstants.kRightInverted)
@@ -70,7 +70,7 @@ public class ElevatorIOSpark implements ElevatorIO {
         PersistMode.kPersistParameters);
     elevatorMotorLeft.configure(
         new SparkMaxConfig()
-            .smartCurrentLimit(ElevatorConstants.kCurrentLimit)
+            .smartCurrentLimit(ElevatorConstants.kStatorLimit)
             .voltageCompensation(ElevatorConstants.kNominalVoltage.in(Volts))
             .idleMode(IdleMode.kBrake)
             .apply(
