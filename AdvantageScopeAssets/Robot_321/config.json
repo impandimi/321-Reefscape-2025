@@ -5,16 +5,16 @@
         {"axis" : "z", "degrees": 270},
         {"axis" : "y", "degrees": 0}
     ],
-    "position": [-0.156, 0.216, -0.105],
+    "position": [-0.216, 0.156, -0.105],
     "cameras": [
         {
             "name": "frontSwervePod",
             "rotations": [
-                {"axis" : "x", "degrees": 0},
-                {"axis" : "y", "degrees": -15},
-                {"axis" : "z", "degrees": 0}
+                {"axis" : "x", "degrees": -15},
+                {"axis" : "y", "degrees": 0},
+                {"axis" : "z", "degrees": 90}
             ],
-            "position": [-0.322326, 0.2290318, 0.1966722],
+            "position": [-0.2290318, 0.322326, 0.1966722],
             "resolution": [1280, 720],
             "fov":70
         },
@@ -22,15 +22,38 @@
         {
             "name": "backLeftSwervePod",
             "rotations": [
-                {"axis" : "x", "degrees": 0},
-                {"axis" : "y", "degrees": 15},
-                {"axis" : "z", "degrees": 135}
+                {"axis" : "x", "degrees": 15},
+                {"axis" : "y", "degrees": 0},
+                {"axis" : "z", "degrees": 225}
             ],
-            "position": [-0.2278126, 0.3010408, 0.1971802],
+            "position": [-0.2278126, -0.3010408, 0.1971802],
+            "resolution": [1280, 720],
+            "fov":70
+        },
+
+        {
+            "name": "topCamera",
+            "rotations": [
+                {"axis" : "x", "degrees": 48},
+                {"axis" : "y", "degrees": 0},
+                {"axis" : "z", "degrees": 7}
+            ],
+            "position": [0.2269236, 0.1643126, 0.2833116],
+            "resolution": [1280, 720],
+            "fov":70
+        },
+
+        {
+            "name": "bottomCamera",
+            "rotations": [
+                {"axis" : "x", "degrees": 10},
+                {"axis" : "y", "degrees": 0},
+                {"axis" : "z", "degrees": 18}
+            ],
+            "position": [0.2269236, -0.1643126, 0.2339594],
             "resolution": [1280, 720],
             "fov":70
         }
-    
     ],
     "components": [
         {
@@ -65,7 +88,6 @@
             ],
             "zeroedPosition": [-0.156, -0.1127, -0.32]
         }
-
 
     ]
 }
