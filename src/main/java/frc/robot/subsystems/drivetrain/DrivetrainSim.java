@@ -252,6 +252,7 @@ public class DrivetrainSim implements SwerveDrive {
   }
 
   @Logged(name = "ReefVisionEstimatedPose")
+  @Override
   public Pose2d getReefVisionPose() {
     return reefPoseEstimator.getEstimatedPosition();
   }
@@ -301,6 +302,8 @@ public class DrivetrainSim implements SwerveDrive {
     // update simulated drive and arena
     SimulatedArena.getInstance().simulationPeriodic();
     simulatedDrive.periodic();
+
+    reefPoseEstimator.update(getHeading(), getModulePositions());
 
     // send simulation data to dashboard for testing
     field2d.setRobotPose(simulatedDrive.getActualPoseInSimulationWorld());

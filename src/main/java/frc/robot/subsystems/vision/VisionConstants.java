@@ -102,12 +102,12 @@ public class VisionConstants {
 
   public static final CameraConfig kElevatorTopCameraConfig =
       new CameraConfig(
-          "Top Elevator Camera", CameraUsage.GENERAL, k321TopElevatorCameraMountTransform, kOV9281);
+          "Top Elevator Camera", CameraUsage.REEF, k321TopElevatorCameraMountTransform, kOV9281);
 
   public static final CameraConfig kElevatorBottomCameraConfig =
       new CameraConfig(
           "Bottom Elevator Camera",
-          CameraUsage.GENERAL,
+          CameraUsage.REEF,
           k321BottomElevatorCameraMountTransform,
           kOV9281);
 

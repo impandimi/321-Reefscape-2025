@@ -167,6 +167,8 @@ public interface SwerveDrive extends Subsystem {
 
   Pose2d getPose();
 
+  Pose2d getReefVisionPose();
+
   ChassisSpeeds getChassisSpeeds();
 
   Rotation2d getHeading();

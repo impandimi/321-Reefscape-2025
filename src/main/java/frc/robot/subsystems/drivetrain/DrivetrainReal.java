@@ -270,6 +270,7 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   }
 
   @Logged(name = "ReefVisionEstimatedPose")
+  @Override
   public Pose2d getReefVisionPose() {
     return reefPoseEstimator.getEstimatedPosition();
   }
@@ -296,5 +297,10 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   public void addReefVisionMeasurement(
       Pose2d visionRobotPose, double timeStampSeconds, Matrix<N3, N1> standardDeviations) {
     reefPoseEstimator.addVisionMeasurement(visionRobotPose, timeStampSeconds, standardDeviations);
+  }
+
+  @Override
+  public void periodic() {
+    reefPoseEstimator.update(getHeading(), getModulePositions());
   }
 }
