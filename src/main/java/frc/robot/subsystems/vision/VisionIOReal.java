@@ -9,16 +9,16 @@ import java.util.stream.Stream;
 
 @Logged
 public class VisionIOReal implements VisionIO {
-  private final List<CameraReal> cameras;
+  private final List<Camera> cameras;
 
   public VisionIOReal(CameraConfig... configs) {
-    cameras = Stream.of(configs).map(CameraReal::new).toList();
+    cameras = Stream.of(configs).map(Camera::new).toList();
   }
 
   @Override
   public VisionEstimate[] getLatestEstimates() {
     return cameras.stream()
-        .map(CameraReal::tryLatestEstimate)
+        .map(Camera::tryLatestEstimate)
         .filter(Objects::nonNull)
         .toArray(VisionEstimate[]::new);
   }

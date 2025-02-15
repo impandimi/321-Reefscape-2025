@@ -22,7 +22,10 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 @Logged
 public class CameraSim {
-  private final CameraType type;
+  // for logging
+  private final String name;
+
+  private final CameraUsage usage;
 
   @NotLogged private final PhotonCameraSim camera;
 
@@ -35,9 +38,15 @@ public class CameraSim {
 
   public CameraSim(
       CameraConfig config, PhotonCameraSim camera, Supplier<Pose2d> robotPoseSupplier) {
-    this.type = config.type();
+    this.name = config.cameraName();
+
+    this.usage = config.usage();
 
     this.camera = camera;
+
+    camera.enableRawStream(true);
+    camera.enableProcessedStream(true);
+    camera.enableDrawWireframe(true);
 
     this.poseEstimator =
         new PhotonPoseEstimator(
@@ -62,7 +71,7 @@ public class CameraSim {
         .map(
             photonEst -> {
               final var visionEst =
-                  new VisionEstimate(photonEst, calculateStdDevs(latestResult), type);
+                  new VisionEstimate(photonEst, calculateStdDevs(latestResult), name, usage);
               latestValidEstimate = visionEst;
               return visionEst;
             })

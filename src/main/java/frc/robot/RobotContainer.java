@@ -25,6 +25,7 @@ import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.drivetrain.DrivetrainConstants;
+import frc.robot.subsystems.drivetrain.DrivetrainSim;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
@@ -50,7 +51,10 @@ public class RobotContainer {
 
   private Vision vision =
       Vision.create(
-          drivetrain::getPose,
+          // Java 21 pattern matching switch would be nice
+          (drivetrain instanceof DrivetrainSim)
+              ? ((DrivetrainSim) drivetrain)::getActualPose
+              : drivetrain::getPose,
           visionEst ->
               drivetrain.addVisionMeasurement(
                   visionEst.estimate().estimatedPose.toPose2d(),

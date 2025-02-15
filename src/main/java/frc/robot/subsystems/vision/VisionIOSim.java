@@ -36,7 +36,7 @@ public class VisionIOSim implements VisionIO {
                 config -> {
                   final var cameraSim =
                       new PhotonCameraSim(
-                          new PhotonCamera(config.cameraName()), config.simProperties());
+                          new PhotonCamera(config.cameraName()), config.calib().simProperties());
                   sim.addCamera(cameraSim, config.robotToCamera());
                   return new CameraSim(config, cameraSim, robotPoseSupplier);
                 })

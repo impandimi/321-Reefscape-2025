@@ -4,7 +4,7 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.epilogue.Logged;
 
 @Logged
-public enum CameraType {
+public enum CameraUsage {
   REEF,
   GENERAL
 }

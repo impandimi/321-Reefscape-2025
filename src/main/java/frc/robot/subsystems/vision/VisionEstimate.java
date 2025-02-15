@@ -12,4 +12,7 @@ import org.photonvision.EstimatedRobotPose;
  * this may be a WPILib bug
  */
 public record VisionEstimate(
-    EstimatedRobotPose estimate, Matrix<N3, N1> stdDevs, CameraType sourceType) {}
+    EstimatedRobotPose estimate,
+    Matrix<N3, N1> stdDevs,
+    String sourceName,
+    CameraUsage sourceType) {}

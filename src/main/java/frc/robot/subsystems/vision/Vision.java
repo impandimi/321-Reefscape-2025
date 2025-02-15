@@ -20,9 +20,12 @@ public class Vision extends VirtualSubsystem {
       Consumer<VisionEstimate> visionDataConsumer,
       Consumer<VisionEstimate> reefVisionDataConsumer) {
     return RobotBase.isReal()
-        ? new Vision(new VisionIOReal(), visionDataConsumer, reefVisionDataConsumer)
+        ? new Vision(
+            new VisionIOReal(VisionConstants.kCameraConfigs),
+            visionDataConsumer,
+            reefVisionDataConsumer)
         : new Vision(
-            new VisionIOSim(robotPoseSupplier, VisionConstants.kUSBCameraConfig),
+            new VisionIOSim(robotPoseSupplier, VisionConstants.kCameraConfigs),
             visionDataConsumer,
             reefVisionDataConsumer);
   }
@@ -43,7 +46,7 @@ public class Vision extends VirtualSubsystem {
     for (final var est : latestEstimates) {
       visionDataConsumer.accept(est);
 
-      if (est.sourceType() == CameraType.REEF) {
+      if (est.sourceType() == CameraUsage.REEF) {
         reefVisionDataConsumer.accept(est);
       }
     }

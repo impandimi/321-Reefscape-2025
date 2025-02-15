@@ -13,14 +13,11 @@ import edu.wpi.first.units.measure.Time;
 import org.photonvision.simulation.SimCameraProperties;
 
 public class VisionConstants {
-  public static final double kTranslationStdDevCoeff = 1.0;
-  public static final double kRotationStdDevCoeff = 1.0;
+  // TODO: tune more thoroughly
+  public static final double kTranslationStdDevCoeff = 5e-3;
+  public static final double kRotationStdDevCoeff = 5e-3;
 
-  public static record CameraConfig(
-      String cameraName,
-      CameraType type,
-      Transform3d robotToCamera,
-      // sim properties
+  public static record CameraCalibration(
       int resolutionWidth,
       int resolutionHeight,
       Rotation2d fovDiag,
@@ -46,6 +43,24 @@ public class VisionConstants {
     }
   }
 
+  public static final CameraCalibration kOV9281 =
+      new CameraCalibration(
+          1280,
+          720,
+          Rotation2d.fromDegrees(70),
+          // TODO: find actual values for this from calibration in Photon Client
+          // calibration file does not show these values and config.json mentioned in docs appears
+          // inaccessible
+          0.1,
+          0.01,
+          Seconds.of(0.5),
+          30,
+          Seconds.of(0.5),
+          Seconds.of(0.5));
+
+  public static record CameraConfig(
+      String cameraName, CameraUsage usage, Transform3d robotToCamera, CameraCalibration calib) {}
+
   private static final Transform3d k427CameraMountTransform =
       new Transform3d(
           Meters.of(-0.27),
@@ -54,20 +69,7 @@ public class VisionConstants {
           new Rotation3d(Degrees.zero(), Degrees.of(30), Degrees.of(180)));
 
   public static final CameraConfig kUSBCameraConfig =
-      new CameraConfig(
-          "USB_Camera",
-          CameraType.GENERAL,
-          k427CameraMountTransform,
-          1280,
-          720,
-          Rotation2d.fromDegrees(70),
-          // TODO: find actual values for this from calibration in Photon Client
-          // calibration file does not show these values and config.json mentioned in docs appears
-          // inaccessible
-          0,
-          0,
-          Seconds.zero(),
-          30,
-          Seconds.zero(),
-          Seconds.zero());
+      new CameraConfig("USB_Camera", CameraUsage.GENERAL, Transform3d.kZero, kOV9281);
+
+  public static final CameraConfig[] kCameraConfigs = {kUSBCameraConfig};
 }

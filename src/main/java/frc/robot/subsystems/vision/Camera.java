@@ -16,8 +16,11 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 @Logged
-public class CameraReal {
-  private final CameraType type;
+public class Camera {
+  // for logging
+  private final String name;
+
+  private final CameraUsage usage;
 
   private final PhotonCamera camera;
 
@@ -26,8 +29,10 @@ public class CameraReal {
   // for logging
   private VisionEstimate latestValidEstimate;
 
-  public CameraReal(CameraConfig config) {
-    this.type = config.type();
+  public Camera(CameraConfig config) {
+    this.name = config.cameraName();
+
+    this.usage = config.usage();
 
     this.camera = new PhotonCamera(config.cameraName());
 
@@ -56,7 +61,7 @@ public class CameraReal {
         .map(
             photonEst -> {
               final var visionEst =
-                  new VisionEstimate(photonEst, calculateStdDevs(latestResult), type);
+                  new VisionEstimate(photonEst, calculateStdDevs(latestResult), name, usage);
               latestValidEstimate = visionEst;
               return visionEst;
             })
