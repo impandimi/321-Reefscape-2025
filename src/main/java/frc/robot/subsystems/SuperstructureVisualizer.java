@@ -75,10 +75,10 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                 4.0,
                 new Color8Bit(Color.kFirstRed)));
 
-    final double pitch =
-        algaePivotSetpoint.get() == null ? 0 : algaePivotSetpoint.get().in(Radians);
-
-    this.algaeIntakePose = new Pose3d(VisualizerConstants.algaeRoot3d, new Rotation3d(0, pitch, 0));
+    this.algaeIntakePose =
+        new Pose3d(
+            VisualizerConstants.algaeRoot3d,
+            new Rotation3d(0, AlgaeIntakePivotConstants.kPivotStartingAngle.in(Radians), 0));
   }
 
   public void update() {

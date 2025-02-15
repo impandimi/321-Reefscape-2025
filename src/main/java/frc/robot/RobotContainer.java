@@ -51,9 +51,16 @@ public class RobotContainer {
   private Vision vision =
       Vision.create(
           drivetrain::getPose,
-          (estimate, stdDevs) ->
+          visionEst ->
               drivetrain.addVisionMeasurement(
-                  estimate.estimatedPose.toPose2d(), estimate.timestampSeconds, stdDevs));
+                  visionEst.estimate().estimatedPose.toPose2d(),
+                  visionEst.estimate().timestampSeconds,
+                  visionEst.stdDevs()),
+          reefVisionEst ->
+              drivetrain.addReefVisionMeasurement(
+                  reefVisionEst.estimate().estimatedPose.toPose2d(),
+                  reefVisionEst.estimate().timestampSeconds,
+                  reefVisionEst.stdDevs()));
 
   private CommandXboxController driver = new CommandXboxController(0);
   private XboxController manipulator = new XboxController(1);

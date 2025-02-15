@@ -4,6 +4,7 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.epilogue.Logged;
 
 @Logged
-public interface VisionIO {
-  VisionEstimate[] getLatestEstimates();
+public enum CameraType {
+  REEF,
+  GENERAL
 }
