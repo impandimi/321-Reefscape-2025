@@ -10,6 +10,7 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -40,6 +41,8 @@ public class DrivetrainSim implements SwerveDrive {
   private final Field2d field2d;
   final DriveTrainSimulationConfig simConfig;
   PIDController headingController;
+
+  private final SwerveDrivePoseEstimator reefPoseEstimator;
 
   public DrivetrainSim() {
     this.simConfig =
@@ -77,6 +80,10 @@ public class DrivetrainSim implements SwerveDrive {
     // A field2d widget for debugging
     field2d = new Field2d();
     SmartDashboard.putData("simulation field", field2d);
+
+    this.reefPoseEstimator =
+        new SwerveDrivePoseEstimator(
+            simulatedDrive.getKinematics(), getHeading(), getModulePositions(), getPose());
 
     configureAutoBuilder();
     configurePoseControllers();
@@ -244,6 +251,12 @@ public class DrivetrainSim implements SwerveDrive {
     return simulatedDrive.getSetPointsOptimized();
   }
 
+  @Logged(name = "ReefVisionEstimatedPose")
+  @Override
+  public Pose2d getReefVisionPose() {
+    return reefPoseEstimator.getEstimatedPosition();
+  }
+
   @Logged(name = "MeasuredRobotPose")
   @Override
   public Pose2d getPose() {
@@ -279,10 +292,18 @@ public class DrivetrainSim implements SwerveDrive {
   }
 
   @Override
+  public void addReefVisionMeasurement(
+      Pose2d visionRobotPose, double timeStampSeconds, Matrix<N3, N1> standardDeviations) {
+    reefPoseEstimator.addVisionMeasurement(visionRobotPose, timeStampSeconds, standardDeviations);
+  }
+
+  @Override
   public void periodic() {
     // update simulated drive and arena
     SimulatedArena.getInstance().simulationPeriodic();
     simulatedDrive.periodic();
+
+    reefPoseEstimator.update(getHeading(), getModulePositions());
 
     // send simulation data to dashboard for testing
     field2d.setRobotPose(simulatedDrive.getActualPoseInSimulationWorld());

@@ -33,6 +33,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    /*
+     * TODO: note that VirtualSubsystem periodics must run after Subsystem periodics
+     * since inputs need to be defined before SuperstructureVisualizer references them
+     */
     VirtualSubsystem.periodicAll();
   }
 
