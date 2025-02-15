@@ -6,13 +6,17 @@ import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.photonvision.PhotonCamera;
 
 @Logged
 public class VisionIOReal implements VisionIO {
   private final List<Camera> cameras;
 
   public VisionIOReal(CameraConfig... configs) {
-    cameras = Stream.of(configs).map(Camera::new).toList();
+    cameras =
+        Stream.of(configs)
+            .map(config -> new Camera(config, new PhotonCamera(config.cameraName())))
+            .toList();
   }
 
   @Override

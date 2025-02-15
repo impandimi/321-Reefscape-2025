@@ -20,7 +20,7 @@ import org.photonvision.simulation.VisionTargetSim;
 public class VisionIOSim implements VisionIO {
   @NotLogged private final VisionSystemSim sim;
 
-  private final List<CameraSim> cameras;
+  private final List<Camera> cameras;
 
   private final Supplier<Pose2d> robotPoseSupplier;
 
@@ -34,11 +34,10 @@ public class VisionIOSim implements VisionIO {
         Stream.of(configs)
             .map(
                 config -> {
-                  final var cameraSim =
-                      new PhotonCameraSim(
-                          new PhotonCamera(config.cameraName()), config.calib().simProperties());
+                  final var camera = new PhotonCamera(config.cameraName());
+                  final var cameraSim = new PhotonCameraSim(camera, config.calib().simProperties());
                   sim.addCamera(cameraSim, config.robotToCamera());
-                  return new CameraSim(config, cameraSim, robotPoseSupplier);
+                  return new Camera(config, camera);
                 })
             .toList();
 
@@ -52,7 +51,7 @@ public class VisionIOSim implements VisionIO {
     sim.update(robotPoseSupplier.get());
 
     return cameras.stream()
-        .map(camera -> camera.tryLatestEstimate(targets))
+        .map(Camera::tryLatestEstimate)
         .filter(Objects::nonNull)
         .toArray(VisionEstimate[]::new);
   }

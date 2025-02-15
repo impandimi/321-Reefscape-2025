@@ -29,12 +29,12 @@ public class Camera {
   // for logging
   private VisionEstimate latestValidEstimate;
 
-  public Camera(CameraConfig config) {
+  public Camera(CameraConfig config, PhotonCamera camera) {
     this.name = config.cameraName();
 
     this.usage = config.usage();
 
-    this.camera = new PhotonCamera(config.cameraName());
+    this.camera = camera;
 
     this.poseEstimator =
         new PhotonPoseEstimator(

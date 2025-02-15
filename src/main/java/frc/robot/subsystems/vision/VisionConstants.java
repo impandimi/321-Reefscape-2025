@@ -14,8 +14,8 @@ import org.photonvision.simulation.SimCameraProperties;
 
 public class VisionConstants {
   // TODO: tune more thoroughly
-  public static final double kTranslationStdDevCoeff = 5e-3;
-  public static final double kRotationStdDevCoeff = 5e-3;
+  public static final double kTranslationStdDevCoeff = 5e-2;
+  public static final double kRotationStdDevCoeff = 5e-2;
 
   public static record CameraCalibration(
       int resolutionWidth,
@@ -50,13 +50,13 @@ public class VisionConstants {
           Rotation2d.fromDegrees(70),
           // TODO: find actual values for this from calibration in Photon Client
           // calibration file does not show these values and config.json mentioned in docs appears
-          // inaccessible
-          0.1,
-          0.01,
-          Seconds.of(0.5),
+          // inaccessibles
+          0.25,
+          0.08,
+          Seconds.zero(),
           30,
-          Seconds.of(0.5),
-          Seconds.of(0.5));
+          Milliseconds.of(35),
+          Milliseconds.of(5));
 
   public static record CameraConfig(
       String cameraName, CameraUsage usage, Transform3d robotToCamera, CameraCalibration calib) {}
@@ -68,8 +68,67 @@ public class VisionConstants {
           Meters.zero(),
           new Rotation3d(Degrees.zero(), Degrees.of(30), Degrees.of(180)));
 
-  public static final CameraConfig kUSBCameraConfig =
-      new CameraConfig("USB_Camera", CameraUsage.GENERAL, Transform3d.kZero, kOV9281);
+  private static final Transform3d k321TopElevatorCameraMountTransform =
+      new Transform3d(
+          Meters.of(0.2269236),
+          Meters.of(-0.1643126),
+          Meters.of(0.2339594),
+          new Rotation3d(Degrees.zero(), Degrees.of(-7), Degrees.of(48)));
 
-  public static final CameraConfig[] kCameraConfigs = {kUSBCameraConfig};
+  private static final Transform3d k321BottomElevatorCameraMountTransform =
+      new Transform3d(
+          Meters.of(0.2269236),
+          Meters.of(-0.1643126),
+          Meters.of(0.2339594),
+          new Rotation3d(Degrees.zero(), Degrees.of(-18), Degrees.of(-10)));
+
+  private static final Transform3d k321FrontSwerveModuleCameraMountTransform =
+      new Transform3d(
+          Meters.of(-0.2290318),
+          Meters.of(0.322326),
+          Meters.of(0.1966722),
+          new Rotation3d(Degrees.zero(), Degrees.of(-15), Degrees.of(90)));
+  // new Transform3d(Meters.of(0.322326), Meters.of(0.2290318), Meters.of(0.1966722), new
+  // Rotation3d(Degrees.zero(), Degrees.of(-15), Degrees.zero()));
+
+  private static final Transform3d k321BackLeftSwerveModuleCameraMountTransform =
+      new Transform3d(
+          Meters.of(-0.3010408),
+          Meters.of(-0.2278126),
+          Meters.of(0.1971802),
+          new Rotation3d(Degrees.zero(), Degrees.of(-15), Degrees.of(135)));
+  //  new Transform3d(Meters.of(-0.2278126), Meters.of(0.3010408), Meters.of(0.1971802), new
+  // Rotation3d(Degrees.zero(), Degrees.of(-15), Degrees.of(135)));
+
+  public static final CameraConfig kElevatorTopCameraConfig =
+      new CameraConfig(
+          "Top Elevator Camera", CameraUsage.GENERAL, k321TopElevatorCameraMountTransform, kOV9281);
+
+  public static final CameraConfig kElevatorBottomCameraConfig =
+      new CameraConfig(
+          "Bottom Elevator Camera",
+          CameraUsage.GENERAL,
+          k321BottomElevatorCameraMountTransform,
+          kOV9281);
+
+  public static final CameraConfig kFrontSwerveCameraConfig =
+      new CameraConfig(
+          "Front Swerve Module Camera",
+          CameraUsage.GENERAL,
+          k321FrontSwerveModuleCameraMountTransform,
+          kOV9281);
+
+  public static final CameraConfig kBackLeftSwerveCameraConfig =
+      new CameraConfig(
+          "Back Left Swerve Module Camera",
+          CameraUsage.GENERAL,
+          k321BackLeftSwerveModuleCameraMountTransform,
+          kOV9281);
+
+  public static final CameraConfig[] kCameraConfigs = {
+    kElevatorTopCameraConfig,
+    kElevatorBottomCameraConfig,
+    kFrontSwerveCameraConfig,
+    kBackLeftSwerveCameraConfig
+  };
 }
