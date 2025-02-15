@@ -3,23 +3,30 @@ package frc.robot.auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.units.ForceUnit;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CoralSuperstructure;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.json.simple.parser.ParseException;
 
 public class AutomaticAutonomousMaker3000 {
 
   private CycleAutoChooser autoChooser = new CycleAutoChooser(3);
 
-  Field2d field = new Field2d();
+  private Field2d field = new Field2d();
+  private String pathError = "";
+  private List<Pose2d> visualizePath = new ArrayList<>();
 
   private CoralSuperstructure coralSuperstructure;
 
@@ -27,30 +34,57 @@ public class AutomaticAutonomousMaker3000 {
 
   public AutomaticAutonomousMaker3000(CoralSuperstructure coralSuperstructure) {
     this.coralSuperstructure = coralSuperstructure;
-
+    
+    SmartDashboard.putData("VisionField", field);
+    // Driver has to click submit to make and view the autonomous path
     SmartDashboard.putData("Submit", Commands.runOnce(() -> {
-        storedAuto = buildAuto(autoChooser.build()).getAuto();
-    }));
+
+      var createdAuto = buildAuto(autoChooser.build());
+      if(createdAuto != null){
+        storedAuto = createdAuto.getAuto();
+        visualizeAuto(createdAuto.getPaths());
+      }
+      // Clears the simulated field path 
+      else {
+        visualizePath.clear();
+        UpdateFieldVisualization();
+      }
+      UpdatePathError();
+      
+    }).ignoringDisable(true).withName("Submit Auto"));
+
+    UpdatePathError();
+  }
+
+  private void UpdateFieldVisualization() {
+    field.getObject("PathPoses").setPoses(visualizePath);
+  }
+
+  private void UpdatePathError() {
+    SmartDashboard.putString("Path Error", pathError);
   }
 
   public Command getStoredAuto() {
     return storedAuto;
   }
+
   private void visualizeAuto(List<PathPlannerPath> paths) {
-    List<Pose2d> visualizePath = new ArrayList<>();
+    visualizePath.clear();
+
+    System.out.println(paths);
 
     for (int i = 0; i < paths.size(); i++) {
         visualizePath.addAll(paths.get(i).getPathPoses()); 
     }
 
-    SmartDashboard.putData("Field", field);
-
-    field.getObject("PathPoses").setPoses(visualizePath);
+    UpdateFieldVisualization();
   }
 
-  public PathAndAuto buildAuto(CycleAutoConfig config) {
-
-    Command auto = Commands.none();
+  //Returns the path list for visualization and autonomous command
+  public PathsAndAuto buildAuto(CycleAutoConfig config) {
+    pathError = "";
+    try {
+      Command auto = Commands.none();
     List<PathPlannerPath> paths = new ArrayList<>();
 
     ReefSide lastReefSide = config.scoringGroup.get(0).reefSide;
@@ -88,19 +122,20 @@ public class AutomaticAutonomousMaker3000 {
         paths.add(scorePath);
       }
     }
-    return new PathAndAuto(auto, paths);
+    return new PathsAndAuto(auto, paths);
+    } catch (Exception e) {
+    pathError = "Path doesn't exist";
+    }
+    return null;
   }
 
   public Command withIntaking(Command path) {
-    // TODO: add intaking logic
-    return path;
-    // return path.alongWith(coralendeffector.intakeCoral()).until(coralendeffector::hasCoral);
+    return path.alongWith(coralSuperstructure.feedCoral()).until(() -> coralSuperstructure.hasCoral());
   }
 
   public Command withScoring(Command path) {
-    // TODO: add scoring logic
+    // TODO: add scoring logic. Ignore for now as we don't have the code
     return path;
-    // return path.andThen(coralSuperstructure.outtakeCoral());
   }
 
   private Command toPathCommand(PathPlannerPath path) {
@@ -108,14 +143,9 @@ public class AutomaticAutonomousMaker3000 {
     return AutoBuilder.followPath(path);
   }
 
-  private PathPlannerPath getPath(String pathName) {
-    try {
+  private PathPlannerPath getPath(String pathName) throws FileVersionException, IOException, ParseException {
       // Load the path you want to follow using its name in the GUI
       return PathPlannerPath.fromPathFile(pathName);
-    } catch (Exception e) {
-      DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-      return null;
-    }
   }
 
   enum StartingPosition {
@@ -173,7 +203,7 @@ public class AutomaticAutonomousMaker3000 {
   }
 
   public static class ScoringGroupChooser {
-    // add sendable choosers
+    // Adds sendable choosers
     private SendableChooser<ReefSide> reefSide = new SendableChooser<>();
     private SendableChooser<Level> level = new SendableChooser<>();
     private SendableChooser<Pole> pole = new SendableChooser<>();
@@ -211,24 +241,17 @@ public class AutomaticAutonomousMaker3000 {
     public ScoringGroup build() {
       return new ScoringGroup(
           feedLocation.getSelected(),
-          pole.getSelected(),
-          reefSide.getSelected(),
-          level.getSelected());
+          reefSide.getSelected());
     }
   }
 
   public static class ScoringGroup {
     private FeedLocation feedLocation;
-    private Pole pole;
     private ReefSide reefSide;
-    private Level level;
-    private StartingPosition startingPosition;
 
-    public ScoringGroup(FeedLocation feedLocation, Pole pole, ReefSide reefSide, Level level) {
+    public ScoringGroup(FeedLocation feedLocation, ReefSide reefSide) {
       this.feedLocation = feedLocation;
-      this.pole = pole;
       this.reefSide = reefSide;
-      this.level = level;
     }
   }
 
@@ -263,21 +286,21 @@ public class AutomaticAutonomousMaker3000 {
     }
   }
 
-  public class PathAndAuto {
+  public class PathsAndAuto {
     Command auto;
-    List<PathPlannerPath> path;
+    List<PathPlannerPath> paths;
 
-    public PathAndAuto(Command auto, List<PathPlannerPath> path) {
+    public PathsAndAuto(Command auto, List<PathPlannerPath> paths) {
         this.auto = auto;
-        this.path = path;
+        this.paths = paths;
     }
 
     public Command getAuto() {
         return auto;
     }
 
-    public List<PathPlannerPath> getPath() {
-        return path;
+    public List<PathPlannerPath> getPaths() {
+        return paths;
     }
   }
 }
