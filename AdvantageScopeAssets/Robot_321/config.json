@@ -2,10 +2,10 @@
     "name": "321Robot",
     "rotations": [
         {"axis" : "x", "degrees": 90},
-        {"axis" : "z", "degrees": 180},
+        {"axis" : "z", "degrees": 270},
         {"axis" : "y", "degrees": 0}
     ],
-    "position": [0.216, 0.156, -0.105],
+    "position": [-0.156, 0.216, -0.105],
     "cameras": [
         {
             "name": "frontSwervePod",
@@ -14,7 +14,7 @@
                 {"axis" : "y", "degrees": -15},
                 {"axis" : "z", "degrees": 0}
             ],
-            "position": [0.2290318, 0.322326, 0.1966722],
+            "position": [-0.322326, 0.2290318, 0.1966722],
             "resolution": [1280, 720],
             "fov":70
         },
@@ -36,34 +36,34 @@
         {
             "zeroedRotations": [
                 {"axis" : "x", "degrees": 90},
-                {"axis" : "z", "degrees": 180},
+                {"axis" : "z", "degrees": 270},
                 {"axis" : "y", "degrees": 0}
             ],
-            "zeroedPosition": [0.215, 0.156, -0.110]
+            "zeroedPosition": [-0.156, 0.215, -0.110]
         },
         {
             "zeroedRotations": [
                 {"axis" : "x", "degrees": 90},
-                {"axis" : "z", "degrees": 180},
+                {"axis" : "z", "degrees": 270},
                 {"axis" : "y", "degrees": 0}
             ],
-            "zeroedPosition": [0.215, 0.156, -0.104]
+            "zeroedPosition": [-0.156, 0.215, -0.104]
         },
         {
             "zeroedRotations": [
                 {"axis" : "x", "degrees": 90},
-                {"axis" : "z", "degrees": 180},
+                {"axis" : "z", "degrees": 270},
                 {"axis" : "y", "degrees": 0}
             ],
-            "zeroedPosition": [0.31, 0.23, -0.97]
+            "zeroedPosition": [-0.23, 0.31, -0.97]
         },
         {
             "zeroedRotations": [
                 {"axis" : "x", "degrees": 90},
-                {"axis" : "z", "degrees": 180},
+                {"axis" : "z", "degrees": 270},
                 {"axis" : "y", "degrees": 0}
             ],
-            "zeroedPosition": [-0.1127, 0.156, -0.32]
+            "zeroedPosition": [-0.156, -0.1127, -0.32]
         }
 
 
