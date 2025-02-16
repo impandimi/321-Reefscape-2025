@@ -32,17 +32,17 @@ public class ProcessorAlign {
   private static final Transform2d kProcessorAlignTransform =
       new Transform2d(kProcessorDistance, Meter.zero(), kProcessorAlignmentRotation);
 
-  private static final int blueProcessorTagID = 16;
-  private static final int redProcessorTagID = 3;
+  private static final int kBlueProcessorTagID = 16;
+  private static final int kRedProcessorTagID = 3;
 
   // TODO: use units
   public static final Pose2d kBlueProcessorPose = new Pose2d(5.983, 0.395, Rotation2d.kZero);
   public static final Pose2d kRedProcessorPose = new Pose2d(11.437, 7.675, Rotation2d.kZero);
 
-  private static final Pose2d blueProcessorTag =
-      RobotConstants.kAprilTagFieldLayout.getTagPose(blueProcessorTagID).get().toPose2d();
-  private static final Pose2d redProcessorTag =
-      RobotConstants.kAprilTagFieldLayout.getTagPose(redProcessorTagID).get().toPose2d();
+  private static final Pose2d kBlueProcessorTag =
+      RobotConstants.kAprilTagFieldLayout.getTagPose(kBlueProcessorTagID).get().toPose2d();
+  private static final Pose2d kRedProcessorTag =
+      RobotConstants.kAprilTagFieldLayout.getTagPose(kRedProcessorTagID).get().toPose2d();
 
   public static final Distance kAlignmentDeadbandRange = Meters.of(0.75);
 
@@ -51,8 +51,8 @@ public class ProcessorAlign {
    * processor poses are loaded
    */
   public static void loadProcessorAlignmentPoses() {
-    int processorTagId = MyAlliance.isRed() ? redProcessorTagID : blueProcessorTagID;
-    processorPoses.computeIfAbsent(processorTagId, ProcessorAlign::getNearestAlign);
+    processorPoses.computeIfAbsent(kBlueProcessorTagID, ProcessorAlign::getNearestAlign);
+    processorPoses.computeIfAbsent(kRedProcessorTagID, ProcessorAlign::getNearestAlign);
   }
 
   /**
@@ -68,7 +68,7 @@ public class ProcessorAlign {
     if (alliance.isEmpty()) return null;
 
     List<Pose2d> processorTag =
-        List.of(alliance.get().equals(Alliance.Red) ? redProcessorTag : blueProcessorTag);
+        List.of(alliance.get().equals(Alliance.Red) ? kRedProcessorTag : kBlueProcessorTag);
 
     return robotPose.nearest(processorTag);
   }
@@ -116,7 +116,7 @@ public class ProcessorAlign {
   public static Command goToNearestAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
         () -> {
-          final var target = processorPoses.get(getNearestProcessorID(swerveDrive.getPose()));
+          final Pose2d target = processorPoses.get(getNearestProcessorID(swerveDrive.getPose()));
           swerveDrive.setAlignmentSetpoint(target);
           return target;
         });

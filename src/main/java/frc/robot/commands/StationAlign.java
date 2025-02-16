@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotConstants;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
-import frc.robot.util.MyAlliance;
+import frc.robot.util.AprilTagUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,26 +31,23 @@ public class StationAlign {
   private static final Transform2d kStationAlignTransform =
       new Transform2d(kStationDistance, Meter.zero(), kStationAlignmentRotation);
 
-  private static final int[] blueStationTagIDs = {12, 13};
-  private static final int[] redStationTagIDs = {1, 2};
+  private static final List<Integer> blueStationTagIDs = List.of(12, 13);
+  private static final List<Integer> redStationTagIDs = List.of(1, 2);
 
-  private static final Pose2d[] blueStationTags = {
-    RobotConstants.kAprilTagFieldLayout.getTagPose(blueStationTagIDs[0]).get().toPose2d(),
-    RobotConstants.kAprilTagFieldLayout.getTagPose(blueStationTagIDs[1]).get().toPose2d()
-  };
-  private static final Pose2d[] redStationTags = {
-    RobotConstants.kAprilTagFieldLayout.getTagPose(redStationTagIDs[0]).get().toPose2d(),
-    RobotConstants.kAprilTagFieldLayout.getTagPose(redStationTagIDs[1]).get().toPose2d()
-  };
+  private static final List<Pose2d> blueStationTags = AprilTagUtil.tagIDsToPoses(blueStationTagIDs);
+  private static final List<Pose2d> redStationTags = AprilTagUtil.tagIDsToPoses(redStationTagIDs);
 
   /**
    * This method is run when DriverStation connects to save computations mid-match, only the station
    * poses are loaded
    */
   public static void loadStationAlignmentPoses() {
-    int[] stationTagIds = MyAlliance.isRed() ? redStationTagIDs : blueStationTagIDs;
-    for (int id : stationTagIds) {
-      stationPoses.computeIfAbsent(id, StationAlign::getNearestCenterAlign);
+    for (int i = 0; i < blueStationTagIDs.size(); i++) {
+      int blueStationID = blueStationTagIDs.get(i);
+      int redStationID = redStationTagIDs.get(i);
+
+      stationPoses.computeIfAbsent(blueStationID, StationAlign::getNearestCenterAlign);
+      stationPoses.computeIfAbsent(redStationID, StationAlign::getNearestCenterAlign);
     }
   }
 
@@ -67,7 +64,7 @@ public class StationAlign {
     if (alliance.isEmpty()) return null;
 
     List<Pose2d> stationTagPoses =
-        List.of(alliance.get().equals(Alliance.Red) ? redStationTags : blueStationTags);
+        alliance.get().equals(Alliance.Red) ? redStationTags : blueStationTags;
 
     return robotPose.nearest(stationTagPoses);
   }
@@ -115,7 +112,7 @@ public class StationAlign {
   public static Command goToNearestCenterAlign(SwerveDrive swerveDrive) {
     return swerveDrive.driveToFieldPose(
         () -> {
-          final var target = stationPoses.get(getNearestStationID(swerveDrive.getPose()));
+          final Pose2d target = stationPoses.get(getNearestStationID(swerveDrive.getPose()));
           swerveDrive.setAlignmentSetpoint(target);
           return target;
         });
