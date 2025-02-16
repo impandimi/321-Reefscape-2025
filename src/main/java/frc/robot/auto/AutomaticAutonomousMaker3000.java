@@ -25,11 +25,44 @@ import org.json.simple.parser.ParseException;
 @Logged
 public class AutomaticAutonomousMaker3000 {
 
-  private CycleAutoChooser autoChooser = new CycleAutoChooser(3);
+  private CycleAutoChooser autoChooser = new CycleAutoChooser(5);
 
   private Field2d field = new Field2d();
   private String pathError = "";
   private List<Pose2d> visualizePath = new ArrayList<>();
+  private SendableChooser<PreBuiltAuto> preBuiltAuto = new SendableChooser<>();
+
+  private static CycleAutoConfig kTopLaneAuto =
+      new CycleAutoConfig(
+          StartingPosition.TOP,
+          List.of(
+              new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFR1, Pole.RIGHTPOLE, Level.L1),
+              new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4),
+              new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.RIGHTPOLE, Level.L4)));
+
+  private static CycleAutoConfig kMidLaneTopAuto =
+      new CycleAutoConfig(
+          StartingPosition.MIDDLE,
+          List.of(
+              new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFR2, Pole.RIGHTPOLE, Level.L1),
+              new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4),
+              new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4)));
+
+  private static CycleAutoConfig kMidLaneBotAuto =
+      new CycleAutoConfig(
+          StartingPosition.MIDDLE,
+          List.of(
+              new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFR2, Pole.LEFTPOLE, Level.L1),
+              new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.LEFTPOLE, Level.L4),
+              new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.RIGHTPOLE, Level.L4)));
+
+  private static CycleAutoConfig kBotLaneAuto =
+      new CycleAutoConfig(
+          StartingPosition.BOTTOM,
+          List.of(
+              new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFR3, Pole.LEFTPOLE, Level.L1),
+              new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.LEFTPOLE, Level.L4),
+              new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.RIGHTPOLE, Level.L4)));
 
   private SwerveDrive drive;
   private CoralSuperstructure coralSuperstructure;
@@ -40,16 +73,36 @@ public class AutomaticAutonomousMaker3000 {
     this.drive = drive;
     this.coralSuperstructure = coralSuperstructure;
 
-    SmartDashboard.putData("VisionField", field);
+    preBuiltAuto.setDefaultOption("No Choice", PreBuiltAuto.CUSTOM);
+    preBuiltAuto.addOption("TopAuto", PreBuiltAuto.TOPAUTO);
+    preBuiltAuto.addOption("MidTopAuto", PreBuiltAuto.MIDTOPAUTO);
+    preBuiltAuto.addOption("MidBotAuto", PreBuiltAuto.MIDBOTAUTO);
+    preBuiltAuto.addOption("BotAuto", PreBuiltAuto.BOTAUTO);
+    preBuiltAuto.addOption("Custom Auto", PreBuiltAuto.CUSTOM);
+
+    SmartDashboard.putData("Autos/PreBuiltAuto", preBuiltAuto);
+    SmartDashboard.putData("Autos/AutoVisualizerField", field);
+
     // Driver has to click submit to make and view the autonomous path
     SmartDashboard.putData(
-        "Submit",
+        "Autos/Submit",
         Commands.runOnce(
                 () -> {
-                  var createdAuto = buildAuto(autoChooser.build());
-                  if (createdAuto != null) {
-                    storedAuto = createdAuto.getAuto();
-                    visualizeAuto(createdAuto.getPaths());
+
+                  // Pre made autos first and then the custom autos
+                  PathsAndAuto selectedAuto =
+                      switch (preBuiltAuto.getSelected()) {
+                        case TOPAUTO -> buildAuto(kTopLaneAuto);
+                        case MIDTOPAUTO -> buildAuto(kMidLaneTopAuto);
+                        case MIDBOTAUTO -> buildAuto(kMidLaneBotAuto);
+                        case BOTAUTO -> buildAuto(kBotLaneAuto);
+                        case CUSTOM -> buildAuto(autoChooser.build());
+                        default -> new PathsAndAuto(Commands.none(), new ArrayList<>());
+                      };
+
+                  if (selectedAuto != null) {
+                    storedAuto = selectedAuto.getAuto();
+                    visualizeAuto(selectedAuto.getPaths());
                   }
                   // Clears the simulated field path
                   else {
@@ -60,8 +113,6 @@ public class AutomaticAutonomousMaker3000 {
                 })
             .ignoringDisable(true)
             .withName("Submit Auto"));
-
-    UpdatePathError();
   }
 
   private void UpdateFieldVisualization() {
@@ -69,7 +120,7 @@ public class AutomaticAutonomousMaker3000 {
   }
 
   private void UpdatePathError() {
-    SmartDashboard.putString("Path Error", pathError);
+    SmartDashboard.putString("Autos/Path Error", pathError);
   }
 
   public Command getStoredAuto() {
@@ -258,6 +309,15 @@ public class AutomaticAutonomousMaker3000 {
     }
   }
 
+  enum PreBuiltAuto {
+    TOPAUTO,
+    MIDTOPAUTO,
+    MIDBOTAUTO,
+    BOTAUTO,
+    CUSTOM,
+    DO_NOTHING;
+  }
+
   public static class ScoringGroupChooser {
     // Adds sendable choosers
     private SendableChooser<ReefSide> reefSide = new SendableChooser<>();
@@ -288,10 +348,10 @@ public class AutomaticAutonomousMaker3000 {
       feedLocation.addOption("Down Coral", FeedLocation.DOWNCORAL);
       feedLocation.addOption("Up Coral", FeedLocation.UPCORAL);
 
-      SmartDashboard.putData("Reef Side" + index, reefSide);
-      SmartDashboard.putData("Level" + index, level);
-      SmartDashboard.putData("Pole" + index, pole);
-      SmartDashboard.putData("FeedLocation" + index, feedLocation);
+      SmartDashboard.putData("Autos/Reef Side" + index, reefSide);
+      SmartDashboard.putData("Autos/Level" + index, level);
+      SmartDashboard.putData("Autos/Pole" + index, pole);
+      SmartDashboard.putData("Autos/FeedLocation" + index, feedLocation);
     }
 
     public ScoringGroup build() {
@@ -337,7 +397,7 @@ public class AutomaticAutonomousMaker3000 {
       startingPosition.addOption("Middle", StartingPosition.MIDDLE);
       startingPosition.addOption("Bottom", StartingPosition.BOTTOM);
 
-      SmartDashboard.putData("Starting Position", startingPosition);
+      SmartDashboard.putData("Autos/Starting Position", startingPosition);
 
       for (int i = 0; i < chooserSize; i++) sgChoosers.add(new ScoringGroupChooser(i));
     }
