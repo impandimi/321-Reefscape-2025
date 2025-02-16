@@ -5,13 +5,13 @@
         {"axis" : "z", "degrees": 270},
         {"axis" : "y", "degrees": 0}
     ],
-    "position": [-0.216, 0.156, -0.105],
+    "position": [-0.156, 0.216, -0.105],
     "cameras": [
         {
             "name": "frontSwervePod",
             "rotations": [
-                {"axis" : "x", "degrees": -15},
-                {"axis" : "y", "degrees": 0},
+                {"axis" : "x", "degrees": 0},
+                {"axis" : "y", "degrees": -15},
                 {"axis" : "z", "degrees": 90}
             ],
             "position": [-0.2290318, 0.322326, 0.1966722],
@@ -22,33 +22,33 @@
         {
             "name": "backLeftSwervePod",
             "rotations": [
-                {"axis" : "x", "degrees": 15},
-                {"axis" : "y", "degrees": 0},
+                {"axis" : "x", "degrees": 0},
+                {"axis" : "y", "degrees": -15},
                 {"axis" : "z", "degrees": 225}
             ],
-            "position": [-0.2278126, -0.3010408, 0.1971802],
+            "position": [-0.2307336, -0.1846072, 0.2322322],
             "resolution": [1280, 720],
             "fov":70
         },
 
         {
-            "name": "topCamera",
+            "name": "topElevatorCamera",
             "rotations": [
-                {"axis" : "x", "degrees": 48},
-                {"axis" : "y", "degrees": 0},
-                {"axis" : "z", "degrees": 7}
+                {"axis" : "x", "degrees": 0},
+                {"axis" : "y", "degrees": -7},
+                {"axis" : "z", "degrees": 48}
             ],
-            "position": [0.2269236, 0.1643126, 0.2833116],
+            "position": [0.2269236, -0.1643126, 0.2833116],
             "resolution": [1280, 720],
             "fov":70
         },
 
         {
-            "name": "bottomCamera",
+            "name": "bottomElevatorCamera",
             "rotations": [
-                {"axis" : "x", "degrees": 10},
-                {"axis" : "y", "degrees": 0},
-                {"axis" : "z", "degrees": 18}
+                {"axis" : "x", "degrees": 0},
+                {"axis" : "y", "degrees": -15},
+                {"axis" : "z", "degrees": -10}
             ],
             "position": [0.2269236, -0.1643126, 0.2339594],
             "resolution": [1280, 720],
@@ -88,6 +88,5 @@
             ],
             "zeroedPosition": [-0.156, -0.1127, -0.32]
         }
-
     ]
 }
