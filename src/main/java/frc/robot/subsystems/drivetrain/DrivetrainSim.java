@@ -1,7 +1,9 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -10,6 +12,7 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -38,8 +41,11 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 public class DrivetrainSim implements SwerveDrive {
   private final SelfControlledSwerveDriveSimulationWrapper simulatedDrive;
   private final Field2d field2d;
+  private Pose2d alignmentSetpoint = Pose2d.kZero;
   final DriveTrainSimulationConfig simConfig;
   PIDController headingController;
+
+  private final SwerveDrivePoseEstimator reefPoseEstimator;
 
   public DrivetrainSim() {
     this.simConfig =
@@ -77,6 +83,10 @@ public class DrivetrainSim implements SwerveDrive {
     // A field2d widget for debugging
     field2d = new Field2d();
     SmartDashboard.putData("simulation field", field2d);
+
+    this.reefPoseEstimator =
+        new SwerveDrivePoseEstimator(
+            simulatedDrive.getKinematics(), getHeading(), getModulePositions(), getPose());
 
     configureAutoBuilder();
     configurePoseControllers();
@@ -222,6 +232,20 @@ public class DrivetrainSim implements SwerveDrive {
   }
 
   @Override
+  public void setAlignmentSetpoint(Pose2d setpoint) {
+    alignmentSetpoint = setpoint;
+  }
+
+  @Override
+  public boolean atPoseSetpoint() {
+    final var currentPose = getPose();
+    return currentPose.getTranslation().getDistance(alignmentSetpoint.getTranslation())
+            < DrivetrainConstants.kAlignmentSetpointTranslationTolerance.in(Meters)
+        && Math.abs(currentPose.getRotation().minus(alignmentSetpoint.getRotation()).getDegrees())
+            < DrivetrainConstants.kAlignmentSetpointRotationTolerance.in(Degrees);
+  }
+
+  @Override
   public void setSwerveModuleStates(SwerveModuleState[] states) {
     simulatedDrive.runSwerveStates(states);
   }
@@ -242,6 +266,12 @@ public class DrivetrainSim implements SwerveDrive {
   @Override
   public SwerveModuleState[] getTargetModuleStates() {
     return simulatedDrive.getSetPointsOptimized();
+  }
+
+  @Logged(name = "ReefVisionEstimatedPose")
+  @Override
+  public Pose2d getReefVisionPose() {
+    return reefPoseEstimator.getEstimatedPosition();
   }
 
   @Logged(name = "MeasuredRobotPose")
@@ -279,10 +309,18 @@ public class DrivetrainSim implements SwerveDrive {
   }
 
   @Override
+  public void addReefVisionMeasurement(
+      Pose2d visionRobotPose, double timeStampSeconds, Matrix<N3, N1> standardDeviations) {
+    reefPoseEstimator.addVisionMeasurement(visionRobotPose, timeStampSeconds, standardDeviations);
+  }
+
+  @Override
   public void periodic() {
     // update simulated drive and arena
     SimulatedArena.getInstance().simulationPeriodic();
     simulatedDrive.periodic();
+
+    reefPoseEstimator.update(getHeading(), getModulePositions());
 
     // send simulation data to dashboard for testing
     field2d.setRobotPose(simulatedDrive.getActualPoseInSimulationWorld());
