@@ -3,87 +3,140 @@ package frc.robot.auto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
-import edu.wpi.first.wpilibj.DriverStation;
+import com.pathplanner.lib.util.FileVersionException;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.CoralSuperstructure;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.json.simple.parser.ParseException;
 
 public class AutomaticAutonomousMaker3000 {
 
   private CycleAutoChooser autoChooser = new CycleAutoChooser(3);
 
-  Field2d field = new Field2d();
+  private Field2d field = new Field2d();
+  private String pathError = "";
+  private List<Pose2d> visualizePath = new ArrayList<>();
 
   private CoralSuperstructure coralSuperstructure;
 
+  private Command storedAuto;
+
   public AutomaticAutonomousMaker3000(CoralSuperstructure coralSuperstructure) {
     this.coralSuperstructure = coralSuperstructure;
+
+    SmartDashboard.putData("VisionField", field);
+    // Driver has to click submit to make and view the autonomous path
+    SmartDashboard.putData(
+        "Submit",
+        Commands.runOnce(
+                () -> {
+                  var createdAuto = buildAuto(autoChooser.build());
+                  if (createdAuto != null) {
+                    storedAuto = createdAuto.getAuto();
+                    visualizeAuto(createdAuto.getPaths());
+                  }
+                  // Clears the simulated field path
+                  else {
+                    visualizePath.clear();
+                    UpdateFieldVisualization();
+                  }
+                  UpdatePathError();
+                })
+            .ignoringDisable(true)
+            .withName("Submit Auto"));
+
+    UpdatePathError();
+  }
+
+  private void UpdateFieldVisualization() {
+    field.getObject("PathPoses").setPoses(visualizePath);
+  }
+
+  private void UpdatePathError() {
+    SmartDashboard.putString("Path Error", pathError);
+  }
+
+  public Command getStoredAuto() {
+    return storedAuto;
   }
 
   private void visualizeAuto(List<PathPlannerPath> paths) {
-    // TODO: implement with the field2d
-    // prolly do something like path#getPathPoses() and join those and display on the field2d
+    visualizePath.clear();
+
+    System.out.println(paths);
+
+    for (int i = 0; i < paths.size(); i++) {
+      visualizePath.addAll(paths.get(i).getPathPoses());
+    }
+
+    UpdateFieldVisualization();
   }
 
-  public Command buildAuto(CycleAutoConfig config) {
+  // Returns the path list for visualization and autonomous command
+  public PathsAndAuto buildAuto(CycleAutoConfig config) {
+    pathError = "";
+    try {
+      Command auto = Commands.none();
+      List<PathPlannerPath> paths = new ArrayList<>();
 
-    Command auto = Commands.none();
-    List<PathPlannerPath> paths = new ArrayList<>();
+      ReefSide lastReefSide = config.scoringGroup.get(0).reefSide;
 
-    ReefSide lastReefSide = config.scoringGroup.get(0).reefSide;
+      for (int i = 0; i < config.scoringGroup.size(); i++) {
 
-    for (int i = 0; i < config.scoringGroup.size(); i++) {
+        if ((i != 0 && config.scoringGroup.get(i).feedLocation == FeedLocation.NOCHOICE)
+            || config.scoringGroup.get(i).reefSide == ReefSide.NOCHOICE) break;
+        if (i == 0) {
+          // first value; score preload and ignore the alt destination instructions
+          PathPlannerPath path =
+              getPath(
+                  config.startingPosition.pathID
+                      + " to "
+                      + config.scoringGroup.get(i).reefSide.pathID);
+          auto = auto.andThen(withScoring(toPathCommand(path)));
+          paths.add(path);
+        } else {
 
-      if ((i != 0 && config.scoringGroup.get(i).feedLocation == FeedLocation.NOCHOICE)
-          || config.scoringGroup.get(i).reefSide == ReefSide.NOCHOICE) break;
-      if (i == 0) {
-        // first value; score preload and ignore the alt destination instructions
-        PathPlannerPath path =
-            getPath(
-                config.startingPosition.pathID
-                    + " to "
-                    + config.scoringGroup.get(i).reefSide.pathID);
-        auto = auto.andThen(withScoring(toPathCommand(path)));
-        paths.add(path);
-      } else {
+          PathPlannerPath intakePath =
+              getPath(
+                  lastReefSide.pathID + " to " + config.scoringGroup.get(i).feedLocation.pathID);
 
-        PathPlannerPath intakePath =
-            getPath(lastReefSide.pathID + " to " + config.scoringGroup.get(i).feedLocation.pathID);
+          PathPlannerPath scorePath =
+              getPath(
+                  config.scoringGroup.get(i).feedLocation.pathID
+                      + " to "
+                      + config.scoringGroup.get(i).reefSide.pathID);
 
-        PathPlannerPath scorePath =
-            getPath(
-                config.scoringGroup.get(i).feedLocation.pathID
-                    + " to "
-                    + config.scoringGroup.get(i).reefSide.pathID);
+          auto =
+              auto.andThen(withIntaking(toPathCommand(intakePath)))
+                  .andThen(withScoring(toPathCommand(scorePath)));
+          lastReefSide = config.scoringGroup.get(i).reefSide;
 
-        auto =
-            auto.andThen(withIntaking(toPathCommand(intakePath)))
-                .andThen(withScoring(toPathCommand(scorePath)));
-        lastReefSide = config.scoringGroup.get(i).reefSide;
-
-        paths.add(intakePath);
-        paths.add(scorePath);
+          paths.add(intakePath);
+          paths.add(scorePath);
+        }
       }
+      return new PathsAndAuto(auto, paths);
+    } catch (Exception e) {
+      pathError = "Path doesn't exist";
     }
-    // TODO: find a way to return BOTH the path and the auto in one object
-    return auto;
+    return null;
   }
 
   public Command withIntaking(Command path) {
-    // TODO: add intaking logic
-    return path;
-    // return path.alongWith(coralendeffector.intakeCoral()).until(coralendeffector::hasCoral);
+    return path.alongWith(coralSuperstructure.feedCoral())
+        .until(() -> coralSuperstructure.hasCoral());
   }
 
   public Command withScoring(Command path) {
-    // TODO: add scoring logic
+    // TODO: add scoring logic. Ignore for now as we don't have the code
     return path;
-    // return path.andThen(coralSuperstructure.outtakeCoral());
   }
 
   private Command toPathCommand(PathPlannerPath path) {
@@ -91,14 +144,10 @@ public class AutomaticAutonomousMaker3000 {
     return AutoBuilder.followPath(path);
   }
 
-  private PathPlannerPath getPath(String pathName) {
-    try {
-      // Load the path you want to follow using its name in the GUI
-      return PathPlannerPath.fromPathFile(pathName);
-    } catch (Exception e) {
-      DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-      return null;
-    }
+  private PathPlannerPath getPath(String pathName)
+      throws FileVersionException, IOException, ParseException {
+    // Load the path you want to follow using its name in the GUI
+    return PathPlannerPath.fromPathFile(pathName);
   }
 
   enum StartingPosition {
@@ -156,7 +205,7 @@ public class AutomaticAutonomousMaker3000 {
   }
 
   public static class ScoringGroupChooser {
-    // add sendable choosers
+    // Adds sendable choosers
     private SendableChooser<ReefSide> reefSide = new SendableChooser<>();
     private SendableChooser<Level> level = new SendableChooser<>();
     private SendableChooser<Pole> pole = new SendableChooser<>();
@@ -192,51 +241,18 @@ public class AutomaticAutonomousMaker3000 {
     }
 
     public ScoringGroup build() {
-      return new ScoringGroup(
-          feedLocation.getSelected(),
-          pole.getSelected(),
-          reefSide.getSelected(),
-          level.getSelected());
+      return new ScoringGroup(feedLocation.getSelected(), reefSide.getSelected());
     }
   }
 
   public static class ScoringGroup {
     private FeedLocation feedLocation;
-    private Pole pole;
     private ReefSide reefSide;
-    private Level level;
 
-    public ScoringGroup(FeedLocation feedLocation, Pole pole, ReefSide reefSide, Level level) {
+    public ScoringGroup(FeedLocation feedLocation, ReefSide reefSide) {
       this.feedLocation = feedLocation;
-      this.pole = pole;
       this.reefSide = reefSide;
-      this.level = level;
     }
-
-    //   private String[] getPath() {
-    //     String[] answer = new String[2];
-    //     answer[0] = feedLocation + " to " + reefSide;
-    //     answer[1] = reefSide + " to " + feedLocation;
-    //     answer[2] = startingPosition + " to " + reefSide;
-    //     return answer;
-    // }
-
-    //   public Trajectory getTrajectory(){
-    //       try {
-    //           PathPlannerPath path = PathPlannerPath.fromPathFile(getPath());
-
-    //           List<Pose2d> poses = path.getPathPoses();
-    //           //TODO: Translate path to pose2D
-
-    //           return TrajectoryGenerator.generateTrajectory(poses,
-    //           new TrajectoryConfig(path.getGlobalConstraints().maxVelocityMPS(),
-    //           path.getGlobalConstraints().maxAccelerationMPSSq()));
-    //       }
-    //       catch (Exception e) {
-    //           DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-    //           return null;
-    //       }
-    //   }
   }
 
   public static class CycleAutoConfig {
@@ -267,6 +283,24 @@ public class AutomaticAutonomousMaker3000 {
     public CycleAutoConfig build() {
       return new CycleAutoConfig(
           startingPosition.getSelected(), sgChoosers.stream().map(a -> a.build()).toList());
+    }
+  }
+
+  public class PathsAndAuto {
+    Command auto;
+    List<PathPlannerPath> paths;
+
+    public PathsAndAuto(Command auto, List<PathPlannerPath> paths) {
+      this.auto = auto;
+      this.paths = paths;
+    }
+
+    public Command getAuto() {
+      return auto;
+    }
+
+    public List<PathPlannerPath> getPaths() {
+      return paths;
     }
   }
 }

@@ -50,10 +50,6 @@ public class CoralEndEffector extends SubsystemBase {
     io.updateInputs(inputs);
   }
 
-  public boolean hasCoral() {
-    return inputs.hasCoral;
-  }
-
   // run the end effector at a certain specified velocity using PIDFF control
   // Will only run once; For a continuous method, see runAtVelocity(Supplier<AngularVelocity>)
   public void runAtVelocity(AngularVelocity velocity) {
@@ -89,6 +85,10 @@ public class CoralEndEffector extends SubsystemBase {
 
   public Command runVolts(Supplier<Voltage> voltage) {
     return run(() -> io.setVoltage(voltage.get()));
+  }
+
+  public boolean hasCoral() {
+    return inputs.hasCoral;
   }
 
   // stalls coral if we have a coral; this should be the default command
