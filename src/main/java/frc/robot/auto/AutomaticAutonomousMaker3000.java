@@ -6,7 +6,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.units.ForceUnit;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,11 +21,36 @@ import org.json.simple.parser.ParseException;
 
 public class AutomaticAutonomousMaker3000 {
 
-  private CycleAutoChooser autoChooser = new CycleAutoChooser(3);
+  private CycleAutoChooser autoChooser = new CycleAutoChooser(5);
 
   private Field2d field = new Field2d();
   private String pathError = "";
   private List<Pose2d> visualizePath = new ArrayList<>();
+  private SendableChooser<PreBuiltAuto> preBuiltAuto = new SendableChooser<>();
+
+  private static CycleAutoConfig kTopLaneAuto = new CycleAutoConfig(StartingPosition.TOP, List.of(
+    new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFR1, Pole.RIGHTPOLE, Level.L1), 
+    new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4),
+    new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.RIGHTPOLE, Level.L4)
+  ));
+  
+  private static CycleAutoConfig kMidLaneTopAuto = new CycleAutoConfig(StartingPosition.MIDDLE, List.of(
+    new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFR2, Pole.RIGHTPOLE, Level.L1), 
+    new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4),
+    new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4)
+  ));
+
+  private static CycleAutoConfig kMidLaneBotAuto = new CycleAutoConfig(StartingPosition.MIDDLE, List.of(
+    new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFR2, Pole.LEFTPOLE, Level.L1), 
+    new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.LEFTPOLE, Level.L4),
+    new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.RIGHTPOLE, Level.L4)
+  ));
+
+  private static CycleAutoConfig kBotLaneAuto = new CycleAutoConfig(StartingPosition.BOTTOM, List.of(
+    new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFR3, Pole.LEFTPOLE, Level.L1), 
+    new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.LEFTPOLE, Level.L4),
+    new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.RIGHTPOLE, Level.L4)
+  ));
 
   private CoralSuperstructure coralSuperstructure;
 
@@ -35,14 +59,32 @@ public class AutomaticAutonomousMaker3000 {
   public AutomaticAutonomousMaker3000(CoralSuperstructure coralSuperstructure) {
     this.coralSuperstructure = coralSuperstructure;
     
+    preBuiltAuto.setDefaultOption("No Choice", PreBuiltAuto.CUSTOM);
+    preBuiltAuto.addOption("TopAuto", PreBuiltAuto.TOPAUTO);
+    preBuiltAuto.addOption("MidTopAuto", PreBuiltAuto.MIDTOPAUTO);
+    preBuiltAuto.addOption("MidBotAuto", PreBuiltAuto.MIDBOTAUTO);
+    preBuiltAuto.addOption("BotAuto", PreBuiltAuto.BOTAUTO);
+    preBuiltAuto.addOption("CUSTOM", PreBuiltAuto.CUSTOM); 
+
+    SmartDashboard.putData("PreBuiltAuto", preBuiltAuto);
     SmartDashboard.putData("VisionField", field);
+
     // Driver has to click submit to make and view the autonomous path
     SmartDashboard.putData("Submit", Commands.runOnce(() -> {
+      
+      // Pre made autos first and then the custom autos
+      PathsAndAuto selectedAuto = switch (preBuiltAuto.getSelected()) {
+        case TOPAUTO -> buildAuto(kTopLaneAuto);
+        case MIDTOPAUTO -> buildAuto(kMidLaneTopAuto);
+        case MIDBOTAUTO -> buildAuto(kMidLaneBotAuto);
+        case BOTAUTO -> buildAuto(kBotLaneAuto);
+        case CUSTOM -> buildAuto(autoChooser.build());
+        default -> new PathsAndAuto(Commands.none(), new ArrayList<>()); 
+      };
 
-      var createdAuto = buildAuto(autoChooser.build());
-      if(createdAuto != null){
-        storedAuto = createdAuto.getAuto();
-        visualizeAuto(createdAuto.getPaths());
+      if(selectedAuto != null){
+        storedAuto = selectedAuto.getAuto();
+        visualizeAuto(selectedAuto.getPaths());
       }
       // Clears the simulated field path 
       else {
@@ -202,6 +244,15 @@ public class AutomaticAutonomousMaker3000 {
     }
   }
 
+  enum PreBuiltAuto {
+    TOPAUTO,
+    MIDTOPAUTO,
+    MIDBOTAUTO,
+    BOTAUTO, 
+    CUSTOM, 
+    DO_NOTHING; 
+  }
+
   public static class ScoringGroupChooser {
     // Adds sendable choosers
     private SendableChooser<ReefSide> reefSide = new SendableChooser<>();
@@ -241,17 +292,23 @@ public class AutomaticAutonomousMaker3000 {
     public ScoringGroup build() {
       return new ScoringGroup(
           feedLocation.getSelected(),
-          reefSide.getSelected());
+          reefSide.getSelected(),
+          pole.getSelected(),
+          level.getSelected());
     }
   }
 
   public static class ScoringGroup {
     private FeedLocation feedLocation;
     private ReefSide reefSide;
+    private Pole pole;
+    private Level level;
 
-    public ScoringGroup(FeedLocation feedLocation, ReefSide reefSide) {
+    public ScoringGroup(FeedLocation feedLocation, ReefSide reefSide, Pole pole, Level level) {
       this.feedLocation = feedLocation;
       this.reefSide = reefSide;
+      this.pole = pole;
+      this.level = level;
     }
   }
 
@@ -268,12 +325,14 @@ public class AutomaticAutonomousMaker3000 {
   public static class CycleAutoChooser {
     private SendableChooser<StartingPosition> startingPosition = new SendableChooser<>();
     private List<ScoringGroupChooser> sgChoosers = new ArrayList<>();
+    private SendableChooser<PreBuiltAuto> preBuiltAuto = new SendableChooser<>();
 
     public CycleAutoChooser(int chooserSize) {
 
       startingPosition.setDefaultOption("Top", StartingPosition.TOP);
       startingPosition.addOption("Middle", StartingPosition.MIDDLE);
       startingPosition.addOption("Bottom", StartingPosition.BOTTOM);
+
 
       SmartDashboard.putData("Starting Position", startingPosition);
 
