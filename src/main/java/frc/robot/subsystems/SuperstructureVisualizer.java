@@ -75,10 +75,10 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
                 4.0,
                 new Color8Bit(Color.kFirstRed)));
 
-    final double pitch =
-        algaePivotSetpoint.get() == null ? 0 : algaePivotSetpoint.get().in(Radians);
-
-    this.algaeIntakePose = new Pose3d(VisualizerConstants.algaeRoot3d, new Rotation3d(0, pitch, 0));
+    this.algaeIntakePose =
+        new Pose3d(
+            VisualizerConstants.algaeRoot3d,
+            new Rotation3d(0, AlgaeIntakePivotConstants.kPivotStartingAngle.in(Radians), 0));
   }
 
   public void update() {
@@ -106,7 +106,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
     this.shoulderPose =
         new Pose3d(
             VisualizerConstants.armRoot3d.plus(new Translation3d(0, 0, startHeightToSetpoint)),
-            new Rotation3d(Radians.convertFrom(-arm.getAngle() - 90, Degrees), 0, 0));
+            new Rotation3d(0, Radians.convertFrom(-arm.getAngle() - 90, Degrees), 0));
 
     this.elbowPose =
         shoulderPose.transformBy(
@@ -117,7 +117,7 @@ public class SuperstructureVisualizer extends VirtualSubsystem {
     this.algaeIntakePose =
         new Pose3d(
             VisualizerConstants.algaeRoot3d,
-            new Rotation3d(0, algaePivotSetpoint.get().in(Radians), 0));
+            new Rotation3d(-algaePivotSetpoint.get().in(Radians), 0, 0));
   }
 
   @Logged(name = "ElevatorFirstStage")

@@ -177,6 +177,8 @@ public interface SwerveDrive extends Subsystem {
 
   Pose2d getPose();
 
+  Pose2d getReefVisionPose();
+
   ChassisSpeeds getChassisSpeeds();
 
   Rotation2d getHeading();
@@ -184,5 +186,8 @@ public interface SwerveDrive extends Subsystem {
   void addVisionMeasurement(Pose2d visionRobotPose, double timeStampSeconds);
 
   void addVisionMeasurement(
+      Pose2d visionRobotPose, double timeStampSeconds, Matrix<N3, N1> standardDeviations);
+
+  void addReefVisionMeasurement(
       Pose2d visionRobotPose, double timeStampSeconds, Matrix<N3, N1> standardDeviations);
 }

@@ -38,13 +38,14 @@ public class ReefAlign {
   private static final Distance kReefDistance = Inches.of(14);
   private static final Distance kRightAlignDistance = Inches.of(6.5);
 
-  private static final Rotation2d kReefAlignmentRotation = Rotation2d.kCW_90deg;
+  private static final Rotation2d kReefAlignmentRotation = Rotation2d.k180deg;
   private static final Transform2d kLeftAlignTransform =
       new Transform2d(kReefDistance, kLeftAlignDistance, kReefAlignmentRotation);
   private static final Transform2d kCenterAlignTransform =
       new Transform2d(kReefDistance, Meter.zero(), kReefAlignmentRotation);
   private static final Transform2d kRightAlignTransform =
       new Transform2d(kReefDistance, kRightAlignDistance, kReefAlignmentRotation);
+
   private static final List<Integer> kBlueReefTagIDs = List.of(17, 18, 19, 20, 21, 22);
   private static final List<Integer> kRedReefTagIDs = List.of(6, 7, 8, 9, 10, 11);
 
