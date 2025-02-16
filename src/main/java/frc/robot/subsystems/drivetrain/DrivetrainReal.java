@@ -1,6 +1,8 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -54,6 +56,8 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
           .withDesaturateWheelSpeeds(true);
 
   private final SwerveDrivePoseEstimator reefPoseEstimator;
+
+  private Pose2d alignmentSetpoint = Pose2d.kZero;
 
   public DrivetrainReal(
       SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
@@ -242,6 +246,20 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
             .withVelocityY(speeds.vyMetersPerSecond)
             .withTargetDirection(rotation)
             .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
+  }
+
+  @Override
+  public void setAlignmentSetpoint(Pose2d setpoint) {
+    alignmentSetpoint = setpoint;
+  }
+
+  @Override
+  public boolean atPoseSetpoint() {
+    final var currentPose = getPose();
+    return currentPose.getTranslation().getDistance(alignmentSetpoint.getTranslation())
+            < DrivetrainConstants.kAlignmentSetpointTranslationTolerance.in(Meters)
+        && Math.abs(currentPose.getRotation().minus(alignmentSetpoint.getRotation()).getDegrees())
+            < DrivetrainConstants.kAlignmentSetpointRotationTolerance.in(Degrees);
   }
 
   @Override

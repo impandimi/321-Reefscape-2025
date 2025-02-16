@@ -1,7 +1,9 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -39,6 +41,7 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 public class DrivetrainSim implements SwerveDrive {
   private final SelfControlledSwerveDriveSimulationWrapper simulatedDrive;
   private final Field2d field2d;
+  private Pose2d alignmentSetpoint = Pose2d.kZero;
   final DriveTrainSimulationConfig simConfig;
   PIDController headingController;
 
@@ -226,6 +229,20 @@ public class DrivetrainSim implements SwerveDrive {
   @Override
   public void resetPose(Pose2d pose) {
     simulatedDrive.resetOdometry(pose);
+  }
+
+  @Override
+  public void setAlignmentSetpoint(Pose2d setpoint) {
+    alignmentSetpoint = setpoint;
+  }
+
+  @Override
+  public boolean atPoseSetpoint() {
+    final var currentPose = getPose();
+    return currentPose.getTranslation().getDistance(alignmentSetpoint.getTranslation())
+            < DrivetrainConstants.kAlignmentSetpointTranslationTolerance.in(Meters)
+        && Math.abs(currentPose.getRotation().minus(alignmentSetpoint.getRotation()).getDegrees())
+            < DrivetrainConstants.kAlignmentSetpointRotationTolerance.in(Degrees);
   }
 
   @Override
