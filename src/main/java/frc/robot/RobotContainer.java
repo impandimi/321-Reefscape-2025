@@ -51,7 +51,7 @@ public class RobotContainer {
       new AlgaeSuperstructure(algaePivot, algaeRollers);
 
   private AutomaticAutonomousMaker3000 automaker =
-      new AutomaticAutonomousMaker3000(coralSuperstructure);
+      new AutomaticAutonomousMaker3000(drivetrain, coralSuperstructure);
 
   private Vision vision =
       Vision.create(
