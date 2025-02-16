@@ -6,9 +6,6 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.ProcessorAlign;
-import frc.robot.commands.ReefAlign;
-import frc.robot.commands.StationAlign;
 import frc.robot.util.VirtualSubsystem;
 
 @Logged
@@ -33,6 +30,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    /*
+     * TODO: note that VirtualSubsystem periodics must run after Subsystem periodics
+     * since inputs need to be defined before SuperstructureVisualizer references them
+     */
     VirtualSubsystem.periodicAll();
   }
 
@@ -48,9 +50,9 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // auto init is the first time that alliance is guaranteed to be resolved, according to memory
-    ReefAlign.loadReefAlignmentPoses();
-    StationAlign.loadStationAlignmentPoses();
-    ProcessorAlign.loadProcessorAlignmentPoses();
+    // ReefAlign.loadReefAlignmentPoses();
+    // StationAlign.loadStationAlignmentPoses();
+    // ProcessorAlign.loadProcessorAlignmentPoses();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -68,9 +70,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     // alliance is also available here, for testing without needing to enable auto first
-    ReefAlign.loadReefAlignmentPoses();
-    StationAlign.loadStationAlignmentPoses();
-    ProcessorAlign.loadProcessorAlignmentPoses();
+    // ReefAlign.loadReefAlignmentPoses();
+    // StationAlign.loadStationAlignmentPoses();
+    // ProcessorAlign.loadProcessorAlignmentPoses();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();

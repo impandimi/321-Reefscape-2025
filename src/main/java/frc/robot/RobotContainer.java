@@ -26,11 +26,13 @@ import frc.robot.subsystems.algaeIntakePivot.AlgaeIntakePivot;
 import frc.robot.subsystems.algaeIntakeRollers.AlgaeIntakeRollers;
 import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.drivetrain.DrivetrainConstants;
+import frc.robot.subsystems.drivetrain.DrivetrainSim;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import frc.robot.subsystems.elevatorarm.ElevatorArmConstants;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.ReefPosition;
 import java.util.function.DoubleSupplier;
 
@@ -51,10 +53,27 @@ public class RobotContainer {
   private AutomaticAutonomousMaker3000 automaker =
       new AutomaticAutonomousMaker3000(coralSuperstructure);
 
+  private Vision vision =
+      Vision.create(
+          // Java 21 pattern matching switch would be nice
+          (drivetrain instanceof DrivetrainSim)
+              ? ((DrivetrainSim) drivetrain)::getActualPose
+              : drivetrain::getPose,
+          visionEst ->
+              drivetrain.addVisionMeasurement(
+                  visionEst.estimate().estimatedPose.toPose2d(),
+                  visionEst.estimate().timestampSeconds,
+                  visionEst.stdDevs()),
+          reefVisionEst ->
+              drivetrain.addReefVisionMeasurement(
+                  reefVisionEst.estimate().estimatedPose.toPose2d(),
+                  reefVisionEst.estimate().timestampSeconds,
+                  reefVisionEst.stdDevs()));
+
   private CommandXboxController driver = new CommandXboxController(0);
   private XboxController manipulator = new XboxController(1);
 
-  private Trigger isSlowMode = driver.leftBumper();
+  private Trigger isSlowMode = new Trigger(() -> false);
 
   private DoubleSupplier driverForward =
       () ->

@@ -99,7 +99,7 @@ public class AutomaticAutonomousMaker3000 {
                   config.startingPosition.pathID
                       + " to "
                       + config.scoringGroup.get(i).reefSide.pathID);
-          auto = auto.andThen(withScoring(toPathCommand(path)));
+          auto = auto.andThen(withScoring(toPathCommand(path, "scoring preload")));
           paths.add(path);
         } else {
 
@@ -114,8 +114,8 @@ public class AutomaticAutonomousMaker3000 {
                       + config.scoringGroup.get(i).reefSide.pathID);
 
           auto =
-              auto.andThen(withIntaking(toPathCommand(intakePath)))
-                  .andThen(withScoring(toPathCommand(scorePath)));
+              auto.andThen(withIntaking(toPathCommand(intakePath, "intaking")))
+                  .andThen(withScoring(toPathCommand(scorePath, "scoring")));
           lastReefSide = config.scoringGroup.get(i).reefSide;
 
           paths.add(intakePath);
@@ -124,14 +124,15 @@ public class AutomaticAutonomousMaker3000 {
       }
       return new PathsAndAuto(auto, paths);
     } catch (Exception e) {
+      System.out.println(e);
       pathError = "Path doesn't exist";
     }
     return null;
   }
 
   public Command withIntaking(Command path) {
-    return path.alongWith(coralSuperstructure.feedCoral())
-        .until(() -> coralSuperstructure.hasCoral());
+    return path.alongWith(
+        coralSuperstructure.feedCoral().until(() -> coralSuperstructure.hasCoral()));
   }
 
   public Command withScoring(Command path) {
@@ -139,9 +140,10 @@ public class AutomaticAutonomousMaker3000 {
     return path;
   }
 
-  private Command toPathCommand(PathPlannerPath path) {
+  private Command toPathCommand(PathPlannerPath path, String name) {
     if (path == null) return Commands.none();
-    return AutoBuilder.followPath(path);
+    return AutoBuilder.followPath(path)
+        .deadlineFor(Commands.run(() -> System.out.println("pathing..." + name)));
   }
 
   private PathPlannerPath getPath(String pathName)
