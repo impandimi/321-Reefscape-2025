@@ -210,6 +210,8 @@ public class DrivetrainSim implements SwerveDrive {
                     getPose().getRotation().getRadians(), pose.getRotation().getRadians())
                 * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond));
 
+    if (atPoseSetpoint()) targetSpeeds = new ChassisSpeeds();
+
     simulatedDrive.runChassisSpeeds(targetSpeeds, Translation2d.kZero, true, false);
   }
 
