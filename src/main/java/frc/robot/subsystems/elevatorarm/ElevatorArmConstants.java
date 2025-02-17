@@ -46,13 +46,13 @@ public class ElevatorArmConstants {
   // the length of the arm (elbow to wrist)
   public static final Distance kElbowLength = Inches.of(10.98);
   // the fixed angle of the elbow (shoulder to elbow to wrist angle)
-  public static final Angle kElbowAngle = Degrees.of(80);
+  public static final Angle kElbowAngle = Degrees.of(53.932);
   // the maximum angle the arm can go in simulation
   public static final Angle kMaxAngle = Degrees.of(180);
   // the minimum angle the arm can go in simulation
   public static final Angle kMinAngle = Degrees.of(-180);
   // the angle from the encoder rotation axis to the center of mass
-  public static final Angle kCMOffset = Degrees.of(-10); // TODO: find
+  public static final Angle kCMOffset = Degrees.of(-19.6848);
   // the starting angle of the arm
   public static final Angle kStartAngle = Degrees.of(-64.53);
 }
