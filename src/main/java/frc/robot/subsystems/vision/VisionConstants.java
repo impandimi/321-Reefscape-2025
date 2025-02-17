@@ -72,8 +72,8 @@ public class VisionConstants {
       new Transform3d(
           Meters.of(0.2269236),
           Meters.of(-0.1643126),
-          Meters.of(0.2833116),
-          new Rotation3d(Degrees.zero(), Degrees.of(-7), Degrees.of(48)));
+          Meters.of(0.3077484),
+          new Rotation3d(Degrees.zero(), Degrees.of(-1), Degrees.of(48)));
 
   private static final Transform3d k321BottomElevatorCameraMountTransform =
       new Transform3d(

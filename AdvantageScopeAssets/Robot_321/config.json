@@ -35,10 +35,10 @@
             "name": "topElevatorCamera",
             "rotations": [
                 {"axis" : "x", "degrees": 0},
-                {"axis" : "y", "degrees": -7},
+                {"axis" : "y", "degrees": -1},
                 {"axis" : "z", "degrees": 48}
             ],
-            "position": [0.2269236, -0.1643126, 0.2833116],
+            "position": [0.2269236, -0.1643126, 0.3077464],
             "resolution": [1280, 720],
             "fov":70
         },
