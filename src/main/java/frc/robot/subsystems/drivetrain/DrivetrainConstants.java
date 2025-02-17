@@ -43,6 +43,6 @@ public class DrivetrainConstants {
 
   public static final Time kLoopDt = Seconds.of(0.02);
 
-  public static final Distance kAlignmentSetpointTranslationTolerance = Inches.of(1);
+  public static final Distance kAlignmentSetpointTranslationTolerance = Inches.one();
   public static final Angle kAlignmentSetpointRotationTolerance = Degrees.of(2.0);
 }
