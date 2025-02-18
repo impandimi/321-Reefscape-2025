@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.auto.AutomaticAutonomousMaker3000;
 import frc.robot.commands.HomingCommands;
 import frc.robot.commands.ProcessorAlign;
 import frc.robot.commands.ReefAlign;
@@ -48,6 +49,9 @@ public class RobotContainer {
       new CoralSuperstructure(elevator, elevatorArm, coralEndEffector);
   private AlgaeSuperstructure algaeSuperstructure =
       new AlgaeSuperstructure(algaePivot, algaeRollers);
+
+  private AutomaticAutonomousMaker3000 automaker =
+      new AutomaticAutonomousMaker3000(drivetrain, coralSuperstructure);
 
   private Vision vision =
       Vision.create(
@@ -423,6 +427,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.none();
+    return automaker.getStoredAuto();
   }
 }
