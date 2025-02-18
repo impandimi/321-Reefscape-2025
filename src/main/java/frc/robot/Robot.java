@@ -6,6 +6,9 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.ProcessorAlign;
+import frc.robot.commands.ReefAlign;
+import frc.robot.commands.StationAlign;
 import frc.robot.util.VirtualSubsystem;
 
 @Logged
@@ -19,16 +22,35 @@ public class Robot extends TimedRobot {
   // public Pose2d robotPose = new Pose2d();
 
   // @Logged(name = "AssetsZeroComponentPoses")
-  // public Pose3d[] zeroComponentPoses = new Pose3d[] {new Pose3d()};
+  // public Pose3d[] zeroComponentPoses =
+  //     new Pose3d[] {new Pose3d(), new Pose3d(), new Pose3d(), new Pose3d()};
 
   public Robot() {
     m_robotContainer = new RobotContainer();
     Epilogue.bind(this);
+
+    /*
+     * RobotConstants.kAprilTagFieldLayout takes a significant amount of computing to load,
+     * referencing `RobotConstants.class` here forces the field layout to load instead of stalling
+     * autonomousInit()/teleopInit()
+     */
+    @SuppressWarnings("unused")
+    final var robotConstants = RobotConstants.class;
+
+    // TODO: load robot alliance globally on DS connection to avoid extra lookups
+    ReefAlign.loadReefAlignmentPoses();
+    StationAlign.loadStationAlignmentPoses();
+    ProcessorAlign.loadProcessorAlignmentPoses();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    /*
+     * TODO: note that VirtualSubsystem periodics must run after Subsystem periodics
+     * since inputs need to be defined before SuperstructureVisualizer references them
+     */
     VirtualSubsystem.periodicAll();
   }
 
