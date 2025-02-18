@@ -33,11 +33,14 @@ public class RobotContainer {
           () -> elevator.getHeight(), () -> elevatorArm.getAngle(), () -> algaePivot.getAngle());
 
   private Leds leds = new Leds();
-  private AddressableLEDSim ledSim = new AddressableLEDSim(leds.ledStrip);
+  private AddressableLEDSim ledSim = new AddressableLEDSim(leds.strip);
 
   public RobotContainer() {
     configureBindings();
+    configureLeds();
   }
+
+  private void configureLeds() {}
 
   private void configureBindings() {}
 
