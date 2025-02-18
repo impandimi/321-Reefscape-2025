@@ -46,7 +46,7 @@ public class AutomaticAutonomousMaker3000 {
           List.of(
               new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFR2, Pole.RIGHTPOLE, Level.L1),
               new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4),
-              new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4)));
+              new ScoringGroup(FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.RIGHTPOLE, Level.L4)));
 
   private static CycleAutoConfig kMidLaneBotAuto =
       new CycleAutoConfig(
