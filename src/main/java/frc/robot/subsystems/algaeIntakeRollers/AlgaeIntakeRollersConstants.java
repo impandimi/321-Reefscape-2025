@@ -22,12 +22,12 @@ public class AlgaeIntakeRollersConstants {
   public static final boolean kRollerInverted = true;
   public static final int kSmartCurrentLimit = 40;
 
-  public static final double kRollerPositionConversionFactor = 1; // ask mech
-  public static final double kRollerVelocityConversionFactor =
-      kRollerPositionConversionFactor / 60.0; // ask mech
-  public static final Voltage kNominalVoltage = Volts.of(12);
-
   // physical constants
-  public static final double kRollerGearing = 1; // ask mech
+  public static final double kRollerGearing = 40.0 / 16.0; // ask mech
   public static final double kRollerMOI = 0.01; // ask mech
+
+  public static final double kRollerPositionConversionFactor = 1 / kRollerGearing; // ask mech
+  public static final double kRollerVelocityConversionFactor =
+      kRollerPositionConversionFactor / 60; // ask mech
+  public static final Voltage kNominalVoltage = Volts.of(12);
 }
