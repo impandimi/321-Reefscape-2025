@@ -3,7 +3,6 @@ package frc.robot.subsystems.algaeIntakePivot;
 
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -15,7 +14,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotConstants;
@@ -139,19 +137,10 @@ public class AlgaeIntakePivot extends SubsystemBase {
   public Command homeMechanism() {
     return setMechanismVoltage(() -> AlgaeIntakePivotConstants.kHomingVoltage)
         .until(
-            () -> {
-              SmartDashboard.putNumber("current", inputs.pivotCurrent.in(Amp));
-              boolean isWorking =
-                  homingDebouncer.calculate(
-                      inputs.pivotCurrent.in(Amp)
-                          > AlgaeIntakePivotConstants.kHomingCurrentThreshold.in(Amp));
-              boolean b =
-                  Math.abs(inputs.pivotVelocity.in(DegreesPerSecond))
-                      < AlgaeIntakePivotConstants.kHomingVelocityThreshold.in(DegreesPerSecond);
-              SmartDashboard.putBoolean("working", isWorking);
-              SmartDashboard.putBoolean("b", b);
-              return isWorking;
-            })
+            () ->
+                homingDebouncer.calculate(
+                    inputs.pivotCurrent.in(Amp)
+                        > AlgaeIntakePivotConstants.kHomingCurrentThreshold.in(Amp)))
         .andThen(
             runOnce(
                 () -> {
