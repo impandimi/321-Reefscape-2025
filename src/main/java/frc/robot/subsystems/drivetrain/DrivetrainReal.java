@@ -213,7 +213,7 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
 
   @Override
   public void driveToFieldPose(Pose2d pose) {
-    var targetSpeeds =
+    ChassisSpeeds targetSpeeds =
         ChassisSpeeds.discretize(
             xPoseController.calculate(getPose().getX(), pose.getX())
                 * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
@@ -223,6 +223,8 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                     getPose().getRotation().getRadians(), pose.getRotation().getRadians())
                 * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond),
             DrivetrainConstants.kLoopDt.in(Seconds));
+
+    if (atPoseSetpoint()) targetSpeeds = new ChassisSpeeds();
 
     setControl(
         fieldCentricRequest

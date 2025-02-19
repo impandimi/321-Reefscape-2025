@@ -6,10 +6,14 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import frc.robot.RobotConstants;
 import org.photonvision.simulation.SimCameraProperties;
 
 public class VisionConstants {
@@ -131,4 +135,16 @@ public class VisionConstants {
     kFrontSwerveCameraConfig,
     kBackLeftSwerveCameraConfig
   };
+
+  // camera data filtering
+  public static final Distance kAllowedFieldDistance =
+      Meters.of(2.5); // allow field estimates 2.5 meters outside field
+  public static final Rectangle2d kAllowedFieldArea =
+      new Rectangle2d(
+          new Translation2d(-kAllowedFieldDistance.in(Meters), -kAllowedFieldDistance.in(Meters)),
+          new Translation2d(
+              RobotConstants.kAprilTagFieldLayout.getFieldLength()
+                  + kAllowedFieldDistance.in(Meters),
+              RobotConstants.kAprilTagFieldLayout.getFieldWidth()
+                  + kAllowedFieldDistance.in(Meters)));
 }
