@@ -1,8 +1,8 @@
 /* (C) Robolancers 2025 */
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
@@ -14,9 +14,6 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutomaticAutonomousMaker3000;
 import frc.robot.commands.HomingCommands;
-import frc.robot.commands.ProcessorAlign;
-import frc.robot.commands.ReefAlign;
-import frc.robot.commands.StationAlign;
 import frc.robot.subsystems.AlgaeSuperstructure;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.subsystems.CoralSuperstructure;
@@ -29,9 +26,7 @@ import frc.robot.subsystems.drivetrain.DrivetrainConstants;
 import frc.robot.subsystems.drivetrain.DrivetrainSim;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
-import frc.robot.subsystems.elevatorarm.ElevatorArmConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.ReefPosition;
 import java.util.function.DoubleSupplier;
@@ -39,11 +34,11 @@ import java.util.function.DoubleSupplier;
 @Logged
 public class RobotContainer {
   private SwerveDrive drivetrain = SwerveDrive.create();
-  private AlgaeIntakePivot algaePivot = AlgaeIntakePivot.create();
-  private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.create();
+  private AlgaeIntakePivot algaePivot = AlgaeIntakePivot.disable();
+  private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.disable();
   private CoralEndEffector coralEndEffector = CoralEndEffector.create();
   private ElevatorArm elevatorArm = ElevatorArm.create();
-  private Elevator elevator = Elevator.create();
+  private Elevator elevator = Elevator.disable();
 
   private CoralSuperstructure coralSuperstructure =
       new CoralSuperstructure(elevator, elevatorArm, coralEndEffector);
@@ -115,18 +110,21 @@ public class RobotContainer {
 
     elevator.setDefaultCommand(
         elevator.goToHeight(() -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight()));
-    elevatorArm.setDefaultCommand(
-        elevatorArm.goToAngle(() -> CoralScorerSetpoint.NEUTRAL.getArmAngle()));
+    // elevatorArm.setDefaultCommand(
+    //     elevatorArm.goToAngle(() -> CoralScorerSetpoint.NEUTRAL.getArmAngle()));
+    elevatorArm.setDefaultCommand(elevatorArm.runVolts(() -> Volts.zero()));
     coralEndEffector.setDefaultCommand(coralEndEffector.stallCoralIfDetected());
 
     // when both are about to collide, move elevator out of the way until the algae pivot is out of
     // the collision zone
-    new Trigger(algaePivot::inCollisionZone)
-        .and(new Trigger(elevator::inCollisionZone))
-        .onTrue(
-            elevator
-                .goToHeight(() -> ElevatorConstants.kElevatorDangerHeight.plus(Meters.of(0.1)))
-                .until(new Trigger(algaePivot::inCollisionZone).negate()));
+    // new Trigger(algaePivot::inCollisionZone)
+    //     .and(new Trigger(elevator::inCollisionZone))
+    //     .onTrue(
+    //         elevator
+    //             .goToHeight(() -> ElevatorConstants.kElevatorDangerHeight.plus(Meters.of(0.1)))
+    //             .until(new Trigger(algaePivot::inCollisionZone).negate()));
+
+    driver.a().whileTrue(elevatorArm.tune());
 
     configureBindings();
   }
