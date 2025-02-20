@@ -3,14 +3,14 @@ package frc.robot.subsystems.elevatorarm;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.ctre.phoenix6.configs.PWM1Configs;
-import com.ctre.phoenix6.hardware.CANdi;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.AnalogSensorConfig;
 import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -39,7 +39,7 @@ public class ElevatorArmIOSpark implements ElevatorArmIO {
   //         360,
   //         ElevatorArmConstants.kAbsoluteEncoderOffset.in(Degrees));
 
-  private CANdi encoderCandi = new CANdi(ElevatorArmConstants.kEncoderCANdiId);
+  // private CANdi encoderCandi = new CANdi(ElevatorArmConstants.kEncoderCANdiId);
 
   public ElevatorArmIOSpark() {
     // setup arm motor
@@ -52,21 +52,23 @@ public class ElevatorArmIOSpark implements ElevatorArmIO {
             .apply(
                 new EncoderConfig() // config for relative encoder
                     .positionConversionFactor(ElevatorArmConstants.kPositionConversionFactor)
-                    .velocityConversionFactor(ElevatorArmConstants.kVelocityConversionFactor)),
+                    .velocityConversionFactor(ElevatorArmConstants.kVelocityConversionFactor))
+            .apply(new AnalogSensorConfig().positionConversionFactor(1)),
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
     // setup encoder
-    encoderCandi
-        .getConfigurator()
-        .apply(
-            new PWM1Configs()
-                .withAbsoluteSensorOffset(ElevatorArmConstants.kAbsoluteEncoderOffset));
+    // encoderCandi
+    //     .getConfigurator()
+    //     .apply(
+    //         new PWM1Configs()
+    //             .withAbsoluteSensorOffset(ElevatorArmConstants.kAbsoluteEncoderOffset));
   }
 
   // update inputs from the arm motor
   public void updateInputs(ElevatorArmInputs inputs) {
-    inputs.angle = encoderCandi.getPWM1Position().getValue();
+    // inputs.angle = encoderCandi.getPWM1Position().getValue()
+    inputs.angle = Radians.of(armMotor.getAnalog().getPosition());
     inputs.velocity = DegreesPerSecond.of(armMotor.getEncoder().getVelocity());
     inputs.current = Amps.of(armMotor.getOutputCurrent());
   }

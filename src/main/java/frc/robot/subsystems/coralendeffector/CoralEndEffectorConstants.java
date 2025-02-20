@@ -10,9 +10,9 @@ import edu.wpi.first.units.measure.Voltage;
 // list of constants for the coral end effector
 public class CoralEndEffectorConstants {
   // Motor configuration
-  public static final int kMotorPort = 0;
+  public static final int kMotorPort = 16;
   public static final int kTimeOfFlightId = 0;
-  public static final boolean kInvertedMotor = false;
+  public static final boolean kInvertedMotor = true;
   public static final int kCurrentLimit = 40;
 
   // Physical constants
@@ -20,8 +20,8 @@ public class CoralEndEffectorConstants {
   public static final double gearing = 1;
 
   // Setpoints
-  public static final Voltage kIntakeVoltage = Volts.of(9);
-  public static final Voltage kOuttakeVoltage = Volts.of(-9);
+  public static final Voltage kIntakeVoltage = Volts.of(8);
+  public static final Voltage kOuttakeVoltage = Volts.of(-3);
   public static final Voltage kStallVoltage = Volts.of(1.2);
 
   // Tuned constants

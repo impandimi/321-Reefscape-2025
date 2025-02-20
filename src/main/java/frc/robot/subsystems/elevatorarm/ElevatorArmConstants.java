@@ -10,7 +10,8 @@ import edu.wpi.first.units.measure.Distance;
 
 public class ElevatorArmConstants {
   // the CAN ID of the arm motor on the elevator
-  public static final int kElevatorArmId = 0;
+  public static final int kElevatorArmId = 15;
+
   public static final int kEncoderCANdiId = 0;
 
   // the gearing of the arm
@@ -22,7 +23,7 @@ public class ElevatorArmConstants {
   // motor characteristics
   public static final int kCurrentLimit = 40;
   public static final double kNominalVoltage = 12;
-  public static final boolean kInverted = false;
+  public static final boolean kInverted = true;
 
   // absolute encoder port on RoboRIO DIO if we need it
   public static final int kAbsoluteEncoderPort = 0;
