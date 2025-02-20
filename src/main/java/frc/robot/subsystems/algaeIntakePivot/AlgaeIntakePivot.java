@@ -3,13 +3,14 @@ package frc.robot.subsystems.algaeIntakePivot;
 
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -34,6 +35,8 @@ public class AlgaeIntakePivot extends SubsystemBase {
 
   private boolean isHomed = false;
 
+  private Debouncer homingDebouncer = new Debouncer(0.15, DebounceType.kBoth);
+
   public AlgaeIntakePivot(AlgaeIntakePivotIO io, AlgaeIntakePivotConfig config) {
     this.io = io;
     this.inputs = new AlgaeIntakePivotInputs(); // sets io, inputs, and config
@@ -44,6 +47,8 @@ public class AlgaeIntakePivot extends SubsystemBase {
 
     algaeIntakeClimbController.setTolerance(
         AlgaeIntakePivotConstants.kControllerTolerance.in(Degrees));
+
+    io.resetEncoder(AlgaeIntakePivotConstants.kPivotStartingAngle);
   }
 
   // Tune PID and feed forward constants(kP, kI, kD, kG) live on smart dashboard / ascope
@@ -133,10 +138,9 @@ public class AlgaeIntakePivot extends SubsystemBase {
     return setMechanismVoltage(() -> AlgaeIntakePivotConstants.kHomingVoltage)
         .until(
             () ->
-                (inputs.pivotCurrent.in(Amp)
-                        > AlgaeIntakePivotConstants.kHomingCurrentThreshold.in(Amp)
-                    && Math.abs(inputs.pivotVelocity.in(DegreesPerSecond))
-                        < AlgaeIntakePivotConstants.kHomingVelocityThreshold.in(DegreesPerSecond)))
+                homingDebouncer.calculate(
+                    inputs.pivotCurrent.in(Amp)
+                        > AlgaeIntakePivotConstants.kHomingCurrentThreshold.in(Amp)))
         .andThen(
             runOnce(
                 () -> {

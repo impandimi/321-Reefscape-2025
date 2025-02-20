@@ -56,8 +56,8 @@ public class AlgaeSuperstructure {
   }
 
   public enum AlgaeSetpoint {
-    NEUTRAL(Degrees.of(0)),
-    INTAKE(Degrees.of(135)),
+    NEUTRAL(Degrees.of(10)),
+    INTAKE(Degrees.of(160)),
     OUTTAKE(Degrees.of(100)),
     CLIMB_PREP(Degrees.of(180));
 
