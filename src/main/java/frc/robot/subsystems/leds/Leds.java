@@ -23,7 +23,7 @@ public class Leds extends SubsystemBase {
   private LEDPattern currentPattern = LedsConstants.kDefault;
 
   public Leds() {
-    this.strip = new AddressableLED(0);
+    this.strip = new AddressableLED(LedsConstants.kPort);
     this.buffer = new AddressableLEDBuffer(LedsConstants.kLength);
     this.strip.setLength(buffer.getLength());
     this.strip.setData(buffer);

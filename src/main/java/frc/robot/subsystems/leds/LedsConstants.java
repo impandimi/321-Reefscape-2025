@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
+import java.util.Map;
+import java.util.function.DoubleSupplier;
 
 /*
  * There is also potential for LED patterns to indicate error states e.g. gyro disconnect/motor burnout,
@@ -63,6 +65,16 @@ public class LedsConstants {
   // Outtaking - blinking orange
   public static final LEDPattern kOuttaking = kIntaking.blink(kBlinkSpeed);
 
-  // error state patterns
-  public static final LEDPattern kGyroDisconnect = LEDPattern.rainbow(255, 255);
+  // progress bar for aligning w/ aligning colors
+  private static final Map<Number, Color> progressMap =
+      Map.of(0, Color.kRed, 0.25, Color.kOrange, 0.5, Color.kYellow, 0.75, Color.kGreen);
+  private static final LEDPattern progressSteps = LEDPattern.steps(progressMap);
+
+  private static LEDPattern progressBar(DoubleSupplier supp) {
+    return LEDPattern.progressMaskLayer(supp);
+  }
+
+  public static LEDPattern kAlignProgress(DoubleSupplier supp) {
+    return progressSteps.mask(progressBar(supp));
+  }
 }
