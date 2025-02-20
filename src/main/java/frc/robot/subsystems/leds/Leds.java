@@ -34,7 +34,7 @@ public class Leds extends SubsystemBase {
   }
 
   // register signals into the tree set. If priority is already taken, don't add it
-  public static void registerSignal(
+  public void registerSignal(
       int priority, BooleanSupplier condition, Supplier<LEDPattern> pattern) {
     final var priorityIsAlreadyClaimed =
         signals.stream().mapToInt(Signal::priority).anyMatch(p -> p == priority);
