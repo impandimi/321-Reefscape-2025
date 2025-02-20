@@ -2,8 +2,8 @@
 package frc.robot.subsystems.elevatorarm;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -53,9 +53,13 @@ public class ElevatorArmIOSpark implements ElevatorArmIO {
                 new EncoderConfig() // config for relative encoder
                     .positionConversionFactor(ElevatorArmConstants.kPositionConversionFactor)
                     .velocityConversionFactor(ElevatorArmConstants.kVelocityConversionFactor))
-            .apply(new AnalogSensorConfig().positionConversionFactor(1)),
+            .apply(new AnalogSensorConfig().positionConversionFactor(360 / 3.3)),
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+
+    // seed arm motor encoder position with lamprey encoder position
+    // TODO: if pid ends up being too messy, seed
+    // armMotor.getEncoder().setPosition(armMotor.getAnalog().getPosition() - 180);
 
     // setup encoder
     // encoderCandi
@@ -68,7 +72,9 @@ public class ElevatorArmIOSpark implements ElevatorArmIO {
   // update inputs from the arm motor
   public void updateInputs(ElevatorArmInputs inputs) {
     // inputs.angle = encoderCandi.getPWM1Position().getValue()
-    inputs.angle = Radians.of(armMotor.getAnalog().getPosition());
+    // TODO: if pid ends up being too messy, seed
+    inputs.angle = Degrees.of(armMotor.getAnalog().getPosition() - 180);
+    // inputs.angle = Degrees.of(armMotor.getEncoder().getPosition());
     inputs.velocity = DegreesPerSecond.of(armMotor.getEncoder().getVelocity());
     inputs.current = Amps.of(armMotor.getOutputCurrent());
   }

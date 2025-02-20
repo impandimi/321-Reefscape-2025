@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -12,6 +13,7 @@ import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
+import frc.robot.util.TunableConstant;
 import java.util.function.Supplier;
 
 public class CoralSuperstructure {
@@ -68,6 +70,13 @@ public class CoralSuperstructure {
 
   public boolean hasCoral() {
     return endEffector.hasCoral();
+  }
+
+  public Command tune() {
+    TunableConstant armAngle = new TunableConstant("/CoralSuperstructure/ArmAngle", 0);
+    TunableConstant height = new TunableConstant("/CoralSuperstructure/ElevatorHeight", 0);
+
+    return goToSetpoint(() -> Meters.of(height.get()), () -> Degrees.of(armAngle.get()));
   }
 
   public enum CoralScorerSetpoint {
