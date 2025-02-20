@@ -6,10 +6,14 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
+import frc.robot.RobotConstants;
 import org.photonvision.simulation.SimCameraProperties;
 
 public class VisionConstants {
@@ -70,17 +74,17 @@ public class VisionConstants {
 
   private static final Transform3d k321TopElevatorCameraMountTransform =
       new Transform3d(
-          Meters.of(0.2269236),
-          Meters.of(-0.1643126),
-          Meters.of(0.3077484),
+          Meters.of(0.2314956),
+          Meters.of(-0.16764),
+          Meters.of(0.3103626),
           new Rotation3d(Degrees.zero(), Degrees.of(-1), Degrees.of(48)));
 
   private static final Transform3d k321BottomElevatorCameraMountTransform =
       new Transform3d(
-          Meters.of(0.2269236),
-          Meters.of(-0.1643126),
-          Meters.of(0.2339594),
-          new Rotation3d(Degrees.zero(), Degrees.of(-15), Degrees.of(-10)));
+          Meters.of(0.2288286),
+          Meters.of(-0.1723644),
+          Meters.of(0.2612136),
+          new Rotation3d(Degrees.zero(), Degrees.of(-10), Degrees.of(-10)));
 
   private static final Transform3d k321FrontSwerveModuleCameraMountTransform =
       new Transform3d(
@@ -93,10 +97,10 @@ public class VisionConstants {
 
   private static final Transform3d k321BackLeftSwerveModuleCameraMountTransform =
       new Transform3d(
-          Meters.of(-0.2307336),
-          Meters.of(-0.1846072),
-          Meters.of(0.2322322),
-          new Rotation3d(Degrees.zero(), Degrees.of(-15), Degrees.of(225)));
+          Meters.of(-0.2275078),
+          Meters.of(-0.1823466),
+          Meters.of(0.2745486),
+          new Rotation3d(Degrees.zero(), Degrees.of(-12), Degrees.of(225)));
   //  new Transform3d(Meters.of(-0.2278126), Meters.of(0.3010408), Meters.of(0.1971802), new
   // Rotation3d(Degrees.zero(), Degrees.of(-15), Degrees.of(135)));
 
@@ -131,4 +135,16 @@ public class VisionConstants {
     kFrontSwerveCameraConfig,
     kBackLeftSwerveCameraConfig
   };
+
+  // camera data filtering
+  public static final Distance kAllowedFieldDistance =
+      Meters.of(2.5); // allow field estimates 2.5 meters outside field
+  public static final Rectangle2d kAllowedFieldArea =
+      new Rectangle2d(
+          new Translation2d(-kAllowedFieldDistance.in(Meters), -kAllowedFieldDistance.in(Meters)),
+          new Translation2d(
+              RobotConstants.kAprilTagFieldLayout.getFieldLength()
+                  + kAllowedFieldDistance.in(Meters),
+              RobotConstants.kAprilTagFieldLayout.getFieldWidth()
+                  + kAllowedFieldDistance.in(Meters)));
 }

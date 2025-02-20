@@ -1,7 +1,6 @@
 /* (C) Robolancers 2025 */
 package frc.robot.subsystems.drivetrain;
 
-import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -44,6 +43,6 @@ public class DrivetrainConstants {
 
   public static final Time kLoopDt = Seconds.of(0.02);
 
-  public static final Distance kAlignmentSetpointTranslationTolerance = Centimeters.one();
-  public static final Angle kAlignmentSetpointRotationTolerance = Degrees.of(1.5);
+  public static final Distance kAlignmentSetpointTranslationTolerance = Inches.one();
+  public static final Angle kAlignmentSetpointRotationTolerance = Degrees.of(2.0);
 }

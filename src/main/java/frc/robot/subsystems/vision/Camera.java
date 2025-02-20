@@ -10,10 +10,10 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.RobotConstants;
 import frc.robot.subsystems.vision.VisionConstants.CameraConfig;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 @Logged
 public class Camera {
@@ -58,10 +58,14 @@ public class Camera {
     final var estimate = poseEstimator.update(latestResult);
 
     return estimate
+        .filter(
+            poseEst ->
+                VisionConstants.kAllowedFieldArea.contains(
+                    poseEst.estimatedPose.getTranslation().toTranslation2d()))
         .map(
             photonEst -> {
               final var visionEst =
-                  new VisionEstimate(photonEst, calculateStdDevs(latestResult), name, usage);
+                  new VisionEstimate(photonEst, calculateStdDevs(photonEst), name, usage);
               latestValidEstimate = visionEst;
               return visionEst;
             })
@@ -71,31 +75,30 @@ public class Camera {
   // could be absolute nonsense, open to tuning constants for each robot camera config
   // assumes `result` has targets
   @NotLogged
-  private Matrix<N3, N1> calculateStdDevs(PhotonPipelineResult result) {
-    final double stdDev = result.metadata.getLatencyMillis() / result.getTargets().size();
-
-    final double rotationStdDev = VisionConstants.kRotationStdDevCoeff * stdDev;
-
-    final Translation3d robotPose = new Translation3d();
-
+  private Matrix<N3, N1> calculateStdDevs(EstimatedRobotPose visionPoseEstimate) {
     // weighted average by ambiguity
     final double avgTargetDistance =
-        result.getTargets().stream()
+        visionPoseEstimate.targetsUsed.stream()
                 .mapToDouble(
                     t -> {
                       final double bestCameraToTargetDistance =
-                          t.getBestCameraToTarget().getTranslation().getDistance(robotPose);
-                      final double altCameraToTargetDistance =
-                          t.getAlternateCameraToTarget().getTranslation().getDistance(robotPose);
+                          t.getBestCameraToTarget()
+                              .getTranslation()
+                              .getDistance(new Translation3d());
 
-                      return t.getPoseAmbiguity()
-                          * (bestCameraToTargetDistance + altCameraToTargetDistance);
+                      return bestCameraToTargetDistance;
                     })
                 .reduce(0.0, Double::sum)
-            / (2.0 * result.getTargets().size());
+            / (visionPoseEstimate.targetsUsed.size());
 
     final double translationStdDev =
-        VisionConstants.kTranslationStdDevCoeff * avgTargetDistance * stdDev;
+        VisionConstants.kTranslationStdDevCoeff
+            * Math.pow(avgTargetDistance, 3)
+            / Math.pow(visionPoseEstimate.targetsUsed.size(), 3);
+    final double rotationStdDev =
+        VisionConstants.kRotationStdDevCoeff
+            * Math.pow(avgTargetDistance, 3)
+            / Math.pow(visionPoseEstimate.targetsUsed.size(), 3);
 
     return VecBuilder.fill(translationStdDev, translationStdDev, rotationStdDev);
   }
