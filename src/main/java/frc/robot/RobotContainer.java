@@ -153,13 +153,18 @@ public class RobotContainer {
     // step 4: climb!
     // driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
     // driver.a().whileTrue(algaeSuperstructure.climb());
+
+    // step 5: alignment testing (no arm)
+    // driver.a().whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward,
+    // driverStrafe));
+    // driver.b().whileTrue(ReefAlign.alignToReef(drivetrain, () -> ReefPosition.LEFT));
   }
 
   private void configureBindings() {
     // driver controls
     // score coral / flip off algae
-    driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
-    driver.a().onTrue(algaeSuperstructure.climb());
+    // driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
+    // driver.a().onTrue(algaeSuperstructure.climb());
 
     // --- CORAL AUTOMATED CONTROLS ---
 
@@ -193,6 +198,10 @@ public class RobotContainer {
                             // when we get close enough, align to reef, but only while we're
                             // close enough
                             ReefAlign.alignToReef(drivetrain, () -> queuedReefPosition)
+                                .until(drivetrain::atPoseSetpoint)
+                                .andThen(
+                                    drivetrain.driveFieldCentric(
+                                        driverForward, driverStrafe, driverTurn))
                                 .onlyWhile(
                                     () ->
                                         ReefAlign.isWithinReefRange(
