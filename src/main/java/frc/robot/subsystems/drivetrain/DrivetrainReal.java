@@ -53,7 +53,11 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   private final SwerveRequest.FieldCentricFacingAngle fieldCentricFacingAngleRequest =
       new SwerveRequest.FieldCentricFacingAngle()
           .withDriveRequestType(DriveRequestType.Velocity)
-          .withDesaturateWheelSpeeds(true);
+          .withDesaturateWheelSpeeds(true)
+          .withHeadingPID(
+              DrivetrainConstants.kHeadingGains.kP(),
+              DrivetrainConstants.kHeadingGains.kI(),
+              DrivetrainConstants.kHeadingGains.kD());
 
   private final SwerveDrivePoseEstimator reefPoseEstimator;
 
