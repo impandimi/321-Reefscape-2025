@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -32,6 +33,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
 import frc.robot.subsystems.elevatorarm.ElevatorArmConstants;
+import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.ReefPosition;
 import java.util.function.DoubleSupplier;
@@ -97,6 +99,8 @@ public class RobotContainer {
       new SuperstructureVisualizer(
           () -> elevator.getHeight(), () -> elevatorArm.getAngle(), () -> algaePivot.getAngle());
 
+  private Leds leds = new Leds();
+  private AddressableLEDSim ledSim = new AddressableLEDSim(leds.strip);
   private boolean isDriverOverride = false;
 
   public RobotContainer() {
@@ -118,6 +122,7 @@ public class RobotContainer {
     elevatorArm.setDefaultCommand(
         elevatorArm.goToAngle(() -> CoralScorerSetpoint.NEUTRAL.getArmAngle()));
     coralEndEffector.setDefaultCommand(coralEndEffector.stallCoralIfDetected());
+    leds.setDefaultCommand(leds.updateLeds());
 
     // when both are about to collide, move elevator out of the way until the algae pivot is out of
     // the collision zone
