@@ -25,7 +25,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class ElevatorArmIOSpark implements ElevatorArmIO {
 
   // tuning config for the ElevatorArmIOReal
-  public static final ElevatorArmConfig config = new ElevatorArmConfig(0, 0, 0, 0, 0);
+  public static final ElevatorArmConfig config = new ElevatorArmConfig(0.25, 0, 0.002, 0.33, 0);
 
   // the motor that is controlling the arm (using a SparkMax controller)
   private SparkMax armMotor =
@@ -59,7 +59,7 @@ public class ElevatorArmIOSpark implements ElevatorArmIO {
 
     // seed arm motor encoder position with lamprey encoder position
     // TODO: if pid ends up being too messy, seed
-    // armMotor.getEncoder().setPosition(armMotor.getAnalog().getPosition() - 180);
+    seedEncoderValues();
 
     // setup encoder
     // encoderCandi
@@ -73,8 +73,8 @@ public class ElevatorArmIOSpark implements ElevatorArmIO {
   public void updateInputs(ElevatorArmInputs inputs) {
     // inputs.angle = encoderCandi.getPWM1Position().getValue()
     // TODO: if pid ends up being too messy, seed
-    inputs.angle = Degrees.of(armMotor.getAnalog().getPosition() - 180);
-    // inputs.angle = Degrees.of(armMotor.getEncoder().getPosition());
+    // inputs.angle = Degrees.of(armMotor.getAnalog().getPosition() - 180);
+    inputs.angle = Degrees.of(armMotor.getEncoder().getPosition());
     inputs.velocity = DegreesPerSecond.of(armMotor.getEncoder().getVelocity());
     inputs.current = Amps.of(armMotor.getOutputCurrent());
   }
@@ -86,5 +86,9 @@ public class ElevatorArmIOSpark implements ElevatorArmIO {
     // if (armMotor.getOutputCurrent() > 40) voltsWithStall /= 60; // jank way to make the motor
     // essentially stop
     armMotor.setVoltage(voltsWithStall);
+  }
+
+  public void seedEncoderValues() {
+    armMotor.getEncoder().setPosition(armMotor.getAnalog().getPosition() - 180);
   }
 }

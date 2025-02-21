@@ -35,7 +35,7 @@ public class AlgaeIntakePivot extends SubsystemBase {
 
   private boolean isHomed = false;
 
-  private Debouncer homingDebouncer = new Debouncer(0.15, DebounceType.kBoth);
+  private Debouncer homingDebouncer = new Debouncer(0.3, DebounceType.kBoth);
 
   public AlgaeIntakePivot(AlgaeIntakePivotIO io, AlgaeIntakePivotConfig config) {
     this.io = io;

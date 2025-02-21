@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class CoralEndEffectorConstants {
   // Motor configuration
   public static final int kMotorPort = 16;
-  public static final int kTimeOfFlightId = 0;
+  public static final int kTimeOfFlightId = 21;
   public static final boolean kInvertedMotor = true;
   public static final int kCurrentLimit = 40;
 

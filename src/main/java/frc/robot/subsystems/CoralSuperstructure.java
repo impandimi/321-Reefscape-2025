@@ -81,8 +81,10 @@ public class CoralSuperstructure {
 
   public enum CoralScorerSetpoint {
     // TODO: determine angles empirically
-    NEUTRAL(ElevatorConstants.kElevatorStartingHeight, Degrees.of(-60)), // TODO: make
-    FEED_CORAL(Inches.of(40.058), Degrees.of(-77.64500)),
+    NEUTRAL(
+        ElevatorConstants.kElevatorStartingHeight.plus(Meters.of(0.1)),
+        Degrees.of(-40)), // TODO: make
+    FEED_CORAL(Meters.of(0.95), Degrees.of(-70)),
     L1(Inches.of(45), Degrees.of(30)), // TODO: actually tune
     L2(Inches.of(55), Degrees.of(50.13600)),
     L3(Inches.of(65), Degrees.of(57.56300)),

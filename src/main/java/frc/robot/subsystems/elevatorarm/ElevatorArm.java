@@ -135,6 +135,10 @@ public class ElevatorArm extends SubsystemBase {
         });
   }
 
+  public Command seedEncoder() {
+    return runOnce(() -> io.seedEncoderValues());
+  }
+
   /**
    * Creates a Command that allows the user to tune the ElevatorArm using SmartDashboard
    *
