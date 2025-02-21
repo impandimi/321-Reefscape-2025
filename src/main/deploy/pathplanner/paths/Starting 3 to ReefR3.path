@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 5.187,
-        "y": 2.815999999999999
+        "x": 5.3105532786885234,
+        "y": 2.62843237704918
       },
       "prevControl": {
-        "x": 5.4990000000000006,
-        "y": 2.6989999999999985
+        "x": 5.622553278688524,
+        "y": 2.5114323770491795
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ReefR3"
     }
   ],
   "rotationTargets": [],
@@ -48,7 +48,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 1.5,
     "rotation": 119.99999999999999
   },
   "reversed": false,

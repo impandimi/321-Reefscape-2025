@@ -56,6 +56,12 @@ public class AutomaticAutonomousMaker3000 {
               new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.LEFTPOLE, Level.L4),
               new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.RIGHTPOLE, Level.L4)));
 
+  private static CycleAutoConfig kMidLaneBotPreloadAuto =
+      new CycleAutoConfig(
+          StartingPosition.MIDDLE,
+          List.of(
+              new ScoringGroup(FeedLocation.DOWNCORAL, ReefSide.REEFR2, Pole.LEFTPOLE, Level.L1)));
+
   private static CycleAutoConfig kBotLaneAuto =
       new CycleAutoConfig(
           StartingPosition.BOTTOM,
@@ -78,6 +84,7 @@ public class AutomaticAutonomousMaker3000 {
     preBuiltAuto.addOption("MidTopAuto", PreBuiltAuto.MIDTOPAUTO);
     preBuiltAuto.addOption("MidBotAuto", PreBuiltAuto.MIDBOTAUTO);
     preBuiltAuto.addOption("BotAuto", PreBuiltAuto.BOTAUTO);
+    preBuiltAuto.addOption("MidPreloadAuto", PreBuiltAuto.MIDPRELOADAUTO);
     preBuiltAuto.addOption("Custom Auto", PreBuiltAuto.CUSTOM);
 
     SmartDashboard.putData("Autos/PreBuiltAuto", preBuiltAuto);
@@ -96,6 +103,7 @@ public class AutomaticAutonomousMaker3000 {
                         case MIDTOPAUTO -> buildAuto(kMidLaneTopAuto);
                         case MIDBOTAUTO -> buildAuto(kMidLaneBotAuto);
                         case BOTAUTO -> buildAuto(kBotLaneAuto);
+                        case MIDPRELOADAUTO -> buildAuto(kMidLaneBotPreloadAuto); // test auto again
                         case CUSTOM -> buildAuto(autoChooser.build());
                         default -> new PathsAndAuto(Commands.none(), new ArrayList<>());
                       };
@@ -315,6 +323,7 @@ public class AutomaticAutonomousMaker3000 {
     MIDBOTAUTO,
     BOTAUTO,
     CUSTOM,
+    MIDPRELOADAUTO,
     DO_NOTHING;
   }
 

@@ -20,8 +20,8 @@
         "y": 4.030993852459016
       },
       "prevControl": {
-        "x": 2.877049180327869,
-        "y": 7.627305327868852
+        "x": 2.6972336065573765,
+        "y": 7.579354508196721
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [
     {
       "name": "ArmCoralOuttake",
-      "waypointRelativePos": 0.443019943019943,
+      "waypointRelativePos": 0.1885090218423551,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -48,8 +48,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 0.0
+    "velocity": 1.5,
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": "Paths",

@@ -48,8 +48,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -55.0
+    "velocity": 1.5,
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": "Paths",

@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.800763028158181,
-        "y": 1.0804999999999996
+        "x": 4.075819672131147,
+        "y": 1.0340676229508199
       },
       "isLocked": false,
       "linkedName": "DownCoral"
     },
     {
       "anchor": {
-        "x": 5.41844262295082,
-        "y": 5.493493852459016
+        "x": 5.358504098360656,
+        "y": 5.433555327868853
       },
       "prevControl": {
-        "x": 8.171938524590164,
-        "y": 3.372389344262296
+        "x": 8.47530737704918,
+        "y": 3.6713627049180326
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,14 +48,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 1.5,
     "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 54.404725478721346
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }
