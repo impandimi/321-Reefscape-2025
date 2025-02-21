@@ -183,11 +183,34 @@ public interface SwerveDrive extends Subsystem {
 
   Rotation2d getHeading();
 
+  /**
+   * Add vision measurement to the main Swerve Drive pose estimator
+   *
+   * @param visionRobotPose the vision measurement estimated pose to add to the pose estimator
+   * @param timeStampSeconds the timestamp of the vision measurement in the FPGA epoch
+   */
   void addVisionMeasurement(Pose2d visionRobotPose, double timeStampSeconds);
 
+  /**
+   * Add vision measurement to the main Swerve Drive pose estimator
+   *
+   * @param visionRobotPose the vision measurement estimated pose to add to the pose estimator
+   * @param timeStampSeconds the timestamp of the vision measurement in the FPGA epoch
+   * @param standardDeviations the standard deviations for the vision measurement; lower standard
+   *     deviations means more trust
+   */
   void addVisionMeasurement(
       Pose2d visionRobotPose, double timeStampSeconds, Matrix<N3, N1> standardDeviations);
 
+  /**
+   * Add vision measurement to the reef-only Swerve Drive pose estimator This should only be called
+   * with vision measurements from the two elevator cameras aimed at the reef
+   *
+   * @param visionRobotPose the vision measurement estimated pose to add to the pose estimator
+   * @param timeStampSeconds the timestamp of the vision measurement in the FPGA epoch
+   * @param standardDeviations the standard deviations for the vision measurement; lower standard
+   *     deviations means more trust
+   */
   void addReefVisionMeasurement(
       Pose2d visionRobotPose, double timeStampSeconds, Matrix<N3, N1> standardDeviations);
 }
