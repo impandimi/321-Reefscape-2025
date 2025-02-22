@@ -125,7 +125,7 @@ public class RobotContainer {
         elevator.goToHeight(() -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight()));
     elevatorArm.setDefaultCommand(
         elevatorArm.goToAngle(() -> CoralScorerSetpoint.NEUTRAL.getArmAngle()));
-    coralEndEffector.setDefaultCommand(coralEndEffector.runVolts(() -> Volts.zero()));
+    coralEndEffector.setDefaultCommand(coralEndEffector.runVolts(() -> Volts.of(1)));
     leds.setDefaultCommand(leds.updateLeds());
 
     // when both are about to collide, move elevator out of the way until the algae pivot is out of
@@ -257,7 +257,7 @@ public class RobotContainer {
             coralSuperstructure
                 .goToSetpoint(() -> queuedSetpoint) // ensure we're at the setpoint
                 .alongWith(coralSuperstructure.outtakeCoral()) // and outtake coral
-                .until(() -> !coralSuperstructure.hasCoral()) // until we don't have coral
+                // .until(() -> !coralSuperstructure.hasCoral()) // until we don't have coral
                 .withTimeout(1) // timeout at 1 second
                 .andThen(
                     // move arm up and go back down (only if we're already at the scoring setpoint

@@ -30,7 +30,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.MyAlliance;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -56,9 +59,9 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
           .withDriveRequestType(DriveRequestType.Velocity)
           .withDesaturateWheelSpeeds(true)
           .withHeadingPID(
-              DrivetrainConstants.kHeadingGains.kP(),
-              DrivetrainConstants.kHeadingGains.kI(),
-              DrivetrainConstants.kHeadingGains.kD());
+              DrivetrainConstants.tuneHeadingGains.kP(),
+              DrivetrainConstants.tuneHeadingGains.kI(),
+              DrivetrainConstants.tuneHeadingGains.kD());
 
   private final SwerveDrivePoseEstimator reefPoseEstimator;
 
@@ -236,7 +239,8 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
             .withDriveRequestType(DriveRequestType.Velocity)
             .withVelocityX(targetSpeeds.vxMetersPerSecond)
             .withVelocityY(targetSpeeds.vyMetersPerSecond)
-            .withRotationalRate(targetSpeeds.omegaRadiansPerSecond));
+            .withRotationalRate(targetSpeeds.omegaRadiansPerSecond)
+            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
   }
 
   // drive with absolute heading control
@@ -251,8 +255,9 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
             .withDriveRequestType(DriveRequestType.Velocity)
             .withVelocityX(speeds.vxMetersPerSecond)
             .withVelocityY(speeds.vyMetersPerSecond)
-            .withTargetDirection(rotation)
-            .withForwardPerspective(ForwardPerspectiveValue.BlueAlliance));
+            .withTargetDirection(
+                MyAlliance.isRed() ? rotation.plus(Rotation2d.fromDegrees(180)) : rotation)
+            .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective));
   }
 
   @Override
@@ -334,5 +339,14 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
   @Override
   public void periodic() {
     reefPoseEstimator.update(getHeading(), getModulePositions());
+
+    if (DriverStation.isDisabled()) {
+      DriverStation.getAlliance()
+          .ifPresent(
+              allianceColor -> {
+                setOperatorPerspectiveForward(
+                    allianceColor == Alliance.Red ? Rotation2d.k180deg : Rotation2d.kZero);
+              });
+    }
   }
 }
