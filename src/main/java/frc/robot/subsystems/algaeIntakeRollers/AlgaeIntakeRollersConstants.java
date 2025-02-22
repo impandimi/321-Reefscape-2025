@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class AlgaeIntakeRollersConstants {
 
   // motor, sensor IDs
-  public static final int kBeamBreakId = 0;
+  public static final int kBeamBreakId = 0; //TODO
   public static final int kMotorId = 17;
 
   // function constants

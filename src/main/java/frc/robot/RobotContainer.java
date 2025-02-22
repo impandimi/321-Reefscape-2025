@@ -55,25 +55,25 @@ public class RobotContainer {
   private CommandXboxController driver = new CommandXboxController(0);
   private XboxController manipulator = new XboxController(1);
 
-  private Trigger isSlowMode = driver.leftBumper();
+  // private Trigger isSlowMode = driver.leftBumper();
 
-  private DoubleSupplier driverForward =
-      () ->
-          -MathUtil.applyDeadband(driver.getLeftY(), 0.05)
-              * (isSlowMode.getAsBoolean()
-                  ? 2
-                  : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
-  private DoubleSupplier driverStrafe =
-      () ->
-          -MathUtil.applyDeadband(driver.getLeftX(), 0.05)
-              * (isSlowMode.getAsBoolean()
-                  ? 2
-                  : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
-  private DoubleSupplier driverTurn = () -> -MathUtil.applyDeadband(driver.getRightX(), 0.05) * 5;
+// private DoubleSupplier driverForward =
+//       () ->
+//           -MathUtil.applyDeadband(driver.getLeftY(), 0.05)
+//               * (isSlowMode.getAsBoolean()
+//                   ? 2
+//                   : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
+//   private DoubleSupplier driverStrafe =
+//       () ->
+//           -MathUtil.applyDeadband(driver.getLeftX(), 0.05)
+//               * (isSlowMode.getAsBoolean()
+//                   ? 2
+//                   : DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond));
+//   private DoubleSupplier driverTurn = () -> -MathUtil.applyDeadband(driver.getRightX(), 0.05) * 5;
 
   // robot queued states
-  private ReefPosition queuedReefPosition = ReefPosition.NONE;
-  private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
+  // private ReefPosition queuedReefPosition = ReefPosition.NONE;
+  // private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
 
   //   private SuperstructureVisualizer stateVisualizer =
   //       new SuperstructureVisualizer(
@@ -244,7 +244,7 @@ public class RobotContainer {
     // // --- ALGAE AUTOMATED CONTROLS ---
 
     // // algae feeding
-    driver.leftBumper().whileTrue(algaeSuperstructure.intakeAlgae());
+    driver.leftBumper().whileTrue(algaeSuperstructure.intakeAlgae());}
 
     // // algae outtake
     // driver
@@ -342,86 +342,86 @@ public class RobotContainer {
     // 5 to 8 - left side L1-L4
     // 9 to 10 - algae low / high
 
-    manipTrigger(1)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.RIGHT;
-                  queuedSetpoint = CoralScorerSetpoint.L1;
-                }));
+  //   manipTrigger(1)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.RIGHT;
+  //                 queuedSetpoint = CoralScorerSetpoint.L1;
+  //               }));
 
-    manipTrigger(2)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.RIGHT;
-                  queuedSetpoint = CoralScorerSetpoint.L2;
-                }));
+  //   manipTrigger(2)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.RIGHT;
+  //                 queuedSetpoint = CoralScorerSetpoint.L2;
+  //               }));
 
-    manipTrigger(3)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.RIGHT;
-                  queuedSetpoint = CoralScorerSetpoint.L3;
-                }));
+  //   manipTrigger(3)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.RIGHT;
+  //                 queuedSetpoint = CoralScorerSetpoint.L3;
+  //               }));
 
-    manipTrigger(4)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.RIGHT;
-                  queuedSetpoint = CoralScorerSetpoint.L4;
-                }));
+  //   manipTrigger(4)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.RIGHT;
+  //                 queuedSetpoint = CoralScorerSetpoint.L4;
+  //               }));
 
-    manipTrigger(5)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.LEFT;
-                  queuedSetpoint = CoralScorerSetpoint.L1;
-                }));
+  //   manipTrigger(5)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.LEFT;
+  //                 queuedSetpoint = CoralScorerSetpoint.L1;
+  //               }));
 
-    manipTrigger(6)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.LEFT;
-                  queuedSetpoint = CoralScorerSetpoint.L2;
-                }));
+  //   manipTrigger(6)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.LEFT;
+  //                 queuedSetpoint = CoralScorerSetpoint.L2;
+  //               }));
 
-    manipTrigger(7)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.LEFT;
-                  queuedSetpoint = CoralScorerSetpoint.L3;
-                }));
+  //   manipTrigger(7)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.LEFT;
+  //                 queuedSetpoint = CoralScorerSetpoint.L3;
+  //               }));
 
-    manipTrigger(8)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.LEFT;
-                  queuedSetpoint = CoralScorerSetpoint.L4;
-                }));
+  //   manipTrigger(8)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.LEFT;
+  //                 queuedSetpoint = CoralScorerSetpoint.L4;
+  //               }));
 
-    manipTrigger(9)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.ALGAE;
-                  queuedSetpoint = CoralScorerSetpoint.ALGAE_LOW;
-                }));
+  //   manipTrigger(9)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.ALGAE;
+  //                 queuedSetpoint = CoralScorerSetpoint.ALGAE_LOW;
+  //               }));
 
-    manipTrigger(10)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  queuedReefPosition = ReefPosition.ALGAE;
-                  queuedSetpoint = CoralScorerSetpoint.ALGAE_HIGH;
-                }));
-  }
+  //   manipTrigger(10)
+  //       .onTrue(
+  //           Commands.runOnce(
+  //               () -> {
+  //                 queuedReefPosition = ReefPosition.ALGAE;
+  //                 queuedSetpoint = CoralScorerSetpoint.ALGAE_HIGH;
+  //               }));
+  // }
 
   private Trigger manipTrigger(int button) {
     return new Trigger(() -> manipulator.getRawButton(button));
