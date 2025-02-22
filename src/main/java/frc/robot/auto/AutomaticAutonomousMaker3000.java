@@ -86,6 +86,7 @@ public class AutomaticAutonomousMaker3000 {
     preBuiltAuto.addOption("BotAuto", PreBuiltAuto.BOTAUTO);
     preBuiltAuto.addOption("MidPreloadAuto", PreBuiltAuto.MIDPRELOADAUTO);
     preBuiltAuto.addOption("Custom Auto", PreBuiltAuto.CUSTOM);
+    preBuiltAuto.addOption("Testing", PreBuiltAuto.TEST);
 
     SmartDashboard.putData("Autos/PreBuiltAuto", preBuiltAuto);
     SmartDashboard.putData("Autos/AutoVisualizerField", field);
@@ -105,6 +106,7 @@ public class AutomaticAutonomousMaker3000 {
                         case BOTAUTO -> buildAuto(kBotLaneAuto);
                         case MIDPRELOADAUTO -> buildAuto(kMidLaneBotPreloadAuto); // test auto again
                         case CUSTOM -> buildAuto(autoChooser.build());
+                        case TEST -> runPath("Forward 1 Meter");
                         default -> new PathsAndAuto(Commands.none(), new ArrayList<>());
                       };
 
@@ -133,6 +135,18 @@ public class AutomaticAutonomousMaker3000 {
 
   public Command getStoredAuto() {
     return storedAuto;
+  }
+
+  private PathsAndAuto runPath(String pathName) {
+    try {
+      PathPlannerPath path = getPath(pathName);
+
+      if (path == null) return null;
+      return new PathsAndAuto(toPathCommand(path, true), List.of(path));
+    } catch (FileVersionException | IOException | ParseException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
   private void visualizeAuto(List<PathPlannerPath> paths) {
@@ -324,7 +338,8 @@ public class AutomaticAutonomousMaker3000 {
     BOTAUTO,
     CUSTOM,
     MIDPRELOADAUTO,
-    DO_NOTHING;
+    DO_NOTHING,
+    TEST;
   }
 
   public static class ScoringGroupChooser {
