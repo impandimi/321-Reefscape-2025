@@ -15,7 +15,6 @@ import frc.robot.commands.ReefAlign;
 import frc.robot.subsystems.CoralSuperstructure;
 import frc.robot.subsystems.CoralSuperstructure.CoralScorerSetpoint;
 import frc.robot.subsystems.drivetrain.SwerveDrive;
-import frc.robot.subsystems.elevatorarm.ElevatorArmConstants;
 import frc.robot.util.ReefPosition;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -106,7 +105,7 @@ public class AutomaticAutonomousMaker3000 {
                         case BOTAUTO -> buildAuto(kBotLaneAuto);
                         case MIDPRELOADAUTO -> buildAuto(kMidLaneBotPreloadAuto); // test auto again
                         case CUSTOM -> buildAuto(autoChooser.build());
-                        case TEST -> runPath("Forward 1 Meter");
+                        case TEST -> runPath("Forward 1 Meter + Rotate 180 degrees");
                         default -> new PathsAndAuto(Commands.none(), new ArrayList<>());
                       };
 
@@ -220,11 +219,13 @@ public class AutomaticAutonomousMaker3000 {
   }
 
   public Command withIntaking(Command path) {
-    return path.alongWith(
-        coralSuperstructure.feedCoral().asProxy().until(() -> coralSuperstructure.hasCoral()));
+    return path;
+    // .alongWith(coralSuperstructure.feedCoral().asProxy().until(() ->
+    // coralSuperstructure.hasCoral()));
   }
 
   public Command withScoring(Command path, Pole pole, Level level) {
+    // return path;
     CoralScorerSetpoint setpoint =
         switch (level) {
           default -> CoralScorerSetpoint.L1;
@@ -233,28 +234,32 @@ public class AutomaticAutonomousMaker3000 {
           case L3 -> CoralScorerSetpoint.L3;
           case L4 -> CoralScorerSetpoint.L4;
         };
-    return path.deadlineFor(
-            coralSuperstructure
-                .goToSetpoint(
-                    () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
-                    () -> ElevatorArmConstants.kPreAlignAngle)
-                .asProxy())
+    return path
+        // .deadlineFor(
+        //         coralSuperstructure
+        //             .goToSetpoint(
+        //                 () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+        //                 () -> ElevatorArmConstants.kPreAlignAngle)
+        //             .asProxy())
         .andThen(
-            ReefAlign.alignToReef(
-                    drive, () -> pole == Pole.LEFTPOLE ? ReefPosition.LEFT : ReefPosition.RIGHT)
-                .asProxy()
-                .alongWith(coralSuperstructure.goToSetpoint(() -> setpoint).asProxy())
-                .until(() -> drive.atPoseSetpoint() && coralSuperstructure.atTargetState()))
-        .andThen(
-            coralSuperstructure
-                .goToSetpoint(() -> setpoint)
-                .asProxy()
-                .withDeadline(
-                    coralSuperstructure
-                        .outtakeCoral()
-                        .asProxy()
-                        .until(() -> !coralSuperstructure.hasCoral())
-                        .withTimeout(2)));
+        ReefAlign.alignToReef(
+                drive, () -> pole == Pole.LEFTPOLE ? ReefPosition.LEFT : ReefPosition.RIGHT)
+            .asProxy()
+            // .alongWith(coralSuperstructure.goToSetpoint(() -> setpoint).asProxy())
+            .until(
+                () -> drive.atPoseSetpoint()
+                //  && coralSuperstructure.atTargetState()
+                ));
+    // .andThen(
+    //     coralSuperstructure
+    //         .goToSetpoint(() -> setpoint)
+    //         .asProxy()
+    //         .withDeadline(
+    //             coralSuperstructure
+    //                 .outtakeCoral()
+    //                 .asProxy()
+    //                 .until(() -> !coralSuperstructure.hasCoral())
+    //                 .withTimeout(2)));
   }
 
   private Command toPathCommand(PathPlannerPath path, boolean zero) {

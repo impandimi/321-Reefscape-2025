@@ -21,7 +21,7 @@ public class DrivetrainConstants {
 
   public static final AutoGains kTranslationGains =
       RobotBase.isReal()
-          ? new AutoGains(5, 0, 0) // real (TODO: TUNE)
+          ? new AutoGains(4, 0, 0) // real (TODO: TUNE)
           : new AutoGains(4, 0, 0.2); // sim
 
   public static final AutoGains kHeadingGains =
@@ -39,7 +39,7 @@ public class DrivetrainConstants {
   public static final double kRotationDeadband = 0.03;
   public static final AngularVelocity kMaxAngularVelocity = RadiansPerSecond.of(Math.PI * 6);
   public static final LinearVelocity kMaxLinearVelocity =
-      MetersPerSecond.of(4.0); // TunerConstants.kSpeedAt12Volts
+      MetersPerSecond.of(5.0); // TunerConstants.kSpeedAt12Volts
 
   public static final Time kLoopDt = Seconds.of(0.02);
 

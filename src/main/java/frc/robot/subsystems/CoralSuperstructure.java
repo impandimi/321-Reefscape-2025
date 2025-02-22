@@ -86,7 +86,7 @@ public class CoralSuperstructure {
         Degrees.of(-40)), // TODO: make
     FEED_CORAL(Meters.of(0.95), Degrees.of(-70)),
     L1(Inches.of(45), Degrees.of(30)), // TODO: actually tune
-    L2(Meters.of(0.95), Degrees.of(105)),
+    L2(Meters.of(0.9), Degrees.of(95)),
     L3(Meters.of(1.3), Degrees.of(105)),
     L4(Meters.of(2), Degrees.of(100)),
     ALGAE_LOW(Inches.of(50), Degrees.of(20)), // TODO: actually tune

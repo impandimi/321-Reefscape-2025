@@ -62,6 +62,7 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
               DrivetrainConstants.tuneHeadingGains.kP(),
               DrivetrainConstants.tuneHeadingGains.kI(),
               DrivetrainConstants.tuneHeadingGains.kD());
+  // .withRotationalDeadband(0.25);
 
   private final SwerveDrivePoseEstimator reefPoseEstimator;
 
@@ -336,6 +337,8 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         visionRobotPose, Utils.fpgaToCurrentTime(timeStampSeconds), standardDeviations);
   }
 
+  private Alliance lastAlliance;
+
   @Override
   public void periodic() {
     reefPoseEstimator.update(getHeading(), getModulePositions());
@@ -344,8 +347,10 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
       DriverStation.getAlliance()
           .ifPresent(
               allianceColor -> {
+                if (lastAlliance == allianceColor) return;
                 setOperatorPerspectiveForward(
                     allianceColor == Alliance.Red ? Rotation2d.k180deg : Rotation2d.kZero);
+                lastAlliance = allianceColor;
               });
     }
   }
