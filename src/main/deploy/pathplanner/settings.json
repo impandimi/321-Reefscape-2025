@@ -3,12 +3,14 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
+    "Testing",
     "Paths"
   ],
   "autoFolders": [
     "1st Starting Position",
+    "3rd Starting Position",
     "Middle Starting Position",
-    "3rd Starting Position"
+    "Testing Autos"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

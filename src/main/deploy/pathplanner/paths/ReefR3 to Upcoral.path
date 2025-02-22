@@ -4,12 +4,12 @@
     {
       "anchor": {
         "x": 5.3105532786885234,
-        "y": 2.6883709016393436
+        "y": 2.62843237704918
       },
       "prevControl": null,
       "nextControl": {
         "x": 2.90470081967213,
-        "y": 0.7266229508196727
+        "y": 0.6666844262295091
       },
       "isLocked": false,
       "linkedName": "ReefR3"
@@ -49,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -52.85531156141885
+    "rotation": 125.00000000000001
   },
   "reversed": false,
   "folder": "Paths",
