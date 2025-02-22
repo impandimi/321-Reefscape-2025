@@ -219,7 +219,7 @@ public class AutomaticAutonomousMaker3000 {
   }
 
   public Command withIntaking(Command path) {
-    return path;
+    return path.andThen(Commands.waitSeconds(1));
     // .alongWith(coralSuperstructure.feedCoral().asProxy().until(() ->
     // coralSuperstructure.hasCoral()));
   }
@@ -242,14 +242,15 @@ public class AutomaticAutonomousMaker3000 {
         //                 () -> ElevatorArmConstants.kPreAlignAngle)
         //             .asProxy())
         .andThen(
-        ReefAlign.alignToReef(
-                drive, () -> pole == Pole.LEFTPOLE ? ReefPosition.LEFT : ReefPosition.RIGHT)
-            .asProxy()
-            // .alongWith(coralSuperstructure.goToSetpoint(() -> setpoint).asProxy())
-            .until(
-                () -> drive.atPoseSetpoint()
-                //  && coralSuperstructure.atTargetState()
-                ));
+            ReefAlign.alignToReef(
+                    drive, () -> pole == Pole.LEFTPOLE ? ReefPosition.LEFT : ReefPosition.RIGHT)
+                .asProxy()
+                // .alongWith(coralSuperstructure.goToSetpoint(() -> setpoint).asProxy())
+                .until(
+                    () -> drive.atPoseSetpoint()
+                    //  && coralSuperstructure.atTargetState()
+                    ))
+        .andThen(Commands.waitSeconds(2));
     // .andThen(
     //     coralSuperstructure
     //         .goToSetpoint(() -> setpoint)
