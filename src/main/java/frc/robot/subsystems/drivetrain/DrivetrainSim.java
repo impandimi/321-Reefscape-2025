@@ -4,9 +4,7 @@ package frc.robot.subsystems.drivetrain;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
@@ -178,14 +176,11 @@ public class DrivetrainSim implements SwerveDrive {
                 () -> {
                   ChassisSpeeds targetSpeeds =
                       new ChassisSpeeds(
-                          xPoseController.calculate(getPose().getX(), pose.get().getX())
-                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
-                          yPoseController.calculate(getPose().getY(), pose.get().getY())
-                              * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
+                          xPoseController.calculate(getPose().getX(), pose.get().getX()),
+                          yPoseController.calculate(getPose().getY(), pose.get().getY()),
                           thetaController.calculate(
-                                  getPose().getRotation().getRadians(),
-                                  pose.get().getRotation().getRadians())
-                              * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond));
+                              getPose().getRotation().getRadians(),
+                              pose.get().getRotation().getRadians()));
 
                   driveRobotCentric(
                       targetSpeeds.vxMetersPerSecond,
@@ -197,18 +192,16 @@ public class DrivetrainSim implements SwerveDrive {
 
   @Override
   public void driveToFieldPose(Pose2d pose) {
+    System.out.println(pose);
 
     if (pose == null) return;
 
     ChassisSpeeds targetSpeeds =
         new ChassisSpeeds(
-            xPoseController.calculate(getPose().getX(), pose.getX())
-                * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
-            yPoseController.calculate(getPose().getY(), pose.getY())
-                * DrivetrainConstants.kMaxLinearVelocity.in(MetersPerSecond),
+            xPoseController.calculate(getPose().getX(), pose.getX()),
+            yPoseController.calculate(getPose().getY(), pose.getY()),
             thetaController.calculate(
-                    getPose().getRotation().getRadians(), pose.getRotation().getRadians())
-                * DrivetrainConstants.kMaxAngularVelocity.in(RadiansPerSecond));
+                getPose().getRotation().getRadians(), pose.getRotation().getRadians()));
 
     if (atPoseSetpoint()) targetSpeeds = new ChassisSpeeds();
 
