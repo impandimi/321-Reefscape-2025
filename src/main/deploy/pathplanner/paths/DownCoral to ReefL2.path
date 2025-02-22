@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.17,
-        "y": 1.0804999999999996
+        "x": 1.5823770491803275,
+        "y": 0.6744364754098353
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.29125,
-        "y": 1.6557499999999994
+        "x": 2.7036270491803274,
+        "y": 1.2496864754098354
       },
       "isLocked": false,
       "linkedName": "DownCoral"
@@ -55,7 +55,7 @@
   "folder": "Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 59.99999999999999
+    "rotation": 55.0
   },
   "useDefaultConstraints": true
 }
