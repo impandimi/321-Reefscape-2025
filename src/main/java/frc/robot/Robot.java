@@ -28,11 +28,29 @@ public class Robot extends TimedRobot {
   public Robot() {
     m_robotContainer = new RobotContainer();
     Epilogue.bind(this);
+
+    /*
+     * RobotConstants.kAprilTagFieldLayout takes a significant amount of computing to load,
+     * referencing `RobotConstants.class` here forces the field layout to load instead of stalling
+     * autonomousInit()/teleopInit()
+     */
+    @SuppressWarnings("unused")
+    final var robotConstants = RobotConstants.class;
+
+    // TODO: load robot alliance globally on DS connection to avoid extra lookups
+    ReefAlign.loadReefAlignmentPoses();
+    StationAlign.loadStationAlignmentPoses();
+    ProcessorAlign.loadProcessorAlignmentPoses();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    /*
+     * TODO: note that VirtualSubsystem periodics must run after Subsystem periodics
+     * since inputs need to be defined before SuperstructureVisualizer references them
+     */
     VirtualSubsystem.periodicAll();
   }
 
@@ -47,11 +65,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    // auto init is the first time that alliance is guaranteed to be resolved, according to memory
-    ReefAlign.loadReefAlignmentPoses();
-    StationAlign.loadStationAlignmentPoses();
-    ProcessorAlign.loadProcessorAlignmentPoses();
-
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -67,11 +80,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    // alliance is also available here, for testing without needing to enable auto first
-    ReefAlign.loadReefAlignmentPoses();
-    StationAlign.loadStationAlignmentPoses();
-    ProcessorAlign.loadProcessorAlignmentPoses();
-
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
