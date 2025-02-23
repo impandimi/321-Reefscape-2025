@@ -192,8 +192,6 @@ public class DrivetrainSim implements SwerveDrive {
 
   @Override
   public void driveToFieldPose(Pose2d pose) {
-    System.out.println(pose);
-
     if (pose == null) return;
 
     ChassisSpeeds targetSpeeds =

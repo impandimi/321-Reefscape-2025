@@ -21,6 +21,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -337,7 +338,7 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         visionRobotPose, Utils.fpgaToCurrentTime(timeStampSeconds), standardDeviations);
   }
 
-  private Alliance lastAlliance;
+  @NotLogged private Alliance lastAlliance;
 
   @Override
   public void periodic() {

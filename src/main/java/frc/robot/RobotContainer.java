@@ -140,24 +140,20 @@ public class RobotContainer {
   }
 
   private void configureTuningBindings() {
-
-    // step 1: tune pivot (disable everything but pivot and drivetrain and vision ig)
-    // driver.b().whileTrue(elevatorArm.tune());
-
-    // step 2: test algae intake
+    // test algae intake
     // driver.b().whileTrue(algaeSuperstructure.intakeAlgae());
     // driver.a().whileTrue(algaeSuperstructure.outtakeAlgae());
 
-    // step 3: find arm setpoints
+    // find arm setpoints
     driver.b().whileTrue(coralSuperstructure.tune());
     driver.leftBumper().whileTrue(coralSuperstructure.feedCoral());
     driver.rightBumper().whileTrue(coralEndEffector.outtakeCoral());
 
-    // step 4: climb!
+    // climb!
     // driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
     // driver.a().whileTrue(algaeSuperstructure.climb());
 
-    // step 5: alignment testing (no arm)
+    // alignment testing (no arm)
     // driver.a().whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward,
     // driverStrafe));
     // driver.b().whileTrue(ReefAlign.alignToReef(drivetrain, () -> ReefPosition.LEFT));
@@ -219,62 +215,59 @@ public class RobotContainer {
                                             !isDriverOverride))
                         // when we get far away, repeat the command
                         .repeatedly()
-                    // .alongWith( // and run the mechanism to where we need to go
-                    //     coralSuperstructure
-                    //         .goToSetpoint(
-                    //             // move arm up to avoid hitting reef until we get close to reef
-                    //             () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
-                    //             () -> ElevatorArmConstants.kPreAlignAngle)
-                    //         .until(
-                    //             () ->
-                    //                 coralSuperstructure.atTargetState()
-                    //                     && ReefAlign.isWithinReefRange(
-                    //                         drivetrain, ReefAlign.kMechanismDeadbandThreshold))
-                    //         .andThen(
-                    //             // move the elevator up but keep arm up
-                    //             coralSuperstructure
-                    //                 .goToSetpoint(
-                    //                     () -> queuedSetpoint.getElevatorHeight(),
-                    //                     () -> ElevatorArmConstants.kPreAlignAngle)
-                    //                 .until(() -> coralSuperstructure.atTargetState())
-                    //                 // then move arm down to setpoint
-                    //                 .andThen(
-                    //                     coralSuperstructure.goToSetpoint(() -> queuedSetpoint)))
-                    //         // and only do this while we're in the zone (when we're not, we will
-                    //         // stay in the pre-alignment position)
-                    //         .onlyWhile(
-                    //             () ->
-                    //                 ReefAlign.isWithinReefRange(
-                    //                         drivetrain, ReefAlign.kMechanismDeadbandThreshold)
-                    //                     && queuedSetpoint != CoralScorerSetpoint.NEUTRAL)
-                    //         .repeatedly())
-                    ));
+                        .alongWith( // and run the mechanism to where we need to go
+                            coralSuperstructure
+                                .goToSetpoint(
+                                    // move arm up to avoid hitting reef until we get close to reef
+                                    () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+                                    () -> ElevatorArmConstants.kPreAlignAngle)
+                                .until(
+                                    () ->
+                                        coralSuperstructure.atTargetState()
+                                            && ReefAlign.isWithinReefRange(
+                                                drivetrain, ReefAlign.kMechanismDeadbandThreshold))
+                                .andThen(
+                                    // move the elevator up but keep arm up
+                                    coralSuperstructure
+                                        .goToSetpoint(
+                                            () -> queuedSetpoint.getElevatorHeight(),
+                                            () -> ElevatorArmConstants.kPreAlignAngle)
+                                        .until(() -> coralSuperstructure.atTargetState())
+                                        // then move arm down to setpoint
+                                        .andThen(
+                                            coralSuperstructure.goToSetpoint(() -> queuedSetpoint)))
+                                // and only do this while we're in the zone (when we're not, we will
+                                // stay in the pre-alignment position)
+                                .onlyWhile(
+                                    () ->
+                                        ReefAlign.isWithinReefRange(
+                                                drivetrain, ReefAlign.kMechanismDeadbandThreshold)
+                                            && queuedSetpoint != CoralScorerSetpoint.NEUTRAL)
+                                .repeatedly())));
 
-    // driver
-    //     .rightTrigger()
-    //     .onFalse( // for coral scoring
-    //         coralSuperstructure
-    //             .goToSetpoint(() -> queuedSetpoint) // ensure we're at the setpoint
-    //             .alongWith(coralSuperstructure.outtakeCoral()) // and outtake coral
-    //             // .until(() -> !coralSuperstructure.hasCoral()) // until we don't have coral
-    //             .withTimeout(1) // timeout at 1 second
-    //             .andThen(
-    //                 // move arm up and go back down (only if we're already at the scoring
-    // setpoint
-    //                 // state)
-    //                 coralSuperstructure
-    //                     .goToSetpoint(
-    //                         () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
-    //                         () -> ElevatorArmConstants.kPreAlignAngle)
-    //                     .until(
-    //                         coralSuperstructure::atTargetState)) // and then resume default
-    // command
-    //             // only if we're at the target state and are ready to score
-    //             .onlyIf(
-    //                 () ->
-    //                     coralSuperstructure.atTargetState()
-    //                         && queuedSetpoint != CoralScorerSetpoint.NEUTRAL
-    //                         && !driver.povLeft().getAsBoolean()));
+    driver
+        .rightTrigger()
+        .onFalse( // for coral scoring
+            coralSuperstructure
+                .goToSetpoint(() -> queuedSetpoint) // ensure we're at the setpoint
+                .alongWith(coralSuperstructure.outtakeCoral()) // and outtake coral
+                // .until(() -> !coralSuperstructure.hasCoral()) // until we don't have coral
+                .withTimeout(1) // timeout at 1 second
+                .andThen(
+                    // move arm up and go back down (only if we're already at the scoring setpoint
+                    // state)
+                    coralSuperstructure
+                        .goToSetpoint(
+                            () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+                            () -> ElevatorArmConstants.kPreAlignAngle)
+                        .until(
+                            coralSuperstructure::atTargetState)) // and then resume default command
+                // only if we're at the target state and are ready to score
+                .onlyIf(
+                    () ->
+                        coralSuperstructure.atTargetState()
+                            && queuedSetpoint != CoralScorerSetpoint.NEUTRAL
+                            && !driver.povLeft().getAsBoolean()));
 
     // --- CORAL MANUAL CONTROLS ---
     driver
@@ -394,39 +387,6 @@ public class RobotContainer {
 
     // toggle driver override
     driver.povUp().onTrue(Commands.runOnce(() -> isDriverOverride = !isDriverOverride));
-
-    /**
-     * Preference 2:
-     *
-     * <p>Pressing right trigger down all the way performs translation-align/to-setpoint, while
-     * pressing it slightly performs the rotation align
-     *
-     * <p>Driver has override over translation-align/to-setpoint
-     */
-    // new Trigger(() -> driver.getRightTriggerAxis() >= 0.8)
-    //     .whileTrue(
-    //         ReefAlign.alignToReef(drivetrain, () -> queuedReefPosition)
-    //             .onlyWhile(
-    //                 () ->
-    //                     ReefAlign.isWithinReefRange(
-    //                             drivetrain, ReefAlign.kMaxAlignmentDeadbandThreshold)
-    //                         && Math.hypot(driverForward.getAsDouble(),
-    // driverStrafe.getAsDouble())
-    //                             <= 0.05)
-    //             .asProxy()
-    //             .repeatedly()
-    //             .alongWith(
-    //                 coralSuperstructure
-    //                     .goToSetpoint(() -> queuedSetpoint)
-    //                     .onlyWhile(
-    //                         () ->
-    //                             ReefAlign.isWithinReefRange(
-    //                                 drivetrain, ReefAlign.kMechanismDeadbandThreshold))
-    //                     .asProxy()
-    //                     .repeatedly()));
-
-    // new Trigger(() -> driver.getRightTriggerAxis() > 0.05 && driver.getRightTriggerAxis() < 0.8)
-    //     .whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward, driverStrafe));
 
     // manip controls
     // 1 to 4 - right side L1-L4
