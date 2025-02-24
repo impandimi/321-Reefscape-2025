@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 1.5104508196721311,
-        "y": 0.722387295081968
+        "x": 1.0549180327868852,
+        "y": 1.0940061475409835
       },
       "prevControl": {
-        "x": 7.029590163934426,
-        "y": 0.8078196721311474
+        "x": 6.574057377049179,
+        "y": 1.1794385245901629
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "DownCoral"
+      "linkedName": "DownCoralMiddle"
     }
   ],
   "rotationTargets": [],
@@ -48,8 +48,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 55.0
+    "velocity": 1.5,
+    "rotation": -125.00000000000001
   },
   "reversed": false,
   "folder": "Paths",
