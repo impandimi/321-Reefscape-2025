@@ -136,7 +136,7 @@ public class RobotContainer {
     // --- CORAL AUTOMATED CONTROLS ---
 
     // coral feeding
-    driver
+      driver
         .rightBumper()
         .whileTrue(
             StationAlign.rotateToNearestStationTag(drivetrain, driverForward, driverStrafe)
