@@ -40,7 +40,7 @@ public class AlgaeIntakePivotConstants {
   public static final Angle kPivotMaxAngle = Degrees.of(180);
   public static final Angle kPivotStartingAngle = Degrees.of(0);
   public static final double kPivotMOI = 0.1; // this
-  public static final Voltage kPivotClimbVoltage = Volts.of(-12);
+  public static final Voltage kPivotClimbVoltage = Volts.of(-5);
 
   // controller constants
   public static final Angle kControllerTolerance = Degrees.of(1);

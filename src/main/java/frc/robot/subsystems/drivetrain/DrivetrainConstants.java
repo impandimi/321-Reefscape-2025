@@ -3,6 +3,7 @@ package frc.robot.subsystems.drivetrain;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
@@ -21,16 +22,17 @@ public class DrivetrainConstants {
 
   public static final AutoGains kTranslationGains =
       RobotBase.isReal()
-          ? new AutoGains(4, 0, 0) // real (TODO: TUNE)
+          ? new AutoGains(6.328, 0, 0.01) // real (TODO: TUNE)
           : new AutoGains(4, 0, 0.2); // sim
 
   public static final AutoGains kHeadingGains =
       RobotBase.isReal()
-          ? new AutoGains(1, 0, 0) // real (TODO: TUNE)
+          ? new AutoGains(3.14, 0, 0) // real (TODO: TUNE)
           : new AutoGains(2, 0, 0.1); // sim
 
   public static final AutoGains tuneTranslationGains = new AutoGains(0, 0, 0); // isn't used
-  public static final AutoGains tuneHeadingGains = new AutoGains(6, 0, 0); // for heading controller
+  public static final AutoGains tuneHeadingGains =
+      new AutoGains(6, 0, 0.01); // for heading controller
 
   public static final Distance kTrackWidth = Inches.of(29);
   public static final Distance kWheelBase = Inches.of(29);
@@ -43,6 +45,6 @@ public class DrivetrainConstants {
 
   public static final Time kLoopDt = Seconds.of(0.02);
 
-  public static final Distance kAlignmentSetpointTranslationTolerance = Inches.one();
+  public static final Distance kAlignmentSetpointTranslationTolerance = Meters.of(0.01);
   public static final Angle kAlignmentSetpointRotationTolerance = Degrees.of(2.0);
 }
