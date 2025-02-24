@@ -3,6 +3,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,8 +33,8 @@ public class StationAlign {
   private static final List<Integer> blueStationTagIDs = List.of(12, 13);
   private static final List<Integer> redStationTagIDs = List.of(1, 2);
 
-  private static final Distance kStationLeftAlignDistance = Inches.of(0);
-  private static final Distance kStationRightAlignDistance = Inches.of(0);
+  private static final Distance kStationLeftAlignDistance = Meters.of(-0.52);
+  private static final Distance kStationRightAlignDistance = Meters.of(0.52);
 
   private static final List<AprilTag> blueStationTags =
       RobotConstants.kAprilTagFieldLayout.getTags().stream()
