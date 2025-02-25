@@ -38,10 +38,10 @@ import java.util.function.DoubleSupplier;
 public class RobotContainer {
   private SwerveDrive drivetrain = SwerveDrive.create();
   private AlgaeIntakePivot algaePivot = AlgaeIntakePivot.create();
-  private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.disable();
-  private CoralEndEffector coralEndEffector = CoralEndEffector.disable();
-  private ElevatorArm elevatorArm = ElevatorArm.disable();
-  private Elevator elevator = Elevator.disable();
+  private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.create();
+  private CoralEndEffector coralEndEffector = CoralEndEffector.create();
+  private ElevatorArm elevatorArm = ElevatorArm.create();
+  private Elevator elevator = Elevator.create();
 
   private CoralSuperstructure coralSuperstructure =
       new CoralSuperstructure(elevator, elevatorArm, coralEndEffector);
@@ -107,26 +107,30 @@ public class RobotContainer {
     RobotModeTriggers.disabled().negate().onTrue(elevatorArm.seedEncoder());
 
     // home everything on robot start
-    // RobotModeTriggers.disabled()
-    //     .negate()
-    //     .onTrue(elevator.homeEncoder().onlyIf(() -> !elevator.elevatorIsHomed()));
+    RobotModeTriggers.disabled()
+        .negate()
+        .onTrue(elevator.homeEncoder().onlyIf(() -> !elevator.elevatorIsHomed()));
 
     // drive
     drivetrain.setDefaultCommand(drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn));
 
-    // NOTE: algae is currently gone.
-    // algae default commands (stalling rollers, default algae pivot setpoint)
+    // full-featured default commnds
     // algaeRollers.setDefaultCommand(algaeRollers.stallIfHasAlgae());
-    // algaeRollers.setDefaultCommand(algaeRollers.setMechanismVoltage(() -> Volts.zero()));
     // algaePivot.setDefaultCommand(algaePivot.goToAngle(() ->
     // AlgaeSetpoint.NEUTRAL.getAlgaeAngle()));
-    algaePivot.setDefaultCommand(algaePivot.setMechanismVoltage(() -> Volts.of(0)));
+    // elevator.setDefaultCommand(elevator.goToHeight(() ->
+    // CoralScorerSetpoint.NEUTRAL.getElevatorHeight()));
+    // elevatorArm.setDefaultCommand(elevatorArm.goToAngle(() ->
+    // CoralScorerSetpoint.NEUTRAL.getArmAngle()));
+    // coralEndEffector.setDefaultCommand(coralEndEffector.stallCoralIfDetected());
 
-    // elevator.setDefaultCommand(
-    //     elevator.goToHeight(() -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight()));
-    // elevatorArm.setDefaultCommand(
-    //     elevatorArm.goToAngle(() -> CoralScorerSetpoint.NEUTRAL.getArmAngle()));
-    // coralEndEffector.setDefaultCommand(coralEndEffector.runVolts(() -> Volts.of(1)));
+    // testing default commands
+    algaeRollers.setDefaultCommand(algaeRollers.setMechanismVoltage(() -> Volts.zero()));
+    algaePivot.setDefaultCommand(algaePivot.setMechanismVoltage(() -> Volts.zero()));
+    elevator.setDefaultCommand(elevator.setVoltage(() -> Volts.zero()));
+    elevatorArm.setDefaultCommand(elevatorArm.runVolts(() -> Volts.zero()));
+    coralEndEffector.setDefaultCommand(coralEndEffector.runVolts(() -> Volts.of(1)));
+
     leds.setDefaultCommand(leds.updateLeds());
 
     // when both are about to collide, move elevator out of the way until the algae pivot is out of
@@ -143,25 +147,31 @@ public class RobotContainer {
   }
 
   private void configureTuningBindings() {
-    // test algae intake
-    // driver.b().whileTrue(algaeSuperstructure.intakeAlgae());
-    // driver.a().whileTrue(algaeSuperstructure.outtakeAlgae());
+
+    // climb!
+    // driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
+    driver.y().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(1)));
+    driver.a().whileTrue(algaeSuperstructure.climb());
+
+    // tune elevator
+    // driver.a().whileTrue(elevator.tune());
+
+    // tune elevator arm
+    // driver.a().whileTrue(elevatorArm.tune());
 
     // find arm setpoints
     // driver.b().whileTrue(coralSuperstructure.tune());
     // driver.leftBumper().whileTrue(coralSuperstructure.feedCoral());
     // driver.rightBumper().whileTrue(coralEndEffector.outtakeCoral());
 
-    // climb!
-
-    driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
-    driver.x().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(1)));
-    driver.a().whileTrue(algaeSuperstructure.climb());
-
     // alignment testing (no arm)
     // driver.a().whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward,
     // driverStrafe));
     // driver.b().whileTrue(ReefAlign.alignToReef(drivetrain, () -> ReefPosition.LEFT));
+
+    // test algae intake
+    // driver.b().whileTrue(algaeSuperstructure.intakeAlgae());
+    // driver.a().whileTrue(algaeSuperstructure.outtakeAlgae());
   }
 
   private void configureBindings() {
