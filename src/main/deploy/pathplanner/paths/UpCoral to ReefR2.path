@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5703893442622954,
-        "y": 7.291649590163933
+        "x": 1.234733606557377,
+        "y": 7.051895491803278
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.085860655737706,
-        "y": 7.063883196721312
+        "x": 1.7502049180327879,
+        "y": 6.824129098360657
       },
       "isLocked": false,
-      "linkedName": "UpCoral"
+      "linkedName": "UpCoralMiddle"
     },
     {
       "anchor": {

@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 1.5703893442622954,
-        "y": 7.291649590163933
+        "x": 1.234733606557377,
+        "y": 7.051895491803278
       },
       "prevControl": {
-        "x": 3.668237704918033,
-        "y": 7.027920081967213
+        "x": 3.3325819672131143,
+        "y": 6.788165983606558
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "UpCoral"
+      "linkedName": "UpCoralMiddle"
     }
   ],
   "rotationTargets": [],
@@ -48,7 +48,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 1.5,
     "rotation": -52.76104810819125
   },
   "reversed": false,

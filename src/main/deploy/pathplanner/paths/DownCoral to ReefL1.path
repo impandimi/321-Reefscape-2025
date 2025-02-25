@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5104508196721311,
-        "y": 0.722387295081968
+        "x": 1.0549180327868852,
+        "y": 1.0940061475409835
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6859508196721313,
-        "y": 1.3951372950819678
+        "x": 1.2304180327868854,
+        "y": 1.7667561475409832
       },
       "isLocked": false,
-      "linkedName": "DownCoral"
+      "linkedName": "DownCoralMiddle"
     },
     {
       "anchor": {
@@ -49,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 1.5,
-    "rotation": -60.3634270428952
+    "rotation": -59.99999999999999
   },
   "reversed": false,
   "folder": "Paths",

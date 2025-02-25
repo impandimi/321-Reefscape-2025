@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5703893442622954,
-        "y": 7.291649590163933
+        "x": 1.234733606557377,
+        "y": 7.051895491803278
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8940573770491804,
-        "y": 6.668288934426228
+        "x": 1.5584016393442621,
+        "y": 6.428534836065573
       },
       "isLocked": false,
-      "linkedName": "UpCoral"
+      "linkedName": "UpCoralMiddle"
     },
     {
       "anchor": {
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 1.5,
-    "rotation": -0.9919181239280266
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Paths",
