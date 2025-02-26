@@ -40,7 +40,7 @@ public class AlgaeSuperstructure {
   }
 
   public Command climb() {
-    return this.pivot.climb();
+    return this.pivot.alternateClimb();
   }
 
   public AlgaeSetpoint getTargetState() {

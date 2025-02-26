@@ -13,6 +13,7 @@ import frc.robot.subsystems.coralendeffector.CoralEndEffector;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevatorarm.ElevatorArm;
+import frc.robot.subsystems.elevatorarm.ElevatorArmConstants;
 import frc.robot.util.TunableConstant;
 import java.util.function.Supplier;
 
@@ -76,7 +77,10 @@ public class CoralSuperstructure {
     TunableConstant armAngle = new TunableConstant("/CoralSuperstructure/ArmAngle", 0);
     TunableConstant height = new TunableConstant("/CoralSuperstructure/ElevatorHeight", 0);
 
-    return goToSetpoint(() -> Meters.of(height.get()), () -> Degrees.of(armAngle.get()));
+    return arm.goToAngle(() -> ElevatorArmConstants.kPreAlignAngle)
+        .until(arm::atSetpoint)
+        .andThen(elevator.goToHeight(() -> Meters.of(height.get())).until(elevator::atSetpoint))
+        .andThen(arm.goToAngle(() -> Degrees.of(armAngle.get())));
   }
 
   public enum CoralScorerSetpoint {
@@ -88,9 +92,10 @@ public class CoralSuperstructure {
     L1(Inches.of(45), Degrees.of(30)), // TODO: actually tune
     L2(Meters.of(0.9), Degrees.of(95)),
     L3(Meters.of(1.3), Degrees.of(105)),
-    L4(Meters.of(2), Degrees.of(100)),
+    L4(Meters.of(1.9), Degrees.of(90)),
     ALGAE_LOW(Inches.of(50), Degrees.of(20)), // TODO: actually tune
-    ALGAE_HIGH(Inches.of(60), Degrees.of(20)); // TODO: actually tune
+    ALGAE_HIGH(Inches.of(60), Degrees.of(20)), // TODO: actually tune
+    CLIMB(Meters.of(1.4), Degrees.of(0));
 
     private Distance elevatorHeight; // the height of the elevator to got
     private Angle armAngle; // the angle the arm should go to

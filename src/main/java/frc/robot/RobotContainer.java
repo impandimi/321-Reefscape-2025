@@ -118,17 +118,17 @@ public class RobotContainer {
     // algaeRollers.setDefaultCommand(algaeRollers.stallIfHasAlgae());
     // algaePivot.setDefaultCommand(algaePivot.goToAngle(() ->
     // AlgaeSetpoint.NEUTRAL.getAlgaeAngle()));
-    // elevator.setDefaultCommand(elevator.goToHeight(() ->
-    // CoralScorerSetpoint.NEUTRAL.getElevatorHeight()));
-    // elevatorArm.setDefaultCommand(elevatorArm.goToAngle(() ->
-    // CoralScorerSetpoint.NEUTRAL.getArmAngle()));
+    elevator.setDefaultCommand(
+        elevator.goToHeight(() -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight()));
+    elevatorArm.setDefaultCommand(
+        elevatorArm.goToAngle(() -> CoralScorerSetpoint.NEUTRAL.getArmAngle()));
     // coralEndEffector.setDefaultCommand(coralEndEffector.stallCoralIfDetected());
 
     // testing default commands
     algaeRollers.setDefaultCommand(algaeRollers.setMechanismVoltage(() -> Volts.zero()));
     algaePivot.setDefaultCommand(algaePivot.setMechanismVoltage(() -> Volts.zero()));
-    elevator.setDefaultCommand(elevator.setVoltage(() -> Volts.zero()));
-    elevatorArm.setDefaultCommand(elevatorArm.runVolts(() -> Volts.zero()));
+    // elevator.setDefaultCommand(elevator.setVoltage(() -> Volts.zero()));
+    // elevatorArm.setDefaultCommand(elevatorArm.runVolts(() -> Volts.zero()));
     coralEndEffector.setDefaultCommand(coralEndEffector.runVolts(() -> Volts.of(1)));
 
     leds.setDefaultCommand(leds.updateLeds());
@@ -150,8 +150,17 @@ public class RobotContainer {
 
     // climb!
     // driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
-    driver.y().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(1)));
-    driver.a().whileTrue(algaeSuperstructure.climb());
+
+    // driver.b().onTrue(coralSuperstructure.goToSetpoint(() -> CoralScorerSetpoint.CLIMB));
+    // driver.y().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(1)));
+    // driver.a().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(-1)));
+    // driver.x().whileTrue(algaeSuperstructure.climb());
+
+    // driver.leftBumper().whileTrue(elevator.setVoltage(() -> Volts.of(1)));
+    // driver.rightBumper().whileTrue(elevator.setVoltage(() -> Volts.of(-1)));
+
+    // driver.povLeft().whileTrue(elevatorArm.runVolts(() -> Volts.of(1)));
+    // driver.povRight().whileTrue(elevatorArm.runVolts(() -> Volts.of(-1)));
 
     // tune elevator
     // driver.a().whileTrue(elevator.tune());
@@ -160,9 +169,9 @@ public class RobotContainer {
     // driver.a().whileTrue(elevatorArm.tune());
 
     // find arm setpoints
-    // driver.b().whileTrue(coralSuperstructure.tune());
-    // driver.leftBumper().whileTrue(coralSuperstructure.feedCoral());
-    // driver.rightBumper().whileTrue(coralEndEffector.outtakeCoral());
+    driver.b().whileTrue(coralSuperstructure.tune());
+    driver.leftBumper().whileTrue(coralSuperstructure.feedCoral());
+    driver.rightBumper().whileTrue(coralEndEffector.outtakeCoral());
 
     // alignment testing (no arm)
     // driver.a().whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward,

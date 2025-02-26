@@ -2,6 +2,7 @@
 package frc.robot.subsystems.algaeIntakePivot;
 
 import static edu.wpi.first.units.Units.Amp;
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
@@ -14,6 +15,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotConstants;
@@ -132,6 +134,28 @@ public class AlgaeIntakePivot extends SubsystemBase {
             io.setPivotVoltage(Volts.of(0));
           }
         });
+  }
+
+  public Command alternateClimb() {
+    Timer timer = new Timer();
+    return runOnce(() -> timer.restart())
+        .andThen(
+            run(() -> {
+                  io.setPivotVoltage(Volts.of(-1));
+                })
+                .until(() -> timer.get() > 0.5 && inputs.pivotCurrent.in(Amp) > 30))
+        .andThen(runOnce(() -> timer.restart()))
+        .andThen(
+            run(
+                () -> {
+                  if ((timer.get() > 0.5 && inputs.pivotCurrent.in(Amp) < 30)
+                      || inputs.pivotAngle.in(Degrees)
+                          <= AlgaeIntakePivotConstants.kPivotClimbThreshold.in(Degree)) {
+                    io.setPivotVoltage(Volts.zero());
+                  } else {
+                    io.setPivotVoltage(Volts.of(-Math.min(1 + 0.5 * timer.get(), 12)));
+                  }
+                }));
   }
 
   public Command homeMechanism() {
