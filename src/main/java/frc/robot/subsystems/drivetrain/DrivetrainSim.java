@@ -70,9 +70,9 @@ public class DrivetrainSim implements SwerveDrive {
 
     this.headingController =
         new PIDController(
-            DrivetrainConstants.tuneHeadingGains.kP(),
-            DrivetrainConstants.tuneHeadingGains.kI(),
-            DrivetrainConstants.tuneHeadingGains.kD());
+            DrivetrainConstants.kTuneHeadingGains.kP(),
+            DrivetrainConstants.kTuneHeadingGains.kI(),
+            DrivetrainConstants.kTuneHeadingGains.kD());
 
     this.headingController.enableContinuousInput(-Math.PI, Math.PI);
 

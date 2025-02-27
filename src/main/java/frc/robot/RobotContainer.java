@@ -9,6 +9,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -38,7 +39,7 @@ import java.util.function.DoubleSupplier;
 public class RobotContainer {
   private SwerveDrive drivetrain = SwerveDrive.create();
   private AlgaeIntakePivot algaePivot = AlgaeIntakePivot.create();
-  private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.create();
+  private AlgaeIntakeRollers algaeRollers = AlgaeIntakeRollers.disable();
   private CoralEndEffector coralEndEffector = CoralEndEffector.create();
   private ElevatorArm elevatorArm = ElevatorArm.create();
   private Elevator elevator = Elevator.create();
@@ -142,19 +143,39 @@ public class RobotContainer {
     //             .goToHeight(() -> ElevatorConstants.kElevatorDangerHeight.plus(Meters.of(0.1)))
     //             .until(new Trigger(algaePivot::inCollisionZone).negate()));
 
-    // configureBindings();
-    configureTuningBindings();
+    configureBindings();
+    // configureTuningBindings();
   }
+
+  private double volts = 0;
 
   private void configureTuningBindings() {
 
     // climb!
     // driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
 
-    // driver.b().onTrue(coralSuperstructure.goToSetpoint(() -> CoralScorerSetpoint.CLIMB));
-    // driver.y().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(1)));
-    // driver.a().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(-1)));
-    // driver.x().whileTrue(algaeSuperstructure.climb());
+    driver.b().toggleOnTrue(coralSuperstructure.goToSetpoint(() -> CoralScorerSetpoint.CLIMB));
+    driver.y().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(1)));
+    driver.a().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(-1)));
+    driver.x().whileTrue(algaePivot.setMechanismVoltage(() -> Volts.of(volts)));
+
+    driver
+        .leftBumper()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  volts += 0.1;
+                  System.out.println("Changing volts to: " + volts);
+                }));
+
+    driver
+        .rightBumper()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  volts -= 0.1;
+                  System.out.println("Changing volts to: " + volts);
+                }));
 
     // driver.leftBumper().whileTrue(elevator.setVoltage(() -> Volts.of(1)));
     // driver.rightBumper().whileTrue(elevator.setVoltage(() -> Volts.of(-1)));
@@ -169,9 +190,9 @@ public class RobotContainer {
     // driver.a().whileTrue(elevatorArm.tune());
 
     // find arm setpoints
-    driver.b().whileTrue(coralSuperstructure.tune());
-    driver.leftBumper().whileTrue(coralSuperstructure.feedCoral());
-    driver.rightBumper().whileTrue(coralEndEffector.outtakeCoral());
+    // driver.b().whileTrue(coralSuperstructure.tune());
+    // driver.leftBumper().whileTrue(coralSuperstructure.feedCoral());
+    // driver.rightBumper().whileTrue(coralEndEffector.outtakeCoral());
 
     // alignment testing (no arm)
     // driver.a().whileTrue(ReefAlign.rotateToNearestReefTag(drivetrain, driverForward,
@@ -196,7 +217,8 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             StationAlign.rotateToNearestStationTag(drivetrain, driverForward, driverStrafe)
-                .alongWith(coralSuperstructure.feedCoral()));
+                .alongWith(coralSuperstructure.feedCoral())
+                .repeatedly());
 
     // coral outtake
     driver
@@ -274,7 +296,12 @@ public class RobotContainer {
         .onFalse( // for coral scoring
             coralSuperstructure
                 .goToSetpoint(() -> queuedSetpoint) // ensure we're at the setpoint
-                .alongWith(coralSuperstructure.outtakeCoral()) // and outtake coral
+                .alongWith(coralSuperstructure.outtakeCoral())
+                .onlyIf(
+                    () ->
+                        coralSuperstructure.atTargetState()
+                            && queuedSetpoint != CoralScorerSetpoint.NEUTRAL
+                            && !driver.povLeft().getAsBoolean()) // and outtake coral
                 // .until(() -> !coralSuperstructure.hasCoral()) // until we don't have coral
                 .withTimeout(1) // timeout at 1 second
                 .andThen(
@@ -284,14 +311,12 @@ public class RobotContainer {
                         .goToSetpoint(
                             () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
                             () -> ElevatorArmConstants.kPreAlignAngle)
-                        .until(
-                            coralSuperstructure::atTargetState)) // and then resume default command
+                        .withTimeout(1)
+                    // .until(
+                    //     coralSuperstructure::atTargetState)
+                    ) // and then resume default command
                 // only if we're at the target state and are ready to score
-                .onlyIf(
-                    () ->
-                        coralSuperstructure.atTargetState()
-                            && queuedSetpoint != CoralScorerSetpoint.NEUTRAL
-                            && !driver.povLeft().getAsBoolean()));
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
     // --- CORAL MANUAL CONTROLS ---
     driver
@@ -330,7 +355,14 @@ public class RobotContainer {
         .onFalse(
             coralSuperstructure
                 .goToSetpoint(() -> queuedSetpoint) // ensure we're at the setpoint
-                .alongWith(coralSuperstructure.outtakeCoral()) // and outtake coral
+                .alongWith(
+                    coralSuperstructure
+                        .outtakeCoral()
+                        .onlyIf(
+                            () ->
+                                coralSuperstructure.atTargetState()
+                                    && queuedSetpoint != CoralScorerSetpoint.NEUTRAL
+                                    && !driver.povLeft().getAsBoolean())) // and outtake coral
                 // .until(() -> !coralSuperstructure.hasCoral()) // until we don't have coral
                 .withTimeout(1) // timeout at 1 second
                 .andThen(
@@ -343,11 +375,22 @@ public class RobotContainer {
                         .until(
                             coralSuperstructure::atTargetState)) // and then resume default command
                 // only if we're at the target state and are ready to score
-                .onlyIf(
-                    () ->
-                        coralSuperstructure.atTargetState()
-                            && queuedSetpoint != CoralScorerSetpoint.NEUTRAL
-                            && !driver.povLeft().getAsBoolean()));
+
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
+    // --- DEALGAEFYING ---
+    driver
+        .b()
+        .whileTrue(
+            ReefAlign.rotateToNearestReefTag(drivetrain, driverForward, driverStrafe)
+                .alongWith(
+                    coralSuperstructure
+                        .goToSetpoint(
+                            () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+                            () -> ElevatorArmConstants.kPreAlignAngle)
+                        .until(coralSuperstructure::atTargetState)
+                        .andThen(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)))
+                .alongWith(coralSuperstructure.outtakeCoral()));
 
     // --- ALGAE AUTOMATED CONTROLS ---
 
@@ -481,21 +524,21 @@ public class RobotContainer {
                   queuedSetpoint = CoralScorerSetpoint.L4;
                 }));
 
-    // manipTrigger(9)
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               queuedReefPosition = ReefPosition.ALGAE;
-    //               queuedSetpoint = CoralScorerSetpoint.ALGAE_LOW;
-    //             }));
+    new Trigger(() -> manipulator.getPOV() == 270)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.ALGAE;
+                  queuedSetpoint = CoralScorerSetpoint.ALGAE_LOW;
+                }));
 
-    // manipTrigger(10)
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               queuedReefPosition = ReefPosition.ALGAE;
-    //               queuedSetpoint = CoralScorerSetpoint.ALGAE_HIGH;
-    //             }));
+    new Trigger(() -> manipulator.getPOV() == 180)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  queuedReefPosition = ReefPosition.ALGAE;
+                  queuedSetpoint = CoralScorerSetpoint.ALGAE_HIGH;
+                }));
   }
 
   private Trigger manipTrigger(int button) {

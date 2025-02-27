@@ -276,7 +276,7 @@ public class AutomaticAutonomousMaker3000 {
         switch (side) {
           default -> StationAlign.goToNearestLeftAlign(drive);
           case LEFT -> StationAlign.goToNearestLeftAlign(drive);
-          case MIDDLE -> StationAlign.goToNearestLeftAlign(drive);
+          case MIDDLE -> StationAlign.goToNearestCenterAlign(drive);
           case RIGHT -> StationAlign.goToNearestRightAlign(drive);
         };
     return path.deadlineFor(coralSuperstructure.feedCoral().asProxy())
@@ -307,7 +307,7 @@ public class AutomaticAutonomousMaker3000 {
                     drive, () -> pole == Pole.LEFTPOLE ? ReefPosition.LEFT : ReefPosition.RIGHT)
                 .asProxy()
                 .alongWith(coralSuperstructure.goToSetpoint(() -> setpoint).asProxy())
-                .until(() -> drive.atPoseSetpoint() && coralSuperstructure.atTargetState())
+                // .until(() -> drive.atPoseSetpoint() && coralSuperstructure.atTargetState())
                 .withTimeout(3))
         .andThen(
             coralSuperstructure

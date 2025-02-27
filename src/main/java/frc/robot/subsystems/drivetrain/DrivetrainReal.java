@@ -60,9 +60,10 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
           .withDriveRequestType(DriveRequestType.Velocity)
           .withDesaturateWheelSpeeds(true)
           .withHeadingPID(
-              DrivetrainConstants.tuneHeadingGains.kP(),
-              DrivetrainConstants.tuneHeadingGains.kI(),
-              DrivetrainConstants.tuneHeadingGains.kD());
+              DrivetrainConstants.kTuneHeadingGains.kP(),
+              DrivetrainConstants.kTuneHeadingGains.kI(),
+              DrivetrainConstants.kTuneHeadingGains.kD())
+          .withRotationalDeadband(0.1);
   // .withRotationalDeadband(0.25);
 
   private final SwerveDrivePoseEstimator reefPoseEstimator;
@@ -234,11 +235,11 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     if (atPoseSetpoint()) targetSpeeds = new ChassisSpeeds();
 
     // TODO: find better way
-    if (Math.hypot(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond) < 0.1)
-      targetSpeeds = new ChassisSpeeds(0, 0, targetSpeeds.omegaRadiansPerSecond);
-    if (targetSpeeds.omegaRadiansPerSecond < 0.1)
-      targetSpeeds =
-          new ChassisSpeeds(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond, 0);
+    // if (Math.hypot(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond) < 0.1)
+    //   targetSpeeds = new ChassisSpeeds(0, 0, targetSpeeds.omegaRadiansPerSecond);
+    // if (targetSpeeds.omegaRadiansPerSecond < 0.1)
+    //   targetSpeeds =
+    //       new ChassisSpeeds(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond, 0);
 
     setControl(
         fieldCentricRequest

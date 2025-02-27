@@ -88,13 +88,13 @@ public class CoralSuperstructure {
     NEUTRAL(
         ElevatorConstants.kElevatorStartingHeight.plus(Meters.of(0.1)),
         Degrees.of(-40)), // TODO: make
-    FEED_CORAL(Meters.of(0.95), Degrees.of(-70)),
+    FEED_CORAL(Meters.of(0.95), Degrees.of(-80)),
     L1(Inches.of(45), Degrees.of(30)), // TODO: actually tune
     L2(Meters.of(0.9), Degrees.of(95)),
-    L3(Meters.of(1.3), Degrees.of(105)),
-    L4(Meters.of(1.9), Degrees.of(90)),
-    ALGAE_LOW(Inches.of(50), Degrees.of(20)), // TODO: actually tune
-    ALGAE_HIGH(Inches.of(60), Degrees.of(20)), // TODO: actually tune
+    L3(Meters.of(1.32), Degrees.of(95)),
+    L4(Meters.of(2), Degrees.of(85)),
+    ALGAE_LOW(Meters.of(1), Degrees.of(40)), // TODO: actually tune
+    ALGAE_HIGH(Meters.of(1.4), Degrees.of(40)), // TODO: actually tune
     CLIMB(Meters.of(1.4), Degrees.of(0));
 
     private Distance elevatorHeight; // the height of the elevator to got

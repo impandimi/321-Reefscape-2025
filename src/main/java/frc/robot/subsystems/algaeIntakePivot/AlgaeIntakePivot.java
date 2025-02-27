@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotConstants;
 import frc.robot.subsystems.AlgaeSuperstructure.AlgaeSetpoint;
 import frc.robot.util.TunableConstant;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 // the mechanism that intakes algae low and pivots back to hang from the deep cage
@@ -138,21 +139,39 @@ public class AlgaeIntakePivot extends SubsystemBase {
 
   public Command alternateClimb() {
     Timer timer = new Timer();
+    AtomicReference<ClimbMode> mode = new AtomicReference<>(ClimbMode.CLIMBING);
+
     return runOnce(() -> timer.restart())
         .andThen(
             run(() -> {
                   io.setPivotVoltage(Volts.of(-1));
                 })
                 .until(() -> timer.get() > 0.5 && inputs.pivotCurrent.in(Amp) > 30))
-        .andThen(runOnce(() -> timer.restart()))
+        .andThen(
+            runOnce(
+                () -> {
+                  timer.restart();
+                  mode.set(ClimbMode.CLIMBING);
+                }))
         .andThen(
             run(
                 () -> {
-                  if ((timer.get() > 0.5 && inputs.pivotCurrent.in(Amp) < 30)
-                      || inputs.pivotAngle.in(Degrees)
-                          <= AlgaeIntakePivotConstants.kPivotClimbThreshold.in(Degree)) {
+                  if (inputs.pivotCurrent.in(Amp) < 30) {
+                    mode.set(ClimbMode.SLIPPED);
+                    timer.stop();
+                  }
+                  if (mode.get() == ClimbMode.CLIMBING
+                      && inputs.pivotAngle.in(Degree)
+                          < AlgaeIntakePivotConstants.kPivotClimbThreshold.in(Degree)) {
+                    mode.set(ClimbMode.CLIMBED);
+                    timer.stop();
+                  }
+
+                  if (mode.get() == ClimbMode.CLIMBING) {
+                    io.setPivotVoltage(Volts.of(-Math.min(1 + 0.5 * timer.get(), 12)));
+                  } else if (mode.get() == ClimbMode.SLIPPED) {
                     io.setPivotVoltage(Volts.zero());
-                  } else {
+                  } else if (mode.get() == ClimbMode.CLIMBED) {
                     io.setPivotVoltage(Volts.of(-Math.min(1 + 0.5 * timer.get(), 12)));
                   }
                 }));
@@ -209,5 +228,11 @@ public class AlgaeIntakePivot extends SubsystemBase {
 
     return effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMinBlockedAngle) >= 0
         && effectiveAngle.compareTo(AlgaeIntakePivotConstants.kMaxBlockedAngle) <= 0;
+  }
+
+  public enum ClimbMode {
+    CLIMBING,
+    SLIPPED,
+    CLIMBED;
   }
 }

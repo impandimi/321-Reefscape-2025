@@ -30,8 +30,8 @@ public class DrivetrainConstants {
           ? new AutoGains(3.14, 0, 0) // real (TODO: TUNE)
           : new AutoGains(3.14, 0, 0); // sim
 
-  public static final AutoGains tuneTranslationGains = new AutoGains(0, 0, 0); // isn't used
-  public static final AutoGains tuneHeadingGains =
+  public static final AutoGains kTuneTranslationGains = new AutoGains(0, 0, 0); // isn't used
+  public static final AutoGains kTuneHeadingGains =
       new AutoGains(6, 0, 0.01); // for heading controller
 
   public static final Distance kTrackWidth = Inches.of(29);
