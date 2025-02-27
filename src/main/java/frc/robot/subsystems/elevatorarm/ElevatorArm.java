@@ -173,4 +173,9 @@ public class ElevatorArm extends SubsystemBase {
   public Angle getAngle() {
     return inputs.angle;
   }
+
+  public boolean atAngle(Angle angle) {
+    return Math.abs(inputs.angle.in(Degrees) - angle.in(Degrees))
+        < ElevatorArmConstants.kAngleTolerance.in(Degrees);
+  }
 }

@@ -57,6 +57,14 @@ public class CoralSuperstructure {
     return elevator.atSetpoint() && arm.atSetpoint();
   }
 
+  public boolean atTargetState(Distance height, Angle angle) {
+    return elevator.atHeight(height) && arm.atAngle(angle);
+  }
+
+  public boolean atTargetState(CoralScorerSetpoint setpoint) {
+    return atTargetState(setpoint.getElevatorHeight(), setpoint.getArmAngle());
+  }
+
   public Command feedCoral() {
     return goToSetpoint(() -> CoralScorerSetpoint.FEED_CORAL).alongWith(endEffector.intakeCoral());
   }

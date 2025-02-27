@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.ReefAlign;
 import frc.robot.commands.StationAlign;
@@ -127,6 +128,7 @@ public class AutomaticAutonomousMaker3000 {
     this.coralSuperstructure = coralSuperstructure;
 
     preBuiltAuto.setDefaultOption("No Choice", PreBuiltAuto.CUSTOM);
+    preBuiltAuto.setDefaultOption("Taxi", PreBuiltAuto.TAXI);
     preBuiltAuto.addOption("TopAuto", PreBuiltAuto.TOPAUTO);
     preBuiltAuto.addOption("MidTopAuto", PreBuiltAuto.MIDTOPAUTO);
     preBuiltAuto.addOption("MidBotAuto", PreBuiltAuto.MIDBOTAUTO);
@@ -134,7 +136,6 @@ public class AutomaticAutonomousMaker3000 {
     preBuiltAuto.addOption("MidPreloadAuto", PreBuiltAuto.MIDPRELOADAUTO);
     preBuiltAuto.addOption("MidOppositeSideAuto", PreBuiltAuto.MIDOPPOSITESIDEAUTO);
     preBuiltAuto.addOption("Custom Auto", PreBuiltAuto.CUSTOM);
-    preBuiltAuto.addOption("Testing", PreBuiltAuto.TEST);
 
     SmartDashboard.putData("Autos/PreBuiltAuto", preBuiltAuto);
     SmartDashboard.putData("Autos/AutoVisualizerField", field);
@@ -148,6 +149,8 @@ public class AutomaticAutonomousMaker3000 {
                   // Pre made autos first and then the custom autos
                   PathsAndAuto selectedAuto =
                       switch (preBuiltAuto.getSelected()) {
+                        case TAXI ->
+                            runPath(autoChooser.build().startingPosition.pathID + " to Brake");
                         case TOPAUTO -> buildAuto(kTopLaneAuto);
                         case MIDTOPAUTO -> buildAuto(kMidLaneTopAuto);
                         case MIDBOTAUTO -> buildAuto(kMidLaneBotAuto);
@@ -156,7 +159,6 @@ public class AutomaticAutonomousMaker3000 {
                         case MIDOPPOSITESIDEAUTO ->
                             buildAuto(kMidLaneOppositeSideAuto); // test auto x2
                         case CUSTOM -> buildAuto(autoChooser.build());
-                        case TEST -> runPath("Forward 1 Meter + Rotate 180 degrees");
                         default -> new PathsAndAuto(Commands.none(), new ArrayList<>());
                       };
 
@@ -307,25 +309,37 @@ public class AutomaticAutonomousMaker3000 {
                     drive, () -> pole == Pole.LEFTPOLE ? ReefPosition.LEFT : ReefPosition.RIGHT)
                 .asProxy()
                 .alongWith(coralSuperstructure.goToSetpoint(() -> setpoint).asProxy())
-                // .until(() -> drive.atPoseSetpoint() && coralSuperstructure.atTargetState())
-                .withTimeout(3))
+                .until(() -> drive.atPoseSetpoint() && coralSuperstructure.atTargetState(setpoint))
+                .withTimeout(2.5))
         .andThen(
-            coralSuperstructure
-                .goToSetpoint(() -> setpoint)
+            ReefAlign.alignToReef(
+                    drive, () -> pole == Pole.LEFTPOLE ? ReefPosition.LEFT : ReefPosition.RIGHT)
+                .asProxy()
+                .alongWith(coralSuperstructure.goToSetpoint(() -> setpoint).asProxy())
                 .asProxy()
                 .withDeadline(
                     coralSuperstructure
                         .outtakeCoral()
                         .asProxy()
-                        .until(() -> !coralSuperstructure.hasCoral())
-                        .withTimeout(1)));
+                        // .until(() -> !coralSuperstructure.hasCoral())
+                        .withTimeout(0.5)))
+        .finallyDo(
+            () -> {
+              // yucky. This is to prevent us from smashing into reef
+              CommandScheduler.getInstance()
+                  .schedule(
+                      coralSuperstructure
+                          .goToSetpoint(
+                              () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+                              () -> ElevatorArmConstants.kPreAlignAngle)
+                          .asProxy());
+            });
   }
 
   private Command toPathCommand(PathPlannerPath path, boolean zero) {
     if (path == null) return Commands.none();
     Pose2d startingPose =
         new Pose2d(path.getPoint(0).position, path.getIdealStartingState().rotation());
-    ;
     return zero
         ? AutoBuilder.resetOdom(startingPose).andThen(AutoBuilder.followPath(path))
         : AutoBuilder.followPath(path);
@@ -403,6 +417,7 @@ public class AutomaticAutonomousMaker3000 {
 
   enum PreBuiltAuto {
     TOPAUTO,
+    TAXI,
     MIDTOPAUTO,
     MIDBOTAUTO,
     BOTAUTO,

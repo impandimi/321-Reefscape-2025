@@ -203,11 +203,11 @@ public class DrivetrainSim implements SwerveDrive {
 
     if (atPoseSetpoint()) targetSpeeds = new ChassisSpeeds();
 
-    if (Math.hypot(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond) < 0.1)
-      targetSpeeds = new ChassisSpeeds(0, 0, targetSpeeds.omegaRadiansPerSecond);
-    if (targetSpeeds.omegaRadiansPerSecond < 0.1)
-      targetSpeeds =
-          new ChassisSpeeds(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond, 0);
+    // if (Math.hypot(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond) < 0.1)
+    //   targetSpeeds = new ChassisSpeeds(0, 0, targetSpeeds.omegaRadiansPerSecond);
+    // if (targetSpeeds.omegaRadiansPerSecond < 0.1)
+    //   targetSpeeds =
+    //       new ChassisSpeeds(targetSpeeds.vxMetersPerSecond, targetSpeeds.vyMetersPerSecond, 0);
 
     simulatedDrive.runChassisSpeeds(targetSpeeds, Translation2d.kZero, true, false);
   }

@@ -123,14 +123,14 @@ public class RobotContainer {
         elevator.goToHeight(() -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight()));
     elevatorArm.setDefaultCommand(
         elevatorArm.goToAngle(() -> CoralScorerSetpoint.NEUTRAL.getArmAngle()));
-    // coralEndEffector.setDefaultCommand(coralEndEffector.stallCoralIfDetected());
+    coralEndEffector.setDefaultCommand(coralEndEffector.stallCoralIfDetected());
 
     // testing default commands
     algaeRollers.setDefaultCommand(algaeRollers.setMechanismVoltage(() -> Volts.zero()));
     algaePivot.setDefaultCommand(algaePivot.setMechanismVoltage(() -> Volts.zero()));
     // elevator.setDefaultCommand(elevator.setVoltage(() -> Volts.zero()));
     // elevatorArm.setDefaultCommand(elevatorArm.runVolts(() -> Volts.zero()));
-    coralEndEffector.setDefaultCommand(coralEndEffector.runVolts(() -> Volts.of(1)));
+    // coralEndEffector.setDefaultCommand(coralEndEffector.runVolts(() -> Volts.of(1)));
 
     leds.setDefaultCommand(leds.updateLeds());
 
@@ -217,8 +217,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             StationAlign.rotateToNearestStationTag(drivetrain, driverForward, driverStrafe)
-                .alongWith(coralSuperstructure.feedCoral())
-                .repeatedly());
+                .alongWith(coralSuperstructure.feedCoral().asProxy().repeatedly()));
 
     // coral outtake
     driver
@@ -269,7 +268,9 @@ public class RobotContainer {
                                     () -> ElevatorArmConstants.kPreAlignAngle)
                                 .until(
                                     () ->
-                                        coralSuperstructure.atTargetState()
+                                        coralSuperstructure.atTargetState(
+                                                CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+                                                ElevatorArmConstants.kPreAlignAngle)
                                             && ReefAlign.isWithinReefRange(
                                                 drivetrain, ReefAlign.kMechanismDeadbandThreshold))
                                 .andThen(
@@ -278,7 +279,11 @@ public class RobotContainer {
                                         .goToSetpoint(
                                             () -> queuedSetpoint.getElevatorHeight(),
                                             () -> ElevatorArmConstants.kPreAlignAngle)
-                                        .until(() -> coralSuperstructure.atTargetState())
+                                        .until(
+                                            () ->
+                                                coralSuperstructure.atTargetState(
+                                                    queuedSetpoint.getElevatorHeight(),
+                                                    ElevatorArmConstants.kPreAlignAngle))
                                         // then move arm down to setpoint
                                         .andThen(
                                             coralSuperstructure.goToSetpoint(() -> queuedSetpoint)))
@@ -299,11 +304,14 @@ public class RobotContainer {
                 .alongWith(coralSuperstructure.outtakeCoral())
                 .onlyIf(
                     () ->
-                        coralSuperstructure.atTargetState()
+                        coralSuperstructure.atTargetState(queuedSetpoint)
                             && queuedSetpoint != CoralScorerSetpoint.NEUTRAL
-                            && !driver.povLeft().getAsBoolean()) // and outtake coral
+                            && !driver.povLeft().getAsBoolean()
+                            && ReefAlign.isWithinReefRange(
+                                drivetrain,
+                                ReefAlign.kMechanismDeadbandThreshold)) // and outtake coral
                 // .until(() -> !coralSuperstructure.hasCoral()) // until we don't have coral
-                .withTimeout(1) // timeout at 1 second
+                .withTimeout(0.5) // timeout at 1 second
                 .andThen(
                     // move arm up and go back down (only if we're already at the scoring setpoint
                     // state)
@@ -311,10 +319,12 @@ public class RobotContainer {
                         .goToSetpoint(
                             () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
                             () -> ElevatorArmConstants.kPreAlignAngle)
-                        .withTimeout(1)
-                    // .until(
-                    //     coralSuperstructure::atTargetState)
-                    ) // and then resume default command
+                        .until(
+                            () ->
+                                coralSuperstructure.atTargetState(
+                                    CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+                                    ElevatorArmConstants
+                                        .kPreAlignAngle))) // and then resume default command
                 // only if we're at the target state and are ready to score
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
@@ -329,26 +339,25 @@ public class RobotContainer {
                     () -> ElevatorArmConstants.kPreAlignAngle)
                 .until(
                     () ->
-                        coralSuperstructure.atTargetState()
-                            && ReefAlign.isWithinReefRange(
-                                drivetrain, ReefAlign.kMechanismDeadbandThreshold))
+                        coralSuperstructure.atTargetState(
+                            CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+                            ElevatorArmConstants.kPreAlignAngle))
                 .andThen(
                     // move the elevator up but keep arm up
                     coralSuperstructure
                         .goToSetpoint(
                             () -> queuedSetpoint.getElevatorHeight(),
                             () -> ElevatorArmConstants.kPreAlignAngle)
-                        .until(() -> coralSuperstructure.atTargetState())
+                        .until(
+                            () ->
+                                coralSuperstructure.atTargetState(
+                                    queuedSetpoint.getElevatorHeight(),
+                                    ElevatorArmConstants.kPreAlignAngle))
                         // then move arm down to setpoint
                         .andThen(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)))
-                // and only do this while we're in the zone (when we're not, we will
-                // stay in the pre-alignment position)
-                .onlyWhile(
-                    () ->
-                        ReefAlign.isWithinReefRange(
-                                drivetrain, ReefAlign.kMechanismDeadbandThreshold)
-                            && queuedSetpoint != CoralScorerSetpoint.NEUTRAL)
-                .repeatedly());
+            // and only do this while we're in the zone (when we're not, we will
+            // stay in the pre-alignment position)
+            );
 
     driver
         .leftTrigger()
@@ -360,11 +369,11 @@ public class RobotContainer {
                         .outtakeCoral()
                         .onlyIf(
                             () ->
-                                coralSuperstructure.atTargetState()
+                                coralSuperstructure.atTargetState(queuedSetpoint)
                                     && queuedSetpoint != CoralScorerSetpoint.NEUTRAL
                                     && !driver.povLeft().getAsBoolean())) // and outtake coral
                 // .until(() -> !coralSuperstructure.hasCoral()) // until we don't have coral
-                .withTimeout(1) // timeout at 1 second
+                .withTimeout(0.5) // timeout at 1 second
                 .andThen(
                     // move arm up and go back down (only if we're already at the scoring setpoint
                     // state)
@@ -373,7 +382,11 @@ public class RobotContainer {
                             () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
                             () -> ElevatorArmConstants.kPreAlignAngle)
                         .until(
-                            coralSuperstructure::atTargetState)) // and then resume default command
+                            () ->
+                                coralSuperstructure.atTargetState(
+                                    CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+                                    ElevatorArmConstants
+                                        .kPreAlignAngle))) // and then resume default command
                 // only if we're at the target state and are ready to score
 
                 .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
