@@ -91,6 +91,10 @@ public class CoralSuperstructure {
         .andThen(arm.goToAngle(() -> Degrees.of(armAngle.get())));
   }
 
+  public Elevator getElevator() {
+    return elevator;
+  }
+
   public enum CoralScorerSetpoint {
     // TODO: determine angles empirically
     NEUTRAL(

@@ -128,7 +128,7 @@ public class AutomaticAutonomousMaker3000 {
     this.coralSuperstructure = coralSuperstructure;
 
     preBuiltAuto.setDefaultOption("No Choice", PreBuiltAuto.CUSTOM);
-    preBuiltAuto.setDefaultOption("Taxi", PreBuiltAuto.TAXI);
+    preBuiltAuto.addOption("Taxi", PreBuiltAuto.TAXI);
     preBuiltAuto.addOption("TopAuto", PreBuiltAuto.TOPAUTO);
     preBuiltAuto.addOption("MidTopAuto", PreBuiltAuto.MIDTOPAUTO);
     preBuiltAuto.addOption("MidBotAuto", PreBuiltAuto.MIDBOTAUTO);
@@ -215,7 +215,9 @@ public class AutomaticAutonomousMaker3000 {
   public PathsAndAuto buildAuto(CycleAutoConfig config) {
     pathError = "";
     try {
-      Command auto = Commands.none();
+      Command auto =
+          Commands.waitUntil(() -> coralSuperstructure.getElevator().elevatorIsHomed())
+              .withTimeout(2);
       List<PathPlannerPath> paths = new ArrayList<>();
 
       ReefSide lastReefSide = config.scoringGroup.get(0).reefSide;
