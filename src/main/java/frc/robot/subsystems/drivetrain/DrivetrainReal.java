@@ -33,6 +33,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.util.MyAlliance;
 import java.util.function.DoubleSupplier;
@@ -68,6 +70,8 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
 
   private final SwerveDrivePoseEstimator reefPoseEstimator;
 
+  private final Field2d poseField = new Field2d();
+
   private Pose2d alignmentSetpoint = Pose2d.kZero;
 
   public DrivetrainReal(
@@ -81,6 +85,8 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     this.reefPoseEstimator =
         new SwerveDrivePoseEstimator(
             getKinematics(), getHeading(), getModulePositions(), getPose());
+
+    SmartDashboard.putData("Drivetrain Pose Field", poseField);
   }
 
   @Override
@@ -359,5 +365,7 @@ public class DrivetrainReal extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                 lastAlliance = allianceColor;
               });
     }
+
+    poseField.setRobotPose(getPose());
   }
 }

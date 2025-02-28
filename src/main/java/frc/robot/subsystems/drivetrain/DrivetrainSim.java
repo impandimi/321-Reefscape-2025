@@ -80,7 +80,7 @@ public class DrivetrainSim implements SwerveDrive {
 
     // A field2d widget for debugging
     field2d = new Field2d();
-    SmartDashboard.putData("simulation field", field2d);
+    SmartDashboard.putData("Drivetrain Pose Field", field2d);
 
     this.reefPoseEstimator =
         new SwerveDrivePoseEstimator(
