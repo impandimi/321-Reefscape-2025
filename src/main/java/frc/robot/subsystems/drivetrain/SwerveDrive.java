@@ -161,6 +161,7 @@ public interface SwerveDrive extends Subsystem {
               xPoseController.reset();
               yPoseController.reset();
               thetaController.reset();
+              setAlignmentSetpoint(pose.get());
             })
         .andThen(run(() -> driveToFieldPose(pose.get())));
   }

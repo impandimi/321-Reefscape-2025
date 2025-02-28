@@ -217,6 +217,10 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             StationAlign.rotateToNearestStationTag(drivetrain, driverForward, driverStrafe)
+                .onlyWhile(() -> StationAlign.getStationDistance(drivetrain) < 1.5)
+                .andThen(drivetrain.teleopDrive(driverForward, driverStrafe, driverTurn))
+                .until(() -> StationAlign.getStationDistance(drivetrain) < 1.5)
+                .repeatedly()
                 .alongWith(coralSuperstructure.feedCoral().asProxy().repeatedly()));
 
     // coral outtake

@@ -39,7 +39,7 @@ public class AutomaticAutonomousMaker3000 {
           StartingPosition.TOP,
           List.of(
               new ScoringGroup(
-                  FeedLocation.UPCORAL, ReefSide.REEFR1, Pole.RIGHTPOLE, Level.L1, CoralSide.LEFT),
+                  FeedLocation.UPCORAL, ReefSide.REEFR1, Pole.RIGHTPOLE, Level.L4, CoralSide.LEFT),
               new ScoringGroup(
                   FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4, CoralSide.LEFT),
               new ScoringGroup(
@@ -54,7 +54,7 @@ public class AutomaticAutonomousMaker3000 {
           StartingPosition.MIDDLE,
           List.of(
               new ScoringGroup(
-                  FeedLocation.UPCORAL, ReefSide.REEFR2, Pole.RIGHTPOLE, Level.L1, CoralSide.LEFT),
+                  FeedLocation.UPCORAL, ReefSide.REEFR2, Pole.RIGHTPOLE, Level.L4, CoralSide.LEFT),
               new ScoringGroup(
                   FeedLocation.UPCORAL, ReefSide.REEFL1, Pole.LEFTPOLE, Level.L4, CoralSide.LEFT),
               new ScoringGroup(
@@ -69,7 +69,7 @@ public class AutomaticAutonomousMaker3000 {
           StartingPosition.MIDDLE,
           List.of(
               new ScoringGroup(
-                  FeedLocation.DOWNCORAL, ReefSide.REEFR2, Pole.LEFTPOLE, Level.L1, CoralSide.LEFT),
+                  FeedLocation.DOWNCORAL, ReefSide.REEFR2, Pole.LEFTPOLE, Level.L4, CoralSide.LEFT),
               new ScoringGroup(
                   FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.LEFTPOLE, Level.L4, CoralSide.LEFT),
               new ScoringGroup(
@@ -86,8 +86,8 @@ public class AutomaticAutonomousMaker3000 {
               new ScoringGroup(
                   FeedLocation.DOWNCORAL,
                   ReefSide.REEFR2,
-                  Pole.LEFTPOLE,
-                  Level.L1,
+                  Pole.RIGHTPOLE,
+                  Level.L4,
                   CoralSide.LEFT)));
 
   private static CycleAutoConfig kMidLaneOppositeSideAuto =
@@ -95,12 +95,12 @@ public class AutomaticAutonomousMaker3000 {
           StartingPosition.MIDDLE,
           List.of(
               new ScoringGroup(
-                  FeedLocation.DOWNCORAL, ReefSide.REEFL2, Pole.LEFTPOLE, Level.L1, CoralSide.LEFT),
+                  FeedLocation.DOWNCORAL, ReefSide.REEFL2, Pole.LEFTPOLE, Level.L4, CoralSide.LEFT),
               new ScoringGroup(
                   FeedLocation.DOWNCORAL,
                   ReefSide.REEFL3,
                   Pole.LEFTPOLE,
-                  Level.L1,
+                  Level.L4,
                   CoralSide.LEFT)));
 
   private static CycleAutoConfig kBotLaneAuto =
@@ -108,7 +108,7 @@ public class AutomaticAutonomousMaker3000 {
           StartingPosition.BOTTOM,
           List.of(
               new ScoringGroup(
-                  FeedLocation.DOWNCORAL, ReefSide.REEFR3, Pole.LEFTPOLE, Level.L1, CoralSide.LEFT),
+                  FeedLocation.DOWNCORAL, ReefSide.REEFR3, Pole.LEFTPOLE, Level.L4, CoralSide.LEFT),
               new ScoringGroup(
                   FeedLocation.DOWNCORAL, ReefSide.REEFL3, Pole.LEFTPOLE, Level.L4, CoralSide.LEFT),
               new ScoringGroup(
@@ -318,11 +318,13 @@ public class AutomaticAutonomousMaker3000 {
                 .alongWith(coralSuperstructure.goToSetpoint(() -> setpoint).asProxy())
                 .asProxy()
                 .withDeadline(
-                    coralSuperstructure
-                        .outtakeCoral()
-                        .asProxy()
-                        // .until(() -> !coralSuperstructure.hasCoral())
-                        .withTimeout(0.5)))
+                    Commands.waitSeconds(1)
+                        .andThen(
+                            coralSuperstructure
+                                .outtakeCoral()
+                                .asProxy()
+                                // .until(() -> !coralSuperstructure.hasCoral())
+                                .withTimeout(0.5))))
         .finallyDo(
             () -> {
               // yucky. This is to prevent us from smashing into reef

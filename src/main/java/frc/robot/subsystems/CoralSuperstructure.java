@@ -96,11 +96,11 @@ public class CoralSuperstructure {
     NEUTRAL(
         ElevatorConstants.kElevatorStartingHeight.plus(Meters.of(0.1)),
         Degrees.of(-40)), // TODO: make
-    FEED_CORAL(Meters.of(0.95), Degrees.of(-80)),
+    FEED_CORAL(Meters.of(0.975), Degrees.of(-87)),
     L1(Inches.of(45), Degrees.of(30)), // TODO: actually tune
-    L2(Meters.of(0.9), Degrees.of(95)),
-    L3(Meters.of(1.32), Degrees.of(95)),
-    L4(Meters.of(2), Degrees.of(85)),
+    L2(Meters.of(0.96), Degrees.of(95)),
+    L3(Meters.of(1.38), Degrees.of(95)),
+    L4(Meters.of(2.06), Degrees.of(85)),
     ALGAE_LOW(Meters.of(1), Degrees.of(40)), // TODO: actually tune
     ALGAE_HIGH(Meters.of(1.4), Degrees.of(40)), // TODO: actually tune
     CLIMB(Meters.of(1.4), Degrees.of(0));

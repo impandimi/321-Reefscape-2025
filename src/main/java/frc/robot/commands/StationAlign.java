@@ -174,4 +174,11 @@ public class StationAlign {
                 .getRotation()
                 .plus(kStationAlignmentRotation));
   }
+
+  public static double getStationDistance(SwerveDrive swerveDrive) {
+    return swerveDrive
+        .getPose()
+        .getTranslation()
+        .getDistance(getNearestStationPose(swerveDrive.getPose()).getTranslation());
+  }
 }
