@@ -281,7 +281,12 @@ public class AutomaticAutonomousMaker3000 {
           case MIDDLE -> StationAlign.goToNearestCenterAlign(drive);
           case RIGHT -> StationAlign.goToNearestRightAlign(drive);
         };
-    return path.deadlineFor(coralSuperstructure.feedCoral().asProxy())
+    return path.deadlineFor(
+            coralSuperstructure
+                .goToSetpoint(
+                    () -> CoralScorerSetpoint.NEUTRAL.getElevatorHeight(),
+                    () -> ElevatorArmConstants.kPreAlignAngle)
+                .asProxy())
         .andThen(
             pathCmd
                 .asProxy()
