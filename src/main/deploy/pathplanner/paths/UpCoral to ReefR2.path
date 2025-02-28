@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.4984631147540983,
-        "y": 7.171772540983605
+        "x": 1.234733606557377,
+        "y": 7.051895491803278
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.0139344262295085,
-        "y": 6.944006147540984
+        "x": 1.7502049180327879,
+        "y": 6.824129098360657
       },
       "isLocked": false,
-      "linkedName": "UpCoral"
+      "linkedName": "UpCoralMiddle"
     },
     {
       "anchor": {
@@ -40,22 +40,22 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 1200.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 1.5,
     "rotation": 180.0
   },
   "reversed": false,
   "folder": "Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -52.85531156141885
+    "rotation": -52.76104810819125
   },
   "useDefaultConstraints": true
 }

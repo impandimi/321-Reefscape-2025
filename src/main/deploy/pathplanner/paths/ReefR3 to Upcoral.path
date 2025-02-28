@@ -4,28 +4,28 @@
     {
       "anchor": {
         "x": 5.3105532786885234,
-        "y": 2.6883709016393436
+        "y": 2.62843237704918
       },
       "prevControl": null,
       "nextControl": {
         "x": 2.90470081967213,
-        "y": 0.7266229508196727
+        "y": 0.6666844262295091
       },
       "isLocked": false,
       "linkedName": "ReefR3"
     },
     {
       "anchor": {
-        "x": 1.4984631147540983,
-        "y": 7.171772540983605
+        "x": 1.234733606557377,
+        "y": 7.051895491803278
       },
       "prevControl": {
-        "x": 1.7262295081967207,
-        "y": 5.313678278688524
+        "x": 1.4624999999999995,
+        "y": 5.193801229508197
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "UpCoral"
+      "linkedName": "UpCoralMiddle"
     }
   ],
   "rotationTargets": [],
@@ -40,16 +40,16 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 2.0,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 1200.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -52.85531156141885
+    "velocity": 1.5,
+    "rotation": -52.76104810819125
   },
   "reversed": false,
   "folder": "Paths",
