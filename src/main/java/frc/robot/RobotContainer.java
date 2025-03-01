@@ -91,8 +91,8 @@ public class RobotContainer {
   private DoubleSupplier driverTurn = () -> -MathUtil.applyDeadband(driver.getRightX(), 0.05) * 5;
 
   // robot queued states
-  private ReefPosition queuedReefPosition = ReefPosition.NONE;
-  private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.NEUTRAL;
+  private ReefPosition queuedReefPosition = ReefPosition.RIGHT;
+  private CoralScorerSetpoint queuedSetpoint = CoralScorerSetpoint.L4;
 
   private SuperstructureVisualizer stateVisualizer =
       new SuperstructureVisualizer(
