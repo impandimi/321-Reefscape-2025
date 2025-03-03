@@ -227,6 +227,8 @@ public class RobotContainer {
     // driver.y().toggleOnTrue(algaeSuperstructure.prepareClimb());
     // driver.a().onTrue(algaeSuperstructure.climb());
 
+    driver.y().whileTrue(coralSuperstructure.feedCoral());
+
     // --- CORAL AUTOMATED CONTROLS ---
 
     // coral feeding
@@ -445,7 +447,7 @@ public class RobotContainer {
                                     .getElevator()
                                     .atHeight(CoralScorerSetpoint.NEUTRAL.getElevatorHeight()))
                         .andThen(coralSuperstructure.goToSetpoint(() -> queuedSetpoint)))
-                .alongWith(coralSuperstructure.outtakeCoral()));
+                .alongWith(coralSuperstructure.knockAlgae()));
 
     // --- ALGAE AUTOMATED CONTROLS ---
 
