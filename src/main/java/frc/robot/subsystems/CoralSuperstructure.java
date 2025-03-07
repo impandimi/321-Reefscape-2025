@@ -104,7 +104,7 @@ public class CoralSuperstructure {
     // TODO: determine angles empirically
     NEUTRAL(
         ElevatorConstants.kElevatorStartingHeight.plus(Meters.of(0.1)),
-        Degrees.of(-40)), // TODO: make
+        Degrees.of(85)), // TODO: make
     FEED_CORAL(Meters.of(0.965), Degrees.of(-87)),
     L1(Inches.of(45), Degrees.of(30)), // TODO: actually tune
     L2(Meters.of(0.95).minus(Inches.of(0.5)), Degrees.of(95)),
